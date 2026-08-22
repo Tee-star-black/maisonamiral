@@ -7,6 +7,16 @@ export function generateStaticParams() {
   return products.map((product) => ({ slug: product.slug }));
 }
 
+function Placeholder({ name, position }: { name: string; position: string }) {
+  return (
+    <div className="product-placeholder">
+      <span>Maison Amiral / Edition 001</span>
+      <strong>{name}</strong>
+      <small>{position} image pending</small>
+    </div>
+  );
+}
+
 export default async function ProductPage({
   params,
 }: {
@@ -43,45 +53,61 @@ export default async function ProductPage({
       <section className="product-layout">
         <div className="product-gallery">
           <div className="product-gallery-item product-gallery-editorial">
-            <Image
-              src={product.images.editorialFront}
-              alt={product.name}
-              fill
-              sizes="(max-width: 900px) 100vw, 60vw"
-              className="cover-image"
-              priority
-            />
+            {product.images.editorialFront ? (
+              <Image
+                src={product.images.editorialFront}
+                alt={product.name}
+                fill
+                sizes="(max-width: 900px) 100vw, 60vw"
+                className="cover-image"
+                priority
+              />
+            ) : (
+              <Placeholder name={product.shortName} position="Editorial front" />
+            )}
           </div>
 
           <div className="product-gallery-pair">
             <div className="product-gallery-item product-gallery-clean">
-              <Image
-                src={product.images.front}
-                alt={`Front view of ${product.name}`}
-                fill
-                sizes="(max-width: 900px) 100vw, 30vw"
-                className="contain-image"
-              />
+              {product.images.front ? (
+                <Image
+                  src={product.images.front}
+                  alt={`Front view of ${product.name}`}
+                  fill
+                  sizes="(max-width: 900px) 100vw, 30vw"
+                  className="contain-image"
+                />
+              ) : (
+                <Placeholder name={product.shortName} position="Front" />
+              )}
             </div>
             <div className="product-gallery-item product-gallery-dark">
-              <Image
-                src={product.images.back}
-                alt={`Back view of ${product.name}`}
-                fill
-                sizes="(max-width: 900px) 100vw, 30vw"
-                className="contain-image"
-              />
+              {product.images.back ? (
+                <Image
+                  src={product.images.back}
+                  alt={`Back view of ${product.name}`}
+                  fill
+                  sizes="(max-width: 900px) 100vw, 30vw"
+                  className="contain-image"
+                />
+              ) : (
+                <Placeholder name={product.shortName} position="Back" />
+              )}
             </div>
           </div>
 
           <div className="product-gallery-item product-gallery-editorial product-gallery-last">
-            <Image
-              src={product.images.editorialBack}
-              alt={`Editorial back view of ${product.name}`}
-              fill
-              sizes="(max-width: 900px) 100vw, 60vw"
-              className="cover-image"
-            />
+            {product.images.editorialBack ? (
+              <Image
+                src={product.images.editorialBack}
+                alt={`Editorial back view of ${product.name}`}
+                fill
+                sizes="(max-width: 900px) 100vw, 60vw"
+                className="cover-image"
+              />
+            ) : (
+              <Placeholder name={product.shortName} position="Editorial back" />
+            )}
           </div>
         </div>
 
@@ -94,6 +120,10 @@ export default async function ProductPage({
             </div>
 
             <p className="product-panel-description">{product.description}</p>
+
+            {product.assetStatus === "awaiting-images" && (
+              <p className="archive-note">Archive imagery is being restored. Product details and sizing are already available.</p>
+            )}
 
             <div className="size-block">
               <div className="size-heading">
@@ -123,17 +153,11 @@ export default async function ProductPage({
             <div className="product-service-notes">
               <details>
                 <summary>Shipping</summary>
-                <p>
-                  South African delivery information will be confirmed at
-                  checkout.
-                </p>
+                <p>South African delivery information will be confirmed at checkout.</p>
               </details>
               <details>
                 <summary>Returns</summary>
-                <p>
-                  Returns are subject to the Maison Amiral returns policy and
-                  item condition requirements.
-                </p>
+                <p>Returns are subject to the Maison Amiral returns policy and item condition requirements.</p>
               </details>
             </div>
 
