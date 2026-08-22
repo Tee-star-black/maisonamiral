@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { CartLink } from "@/components/cart/CartLink";
 import { formatPrice, products } from "@/data/products";
 
 function ProductVisual({ product, index }: { product: (typeof products)[number]; index: number }) {
@@ -31,10 +32,7 @@ export default function ShopPage() {
   return (
     <main className="shop-page">
       <header className="site-header shop-header">
-        <Link className="brand" href="/" aria-label="Maison Amiral home">
-          MAISON AMIRAL
-        </Link>
-
+        <Link className="brand" href="/" aria-label="Maison Amiral home">MAISON AMIRAL</Link>
         <nav className="desktop-nav" aria-label="Primary navigation">
           <Link href="/shop">Shop</Link>
           <Link href="/collections">Collections</Link>
@@ -42,10 +40,9 @@ export default function ShopPage() {
           <Link href="/editorial">Editorial</Link>
           <Link href="/journal">Journal</Link>
         </nav>
-
         <div className="header-actions" aria-label="Store actions">
           <Link href="/search">Search</Link>
-          <Link href="/cart">Bag · 0</Link>
+          <CartLink />
         </div>
       </header>
 
@@ -54,18 +51,9 @@ export default function ShopPage() {
           <p className="eyebrow">Maison Amiral / Shop</p>
           <span className="shop-count">{products.length.toString().padStart(2, "0")} objects</span>
         </div>
-
-        <h1>
-          Edition
-          <br />
-          001.
-        </h1>
-
+        <h1>Edition<br />001.</h1>
         <div className="shop-intro-copy">
-          <p>
-            The first Maison Amiral release. Quiet graphics, deliberate form and
-            pieces intended to live beyond a single season.
-          </p>
+          <p>The first Maison Amiral release. Quiet graphics, deliberate form and pieces intended to live beyond a single season.</p>
           <p>Johannesburg, South Africa.</p>
         </div>
       </section>
@@ -75,25 +63,17 @@ export default function ShopPage() {
           <article className="shop-card" key={product.slug}>
             <Link className="shop-card-image" href={`/product/${product.slug}`}>
               <ProductVisual product={product} index={index} />
-              <span className="shop-card-number">
-                {(index + 1).toString().padStart(2, "0")}
-              </span>
+              <span className="shop-card-number">{(index + 1).toString().padStart(2, "0")}</span>
             </Link>
-
             <div className="shop-card-info">
               <div>
                 <p className="product-index">{product.collection}</p>
-                <Link href={`/product/${product.slug}`}>
-                  <h2>{product.shortName}</h2>
-                </Link>
+                <Link href={`/product/${product.slug}`}><h2>{product.shortName}</h2></Link>
                 <p>{product.description}</p>
               </div>
-
               <div className="shop-card-side">
                 <span>{formatPrice(product.price)}</span>
-                <Link className="text-link" href={`/product/${product.slug}`}>
-                  View piece <span aria-hidden="true">↗</span>
-                </Link>
+                <Link className="text-link" href={`/product/${product.slug}`}>View piece <span aria-hidden="true">↗</span></Link>
               </div>
             </div>
           </article>
@@ -102,13 +82,8 @@ export default function ShopPage() {
 
       <section className="shop-closing section-pad">
         <p className="eyebrow">House note / 001</p>
-        <p className="shop-closing-copy">
-          We release slowly. Each object earns its place before it enters the
-          collection.
-        </p>
-        <Link className="text-link" href="/editorial">
-          Read the editorial <span aria-hidden="true">↗</span>
-        </Link>
+        <p className="shop-closing-copy">We release slowly. Each object earns its place before it enters the collection.</p>
+        <Link className="text-link" href="/editorial">Read the editorial <span aria-hidden="true">↗</span></Link>
       </section>
     </main>
   );
