@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { CartLink } from "@/components/cart/CartLink";
 import { useCart } from "@/components/cart/CartProvider";
 import { formatPrice, getProduct } from "@/data/products";
@@ -31,7 +32,8 @@ const initialFields: CheckoutFields = {
 };
 
 export default function CheckoutPage() {
-  const { items, subtotal, hydrated } = useCart();
+  const router = useRouter();
+  const { items, subtotal, hydrated, clearCart } = useCart();
   const [fields, setFields] = useState(initialFields);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,37 +50,35 @@ export default function CheckoutPage() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!items.length) return;
+
     setSubmitting(true);
     setError(null);
 
     try {
-      const response = await fetch("/api/payfast", {
+      const response = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ customer: fields, items }),
       });
+
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error ?? "Unable to prepare payment.");
+      if (!response.ok) throw new Error(payload.error ?? "Unable to create your order.");
 
       window.localStorage.setItem(
-        "maison-amiral-pending-order",
-        JSON.stringify({ orderId: payload.orderId, customer: fields, items, subtotal, createdAt: new Date().toISOString() }),
+        "maison-amiral-last-order",
+        JSON.stringify({
+          orderId: payload.orderId,
+          customer: fields,
+          items,
+          total: payload.total,
+          createdAt: new Date().toISOString(),
+        }),
       );
 
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = payload.action;
-      Object.entries(payload.fields as Record<string, string>).forEach(([name, value]) => {
-        const input = document.createElement("input");
-        input.type = "hidden";
-        input.name = name;
-        input.value = value;
-        form.appendChild(input);
-      });
-      document.body.appendChild(form);
-      form.submit();
+      clearCart();
+      router.push(`/order/confirmed?order=${encodeURIComponent(payload.orderId)}`);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Unable to prepare payment.");
+      setError(cause instanceof Error ? cause.message : "Unable to create your order.");
       setSubmitting(false);
     }
   }
@@ -128,12 +128,23 @@ export default function CheckoutPage() {
             </div>
           </div>
 
+          <div className="form-section">
+            <h2>Payment method</h2>
+            <div className="eft-method-card">
+              <div>
+                <strong>Electronic funds transfer (EFT)</strong>
+                <p>Your invoice, banking details and unique payment reference will be emailed to the address above after you place the order.</p>
+              </div>
+              <span>Manual EFT</span>
+            </div>
+          </div>
+
           {error && <p className="checkout-error">{error}</p>}
           <button className="pay-button" type="submit" disabled={submitting || !hydrated}>
-            <span>{submitting ? "Opening secure payment…" : "Continue to PayFast"}</span>
+            <span>{submitting ? "Creating order…" : "Place order"}</span>
             <span>{formatPrice(subtotal)}</span>
           </button>
-          <p className="secure-note">You will be redirected to PayFast to complete payment securely.</p>
+          <p className="secure-note">No card payment is taken on this website. Your EFT instructions will be sent by email after the order is created.</p>
         </form>
 
         <aside className="checkout-summary">
