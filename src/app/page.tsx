@@ -120,7 +120,10 @@ export default function Home() {
         </div>
 
         <div className="product-showcase">
-          <Link className="product-image product-image-main" href="/shop">
+          <Link
+            className="product-image product-image-main"
+            href="/product/emblem-tee"
+          >
             <Image
               src="/products/emblem/front-edit.jpeg"
               alt="Maison Amiral Flagship Emblem Tee"
@@ -131,7 +134,10 @@ export default function Home() {
           </Link>
 
           <div className="product-side">
-            <div className="product-side-image">
+            <Link
+              className="product-side-image"
+              href="/product/emblem-tee"
+            >
               <Image
                 src="/products/emblem/back-editorial.jpeg"
                 alt="Back detail of the Maison Amiral Flagship Emblem Tee"
@@ -139,12 +145,14 @@ export default function Home() {
                 sizes="(max-width: 800px) 100vw, 35vw"
                 className="cover-image"
               />
-            </div>
+            </Link>
 
             <div className="product-meta">
               <div>
                 <p className="product-index">01 / Flagship</p>
-                <h3>Emblem Tee</h3>
+                <Link href="/product/emblem-tee">
+                  <h3>Emblem Tee</h3>
+                </Link>
                 <p className="product-description">
                   A restrained house staple built around the Maison Amiral
                   emblem and the visual language of the first collection.
