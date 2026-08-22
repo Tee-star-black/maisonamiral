@@ -2,6 +2,31 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatPrice, products } from "@/data/products";
 
+function ProductVisual({ product, index }: { product: (typeof products)[number]; index: number }) {
+  const image = product.images.editorialFront;
+
+  if (image) {
+    return (
+      <Image
+        src={image}
+        alt={product.name}
+        fill
+        sizes="(max-width: 800px) 100vw, 50vw"
+        className="cover-image"
+        priority={index === 0}
+      />
+    );
+  }
+
+  return (
+    <div className="shop-placeholder" aria-label={`${product.name} image pending`}>
+      <span className="shop-placeholder-label">Edition 001</span>
+      <strong>{product.shortName}</strong>
+      <span className="shop-placeholder-note">Archive image pending</span>
+    </div>
+  );
+}
+
 export default function ShopPage() {
   return (
     <main className="shop-page">
@@ -27,7 +52,7 @@ export default function ShopPage() {
       <section className="shop-intro section-pad">
         <div className="shop-intro-top">
           <p className="eyebrow">Maison Amiral / Shop</p>
-          <span className="shop-count">{products.length.toString().padStart(2, "0")} object</span>
+          <span className="shop-count">{products.length.toString().padStart(2, "0")} objects</span>
         </div>
 
         <h1>
@@ -49,14 +74,7 @@ export default function ShopPage() {
         {products.map((product, index) => (
           <article className="shop-card" key={product.slug}>
             <Link className="shop-card-image" href={`/product/${product.slug}`}>
-              <Image
-                src={product.images.editorialFront}
-                alt={product.name}
-                fill
-                sizes="(max-width: 800px) 100vw, 70vw"
-                className="cover-image"
-                priority={index === 0}
-              />
+              <ProductVisual product={product} index={index} />
               <span className="shop-card-number">
                 {(index + 1).toString().padStart(2, "0")}
               </span>
