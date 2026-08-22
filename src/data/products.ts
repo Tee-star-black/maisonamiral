@@ -36,10 +36,10 @@ export const products: Product[] = [
     sizes: ["S", "M", "L", "XL"],
     assetStatus: "ready",
     images: {
-      front: "/products/emblem/front.jpeg",
-      back: "/products/emblem/back.jpeg",
-      editorialFront: "/products/emblem/front-edit.jpeg",
-      editorialBack: "/products/emblem/back-editorial.jpeg",
+      front: "/products/emblem-tee/front.jpeg",
+      back: "/products/emblem-tee/back.jpeg",
+      editorialFront: "/products/emblem-tee/frontedit.jpeg",
+      editorialBack: "/products/emblem-tee/back2.jpeg",
     },
   },
   {
@@ -58,8 +58,13 @@ export const products: Product[] = [
       "Designed in Johannesburg",
     ],
     sizes: ["S", "M", "L", "XL"],
-    assetStatus: "awaiting-images",
-    images: {},
+    assetStatus: "ready",
+    images: {
+      front: "/products/car-capsule/front.jpg",
+      back: "/products/car-capsule/back.jpg",
+      editorialFront: "/products/car-capsule/Automobile1.jpeg",
+      editorialBack: "/products/car-capsule/back2.jpeg",
+    },
   },
   {
     slug: "guerrilla-tee",
@@ -77,8 +82,13 @@ export const products: Product[] = [
       "Designed in Johannesburg",
     ],
     sizes: ["S", "M", "L", "XL"],
-    assetStatus: "awaiting-images",
-    images: {},
+    assetStatus: "ready",
+    images: {
+      front: "/products/flagship-inc/front.jpg",
+      back: "/products/flagship-inc/detail.jpg",
+      editorialFront: "/products/flagship-inc/Guerilla1.jpeg",
+      editorialBack: "/products/flagship-inc/Gedit.jpeg",
+    },
   },
   {
     slug: "flag-staple-tee",
