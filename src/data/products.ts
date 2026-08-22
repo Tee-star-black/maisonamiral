@@ -90,25 +90,6 @@ export const products: Product[] = [
       editorialBack: "/products/flagship-inc/Gedit.jpeg",
     },
   },
-  {
-    slug: "flag-staple-tee",
-    name: "Flag Staple Tee",
-    shortName: "Flag Staple Tee",
-    price: 450,
-    currency: "ZAR",
-    collection: "Edition 001",
-    description:
-      "A house staple built around the flag motif, carrying Maison Amiral's maritime codes into a simple everyday uniform.",
-    details: [
-      "Relaxed unisex silhouette",
-      "Maison Amiral flag motif",
-      "Edition 001 release",
-      "Designed in Johannesburg",
-    ],
-    sizes: ["S", "M", "L", "XL"],
-    assetStatus: "awaiting-images",
-    images: {},
-  },
 ];
 
 export function getProduct(slug: string) {
