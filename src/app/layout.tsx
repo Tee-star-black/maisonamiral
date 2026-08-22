@@ -5,6 +5,7 @@ import "./globals.css";
 import "./store.css";
 import "./catalogue.css";
 import "./checkout.css";
+import "./purchase.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
