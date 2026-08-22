@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { useCart } from "@/components/cart/CartProvider";
 
 type PendingOrder = {
@@ -12,23 +11,27 @@ type PendingOrder = {
 };
 
 export default function PaymentSuccessPage() {
-  const searchParams = useSearchParams();
   const { clearCart } = useCart();
   const [order, setOrder] = useState<PendingOrder | null>(null);
+  const [orderId, setOrderId] = useState("Maison Amiral order");
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
     const raw = window.localStorage.getItem("maison-amiral-pending-order");
+    let stored: PendingOrder | null = null;
+
     if (raw) {
       try {
-        setOrder(JSON.parse(raw) as PendingOrder);
+        stored = JSON.parse(raw) as PendingOrder;
+        setOrder(stored);
       } catch {
-        setOrder(null);
+        stored = null;
       }
     }
+
+    setOrderId(params.get("order") || stored?.orderId || "Maison Amiral order");
     clearCart();
   }, [clearCart]);
-
-  const orderId = searchParams.get("order") || order?.orderId || "Maison Amiral order";
 
   return (
     <main className="payment-result-page">
