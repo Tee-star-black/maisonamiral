@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const navItems = [
@@ -11,8 +12,20 @@ const navItems = [
 export default function Home() {
   return (
     <main>
-      <section className="hero">
-        <header className="site-header">
+      <section className="hero hero-media">
+        <video
+          className="hero-video"
+          src="/video/flag.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          aria-hidden="true"
+        />
+        <div className="hero-shade" />
+
+        <header className="site-header hero-header">
           <Link className="brand" href="/" aria-label="Maison Amiral home">
             MAISON AMIRAL
           </Link>
@@ -31,7 +44,7 @@ export default function Home() {
           </div>
         </header>
 
-        <div className="hero-grid">
+        <div className="hero-grid hero-content">
           <div className="hero-kicker">
             <span>Johannesburg</span>
             <span>Edition 001</span>
@@ -71,10 +84,30 @@ export default function Home() {
               Maison Amiral lives between tailoring and street culture,
               machinery and memory, restraint and rebellion.
             </p>
-            <p>
-              We make pieces that do not ask for attention. They hold it.
-            </p>
+            <p>We make pieces that do not ask for attention. They hold it.</p>
           </div>
+        </div>
+      </section>
+
+      <section className="wheel-story section-pad">
+        <div className="wheel-copy">
+          <p className="eyebrow">Motion / Form</p>
+          <h2>Built around movement.</h2>
+          <p>
+            Mechanical forms, maritime codes and South African street culture
+            collide in a uniform designed to move between worlds.
+          </p>
+        </div>
+
+        <div className="wheel-wrap" aria-hidden="true">
+          <Image
+            className="wheel-image"
+            src="/graphics/wheel.png"
+            alt=""
+            width={1100}
+            height={1100}
+            priority={false}
+          />
         </div>
       </section>
 
@@ -86,25 +119,74 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="product-stage">
-          <div className="product-art" aria-hidden="true">
-            <span className="product-art-word">AMIRAL</span>
-          </div>
+        <div className="product-showcase">
+          <Link className="product-image product-image-main" href="/shop">
+            <Image
+              src="/products/emblem/front-edit.jpeg"
+              alt="Maison Amiral Flagship Emblem Tee"
+              fill
+              sizes="(max-width: 800px) 100vw, 65vw"
+              className="cover-image"
+            />
+          </Link>
 
-          <div className="product-meta">
-            <div>
-              <p className="product-index">01</p>
-              <h3>Flagship Emblem Tee</h3>
+          <div className="product-side">
+            <div className="product-side-image">
+              <Image
+                src="/products/emblem/back-editorial.jpeg"
+                alt="Back detail of the Maison Amiral Flagship Emblem Tee"
+                fill
+                sizes="(max-width: 800px) 100vw, 35vw"
+                className="cover-image"
+              />
             </div>
-            <div className="product-price">R450</div>
+
+            <div className="product-meta">
+              <div>
+                <p className="product-index">01 / Flagship</p>
+                <h3>Emblem Tee</h3>
+                <p className="product-description">
+                  A restrained house staple built around the Maison Amiral
+                  emblem and the visual language of the first collection.
+                </p>
+              </div>
+              <div className="product-price">R450</div>
+            </div>
           </div>
+        </div>
+      </section>
+
+      <section className="product-detail-strip">
+        <div className="detail-image">
+          <Image
+            src="/products/emblem/front.jpeg"
+            alt="Front of Maison Amiral Emblem Tee"
+            fill
+            sizes="50vw"
+            className="contain-image"
+          />
+        </div>
+        <div className="detail-image dark-detail">
+          <Image
+            src="/products/emblem/back.jpeg"
+            alt="Back of Maison Amiral Emblem Tee"
+            fill
+            sizes="50vw"
+            className="contain-image"
+          />
         </div>
       </section>
 
       <section className="editorial-banner">
         <div className="editorial-overlay">
           <p className="eyebrow light">Editorial / Vol. 01</p>
-          <h2>Shadow.<br />Structure.<br />Movement.</h2>
+          <h2>
+            Shadow.
+            <br />
+            Structure.
+            <br />
+            Movement.
+          </h2>
           <Link className="text-link light" href="/editorial">
             Read the statement <span aria-hidden="true">↗</span>
           </Link>
