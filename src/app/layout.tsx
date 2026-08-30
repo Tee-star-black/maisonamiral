@@ -4,6 +4,7 @@ import { CartProvider } from "@/components/cart/CartProvider";
 import { SiteFrame } from "@/components/layout/SiteFrame";
 import "./globals.css";
 import "./nav-balance.css";
+import "./footer.css";
 import "./store.css";
 import "./catalogue.css";
 import "./checkout.css";
