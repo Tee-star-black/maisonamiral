@@ -1,0 +1,103 @@
+.global-nav {
+  grid-template-columns: minmax(0, 1fr) 96px minmax(0, 1fr) !important;
+  column-gap: 20px;
+}
+
+.global-nav-side {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.global-nav-left {
+  padding-right: 14px;
+}
+
+.global-nav-right {
+  padding-left: 14px;
+}
+
+.global-nav-left > a,
+.global-nav-right > a,
+.global-nav-right > .nav-cart {
+  display: flex;
+  align-items: center;
+  min-height: 68px;
+}
+
+.global-nav-left > a:nth-child(1) { justify-content: flex-start; }
+.global-nav-left > a:nth-child(2) { justify-content: center; }
+.global-nav-left > a:nth-child(3) { justify-content: flex-end; }
+
+.global-nav-right > a:nth-child(1) { justify-content: flex-start; }
+.global-nav-right > a:nth-child(2) { justify-content: center; }
+.global-nav-right > .nav-cart { justify-content: flex-end; }
+
+.global-nav-side > a,
+.nav-cart > a {
+  position: relative;
+  width: fit-content;
+  white-space: nowrap;
+}
+
+.global-nav-side > a::after,
+.nav-cart > a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 220ms ease;
+}
+
+.global-nav-side > a:hover::after,
+.global-nav-side > a.is-active::after,
+.nav-cart:hover > a::after,
+.nav-cart.is-active > a::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.global-ship-mark {
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  transform: none !important;
+  justify-self: center;
+}
+
+.page-shop .global-ship-mark,
+.page-collections .global-ship-mark,
+.page-product .global-ship-mark {
+  animation: none !important;
+}
+
+@media (max-width: 900px) {
+  .global-nav {
+    grid-template-columns: 1fr 72px 1fr !important;
+    padding-left: 16px;
+    padding-right: 16px;
+    column-gap: 10px;
+  }
+
+  .global-nav-side {
+    display: flex;
+    gap: 14px;
+  }
+
+  .global-nav-left { justify-content: flex-start; padding-right: 0; }
+  .global-nav-right { justify-content: flex-end; padding-left: 0; }
+
+  .global-nav-left > a:nth-child(2),
+  .global-nav-left > a:nth-child(3),
+  .global-nav-right > a:nth-child(1),
+  .global-nav-right > a:nth-child(2) {
+    display: none;
+  }
+}
