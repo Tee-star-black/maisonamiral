@@ -48,12 +48,12 @@
   gap: 10px;
   overflow: hidden;
 }
-.ma-footer-mark-ma {
-  font-family: var(--font-maison-display), Georgia, serif;
-  font-size: clamp(4rem, 7vw, 7rem);
-  line-height: .8;
-  letter-spacing: -.08em;
-  font-weight: 500;
+.ma-footer-ship {
+  width: 58px;
+  height: auto;
+  object-fit: contain;
+  filter: brightness(0);
+  opacity: .9;
 }
 .ma-footer-mark-caption { font-size: 7px; letter-spacing: .15em; color: #686862; }
 
@@ -217,6 +217,7 @@
   .ma-footer-top-grid > *:nth-child(even),
   .ma-footer-info-grid > *:nth-child(even) { border-left: 0; }
   .ma-footer-mark { grid-column: auto; }
+  .ma-footer-ship { width: 48px; }
   .ma-footer-cell { padding: 16px; }
   .ma-footer-statement h2 { max-width: 420px; }
   .ma-footer-blueprint { min-height: 190px; }
