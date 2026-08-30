@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const shopLinks = [
@@ -43,7 +44,13 @@ export function MaisonFooter() {
         </nav>
 
         <div className="ma-footer-cell ma-footer-mark" aria-label="Maison Amiral house mark">
-          <span className="ma-footer-mark-ma">MA</span>
+          <Image
+            className="ma-footer-ship"
+            src="/graphics/ship.png"
+            alt="Maison Amiral ship emblem"
+            width={49}
+            height={96}
+          />
           <span className="ma-footer-mark-caption">HOUSE MARK / 001</span>
         </div>
       </div>
