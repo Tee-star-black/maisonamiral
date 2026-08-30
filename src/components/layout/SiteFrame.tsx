@@ -54,10 +54,10 @@ export function SiteFrame({ children }: { children: React.ReactNode }) {
         <Link className="global-ship-mark" href="/" aria-label="Maison Amiral home">
           {!shipFailed ? (
             <Image
-              src="/graphics/ship.jpeg"
-              alt="Maison Amiral ship mark"
-              width={72}
-              height={36}
+              src="/graphics/ship.png"
+              alt="Maison Amiral ship emblem"
+              width={49}
+              height={96}
               priority
               onError={() => setShipFailed(true)}
             />
