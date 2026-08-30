@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
 import { CartLink } from "@/components/cart/CartLink";
+import { MaisonFooter } from "@/components/layout/MaisonFooter";
 
 const leftNavItems = [
   ["Shop", "/shop"],
@@ -89,6 +90,7 @@ export function SiteFrame({ children }: { children: React.ReactNode }) {
       </div>
 
       <div className="site-page-content">{children}</div>
+      <MaisonFooter />
     </div>
   );
 }
