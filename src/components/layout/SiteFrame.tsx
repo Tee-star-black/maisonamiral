@@ -8,12 +8,6 @@ import { CartLink } from "@/components/cart/CartLink";
 
 const leftNavItems = [
   ["Shop", "/shop"],
-  ["Collections", "/collections"],
-  ["Search", "/search"],
-] as const;
-
-const rightNavItems = [
-  ["Editorial", "/editorial"],
   ["Journal", "/journal"],
 ] as const;
 
@@ -26,6 +20,7 @@ const pageWords: Record<string, string[]> = {
   product: ["OBJECT", "DETAIL", "PROPORTION", "EDITION 001"],
   cart: ["SELECTION", "OBJECTS", "BAG", "MAISON"],
   checkout: ["ORDER", "DETAILS", "SECURE", "MAISON"],
+  subscribe: ["CORRESPONDENCE", "HOUSE NOTES", "EDITION 001", "MAISON"],
 };
 
 function getPageKey(pathname: string) {
@@ -71,11 +66,9 @@ export function SiteFrame({ children }: { children: React.ReactNode }) {
         </Link>
 
         <nav className="global-nav-side global-nav-right" aria-label="Primary navigation right">
-          {rightNavItems.map(([label, href]) => (
-            <Link key={`${label}-${href}`} className={pathname === href ? "is-active" : ""} href={href}>
-              {label}
-            </Link>
-          ))}
+          <Link className={pathname === "/subscribe" ? "is-active" : ""} href="/subscribe">
+            Subscribe
+          </Link>
           <div className={pathname === "/cart" ? "nav-cart is-active" : "nav-cart"}>
             <CartLink />
           </div>
