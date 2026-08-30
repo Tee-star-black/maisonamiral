@@ -36,7 +36,7 @@ const stories = [
 ] as const;
 
 export default function Home() {
-  const arrivals = products.slice(0, 4);
+  const arrivals = products.slice(0, 3);
 
   return (
     <main className="si-home">
@@ -80,7 +80,7 @@ export default function Home() {
                       src={image}
                       alt={product.name}
                       fill
-                      sizes="(max-width: 760px) 50vw, 25vw"
+                      sizes="(max-width: 760px) 100vw, 33vw"
                       className="si-cover"
                       priority={index < 2}
                     />
@@ -117,7 +117,7 @@ export default function Home() {
             <span>02</span><strong>Collections</strong><small>Current & archive</small>
           </Link>
           <Link href="/lookbook" className="si-category-card image-card">
-            <Image src="/products/emblem/back-editorial.jpeg" alt="Maison Amiral lookbook" fill sizes="33vw" className="si-cover" />
+            <Image src="/products/emblem-tee/back2.jpeg" alt="Maison Amiral lookbook" fill sizes="33vw" className="si-cover" />
             <div className="si-category-overlay" />
             <span>03</span><strong>Lookbook</strong><small>Johannesburg studies</small>
           </Link>
@@ -161,7 +161,7 @@ export default function Home() {
       </section>
 
       <section className="si-campaign">
-        <Image src="/products/emblem/front-edit.jpeg" alt="Maison Amiral Edition 001 campaign" fill sizes="100vw" className="si-cover" />
+        <Image src="/products/emblem-tee/frontedit.jpeg" alt="Maison Amiral Edition 001 campaign" fill sizes="100vw" className="si-cover" />
         <div className="si-campaign-shade" />
         <div className="si-campaign-copy">
           <p className="si-overline">004 / EDITION 001</p>
