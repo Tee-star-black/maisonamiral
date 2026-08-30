@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import { CartProvider } from "@/components/cart/CartProvider";
+import { SiteFrame } from "@/components/layout/SiteFrame";
 import "./globals.css";
 import "./store.css";
 import "./catalogue.css";
@@ -35,7 +36,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${maisonSans.variable} ${maisonDisplay.variable} h-full antialiased`}
     >
       <body className="min-h-full">
-        <CartProvider>{children}</CartProvider>
+        <CartProvider>
+          <SiteFrame>{children}</SiteFrame>
+        </CartProvider>
       </body>
     </html>
   );
