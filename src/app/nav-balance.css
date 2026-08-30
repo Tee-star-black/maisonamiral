@@ -68,13 +68,27 @@
   transform: none !important;
   justify-self: center;
   width: 88px;
-  height: 48px;
+  height: 54px;
+  display: grid;
+  place-items: center;
 }
 
 .global-ship-mark img {
-  width: 76px;
-  height: 38px;
+  width: 25px;
+  height: 49px;
   object-fit: contain;
+  filter: brightness(0);
+  opacity: .94;
+  transition: transform 260ms ease, opacity 260ms ease, filter 260ms ease;
+}
+
+.is-home .global-ship-mark img {
+  filter: none;
+  opacity: .98;
+}
+
+.global-ship-mark:hover img {
+  transform: translateY(-1px) scale(1.03);
 }
 
 .ship-fallback {
@@ -127,10 +141,11 @@
 
   .global-ship-mark {
     width: 58px;
+    height: 48px;
   }
 
   .global-ship-mark img {
-    width: 52px;
-    height: 30px;
+    width: 22px;
+    height: 42px;
   }
 }
