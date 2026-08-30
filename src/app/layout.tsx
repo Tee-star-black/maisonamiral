@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import { CartProvider } from "@/components/cart/CartProvider";
 import "./globals.css";
 import "./store.css";
@@ -8,14 +8,15 @@ import "./checkout.css";
 import "./purchase.css";
 import "./eft.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const maisonSans = DM_Sans({
+  variable: "--font-maison-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const maisonDisplay = Cormorant_Garamond({
+  variable: "--font-maison-display",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -31,7 +32,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en-ZA"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${maisonSans.variable} ${maisonDisplay.variable} h-full antialiased`}
     >
       <body className="min-h-full">
         <CartProvider>{children}</CartProvider>
