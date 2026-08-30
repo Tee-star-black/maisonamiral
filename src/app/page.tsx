@@ -1,15 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CartLink } from "@/components/cart/CartLink";
 import { formatPrice, products } from "@/data/products";
-
-const navItems = [
-  ["New", "/shop"],
-  ["Shop", "/shop"],
-  ["Collections", "/collections"],
-  ["Editorial", "/editorial"],
-  ["Journal", "/journal"],
-] as const;
 
 const stories = [
   {
@@ -43,14 +34,6 @@ export default function Home() {
       <section className="si-hero">
         <video className="si-hero-video" src="/video/flag.mp4" autoPlay muted loop playsInline preload="metadata" aria-hidden="true" />
         <div className="si-hero-shade" />
-
-        <header className="si-header">
-          <Link className="si-brand" href="/" aria-label="Maison Amiral home">MAISON AMIRAL</Link>
-          <nav className="si-nav" aria-label="Primary navigation">
-            {navItems.map(([label, href]) => <Link key={`${label}-${href}`} href={href}>{label}</Link>)}
-          </nav>
-          <div className="si-actions"><Link href="/search">Search</Link><CartLink /></div>
-        </header>
 
         <div className="si-hero-copy">
           <p className="si-overline">EDITION 001 / JOHANNESBURG</p>
@@ -169,17 +152,6 @@ export default function Home() {
           <Link className="si-cta light" href="/shop">Explore the collection</Link>
         </div>
       </section>
-
-      <footer className="si-footer">
-        <div className="si-footer-title">MAISON AMIRAL</div>
-        <div className="si-footer-grid">
-          <div><p>Explore</p><Link href="/shop">Shop</Link><Link href="/collections">Collections</Link><Link href="/journal">Journal</Link></div>
-          <div><p>Information</p><Link href="/shipping">Shipping</Link><Link href="/returns">Returns</Link><Link href="/contact">Contact</Link></div>
-          <div><p>Legal</p><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link></div>
-          <div><p>Maison</p><span>Johannesburg, South Africa</span><span>Edition 001</span></div>
-        </div>
-        <div className="si-footer-bottom"><span>© 2026 Maison Amiral</span><span>Product of BloomTech</span></div>
-      </footer>
     </main>
   );
 }
