@@ -6,10 +6,13 @@ import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
 import { CartLink } from "@/components/cart/CartLink";
 
-const navItems = [
-  ["New", "/shop"],
+const leftNavItems = [
   ["Shop", "/shop"],
   ["Collections", "/collections"],
+  ["Search", "/search"],
+] as const;
+
+const rightNavItems = [
   ["Editorial", "/editorial"],
   ["Journal", "/journal"],
 ] as const;
@@ -36,19 +39,21 @@ export function SiteFrame({ children }: { children: React.ReactNode }) {
   const pageKey = getPageKey(pathname);
   const isHome = pathname === "/";
   const [shipFailed, setShipFailed] = useState(false);
-  const words = useMemo(() => pageWords[pageKey] ?? ["MAISON AMIRAL", "JOHANNESBURG", "OBJECT", "FORM"], [pageKey]);
+  const words = useMemo(
+    () => pageWords[pageKey] ?? ["MAISON AMIRAL", "JOHANNESBURG", "OBJECT", "FORM"],
+    [pageKey],
+  );
 
   return (
     <div className={`maison-frame page-${pageKey} ${isHome ? "is-home" : "is-inner"}`}>
       <header className="global-nav">
-        <div className="global-nav-left">
-          <Link className="global-wordmark" href="/">MAISON AMIRAL</Link>
-          <nav className="global-nav-links" aria-label="Primary navigation">
-            {navItems.map(([label, href]) => (
-              <Link key={`${label}-${href}`} className={pathname === href ? "is-active" : ""} href={href}>{label}</Link>
-            ))}
-          </nav>
-        </div>
+        <nav className="global-nav-side global-nav-left" aria-label="Primary navigation left">
+          {leftNavItems.map(([label, href]) => (
+            <Link key={`${label}-${href}`} className={pathname === href ? "is-active" : ""} href={href}>
+              {label}
+            </Link>
+          ))}
+        </nav>
 
         <Link className="global-ship-mark" href="/" aria-label="Maison Amiral home">
           {!shipFailed ? (
@@ -65,10 +70,16 @@ export function SiteFrame({ children }: { children: React.ReactNode }) {
           )}
         </Link>
 
-        <div className="global-nav-actions">
-          <Link href="/search">Search</Link>
-          <CartLink />
-        </div>
+        <nav className="global-nav-side global-nav-right" aria-label="Primary navigation right">
+          {rightNavItems.map(([label, href]) => (
+            <Link key={`${label}-${href}`} className={pathname === href ? "is-active" : ""} href={href}>
+              {label}
+            </Link>
+          ))}
+          <div className={pathname === "/cart" ? "nav-cart is-active" : "nav-cart"}>
+            <CartLink />
+          </div>
+        </nav>
       </header>
 
       <div className="ambient-wheel ambient-wheel-right" aria-hidden="true">
@@ -79,7 +90,9 @@ export function SiteFrame({ children }: { children: React.ReactNode }) {
       </div>
 
       <div className="scattered-words" aria-hidden="true">
-        {words.map((word, index) => <span key={`${word}-${index}`} className={`scatter-word scatter-${index + 1}`}>{word}</span>)}
+        {words.map((word, index) => (
+          <span key={`${word}-${index}`} className={`scatter-word scatter-${index + 1}`}>{word}</span>
+        ))}
       </div>
 
       <div className="site-page-content">{children}</div>
