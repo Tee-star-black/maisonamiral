@@ -3,6 +3,7 @@ import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { SiteFrame } from "@/components/layout/SiteFrame";
 import "./globals.css";
+import "./nav-balance.css";
 import "./store.css";
 import "./catalogue.css";
 import "./checkout.css";
