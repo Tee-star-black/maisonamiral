@@ -6,6 +6,7 @@ import "./globals.css";
 import "./nav-balance.css";
 import "./footer.css";
 import "./store.css";
+import "./shop-tweaks.css";
 import "./catalogue.css";
 import "./checkout.css";
 import "./purchase.css";
