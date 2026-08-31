@@ -563,3 +563,182 @@
     margin-top: 38px;
   }
 }
+
+/* Artistic dark interruptions for the Shop page */
+.shop-dark-interlude {
+  position: relative;
+  min-height: 48vh;
+  overflow: hidden;
+  background: #0b0b0b;
+  color: #fff;
+  padding: 20px 28px 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.shop-dark-meta {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+  font-size: 8px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.58);
+}
+
+.shop-dark-meta span:nth-child(2) { text-align: center; }
+.shop-dark-meta span:last-child { text-align: right; }
+
+.shop-dark-word {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -49%);
+  font-family: var(--font-maison-display), Georgia, serif;
+  font-size: clamp(8rem, 21vw, 24rem);
+  line-height: .7;
+  letter-spacing: -.085em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255,255,255,.17);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.shop-dark-copy {
+  position: relative;
+  z-index: 2;
+  align-self: flex-end;
+  width: min(540px, 46vw);
+  padding-top: 100px;
+}
+
+.shop-dark-copy .eyebrow {
+  margin-bottom: 22px;
+  color: rgba(255,255,255,.55);
+}
+
+.shop-dark-copy > p:nth-child(2) {
+  margin: 0 0 20px;
+  font-family: var(--font-maison-display), Georgia, serif;
+  font-size: clamp(2.8rem, 5.2vw, 6rem);
+  line-height: .88;
+  letter-spacing: -.05em;
+}
+
+.shop-dark-copy > span {
+  display: block;
+  max-width: 360px;
+  font-size: 11px;
+  line-height: 1.55;
+  color: rgba(255,255,255,.58);
+}
+
+.shop-dark-rule {
+  position: absolute;
+  left: 28px;
+  right: 28px;
+  bottom: 24px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255,255,255,.55), rgba(255,255,255,.06) 42%, rgba(255,255,255,.22));
+}
+
+.shop-card-2 {
+  position: relative;
+}
+
+.shop-card-2::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: -12px;
+  right: -12px;
+  top: -12px;
+  bottom: 34%;
+  background: #111;
+}
+
+.shop-card-2 .shop-card-number,
+.shop-card-2 .shop-card-view {
+  color: #fff;
+}
+
+.shop-card-2 .shop-card-image {
+  box-shadow: 0 0 0 1px rgba(17,17,17,.75);
+}
+
+.shop-card-1,
+.shop-card-3 {
+  transform: translateY(26px);
+}
+
+.shop-collection-meta {
+  border-top: 10px solid #111;
+}
+
+.shop-closing::before {
+  content: "EDITION 001";
+  position: absolute;
+  left: 28px;
+  top: 24px;
+  font-family: var(--font-maison-display), Georgia, serif;
+  font-size: clamp(4rem, 10vw, 11rem);
+  line-height: .8;
+  letter-spacing: -.06em;
+  color: rgba(17,17,17,.035);
+  pointer-events: none;
+}
+
+@media (max-width: 1050px) {
+  .shop-card-1,
+  .shop-card-3 { transform: none; }
+
+  .shop-card-2::before {
+    left: -10px;
+    right: -10px;
+    top: -10px;
+    bottom: 38%;
+  }
+}
+
+@media (max-width: 700px) {
+  .shop-dark-interlude {
+    min-height: 56vh;
+    padding: 18px;
+  }
+
+  .shop-dark-meta {
+    grid-template-columns: 1fr auto;
+  }
+
+  .shop-dark-meta span:nth-child(2) { display: none; }
+
+  .shop-dark-copy {
+    width: 100%;
+    padding-top: 150px;
+  }
+
+  .shop-dark-word {
+    top: 43%;
+    font-size: clamp(6rem, 34vw, 11rem);
+  }
+
+  .shop-dark-rule {
+    left: 18px;
+    right: 18px;
+  }
+
+  .shop-card-2::before {
+    left: -8px;
+    right: -8px;
+    top: -8px;
+    bottom: 42%;
+  }
+
+  .shop-collection-meta {
+    border-top-width: 7px;
+  }
+}
