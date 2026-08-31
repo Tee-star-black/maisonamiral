@@ -71,24 +71,32 @@
   height: 54px;
   display: grid;
   place-items: center;
+  isolation: auto;
 }
 
+/*
+ * The source emblem is white on transparency. Difference blending makes the
+ * mark automatically become the inverse of the pixels beneath it:
+ * white background -> black ship, dark background -> white ship.
+ */
 .global-ship-mark img {
-  width: 25px;
-  height: 49px;
+  width: 27px;
+  height: 51px;
   object-fit: contain;
-  filter: brightness(0);
-  opacity: .94;
-  transition: transform 260ms ease, opacity 260ms ease, filter 260ms ease;
+  filter: none !important;
+  opacity: 1;
+  mix-blend-mode: difference;
+  transition: transform 260ms ease;
+  will-change: transform;
 }
 
 .is-home .global-ship-mark img {
-  filter: none;
-  opacity: .98;
+  filter: none !important;
+  opacity: 1;
 }
 
 .global-ship-mark:hover img {
-  transform: translateY(-1px) scale(1.03);
+  transform: translateY(-1px) scale(1.04);
 }
 
 .ship-fallback {
@@ -145,7 +153,7 @@
   }
 
   .global-ship-mark img {
-    width: 22px;
-    height: 42px;
+    width: 24px;
+    height: 44px;
   }
 }
