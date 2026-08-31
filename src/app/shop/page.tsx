@@ -1,10 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CartLink } from "@/components/cart/CartLink";
 import { formatPrice, products } from "@/data/products";
 
 function ProductVisual({ product, index }: { product: (typeof products)[number]; index: number }) {
-  const image = product.images.editorialFront;
+  const image = product.images.editorialFront ?? product.images.front;
 
   if (image) {
     return (
@@ -12,9 +11,9 @@ function ProductVisual({ product, index }: { product: (typeof products)[number];
         src={image}
         alt={product.name}
         fill
-        sizes="(max-width: 800px) 100vw, 50vw"
+        sizes="(max-width: 700px) 100vw, (max-width: 1050px) 50vw, 33vw"
         className="cover-image"
-        priority={index === 0}
+        priority={index < 3}
       />
     );
   }
@@ -31,56 +30,56 @@ function ProductVisual({ product, index }: { product: (typeof products)[number];
 export default function ShopPage() {
   return (
     <main className="shop-page">
-      <header className="site-header shop-header">
-        <Link className="brand" href="/" aria-label="Maison Amiral home">MAISON AMIRAL</Link>
-        <nav className="desktop-nav" aria-label="Primary navigation">
-          <Link href="/shop">Shop</Link>
-          <Link href="/collections">Collections</Link>
-          <Link href="/lookbook">Lookbook</Link>
-          <Link href="/editorial">Editorial</Link>
-          <Link href="/journal">Journal</Link>
-        </nav>
-        <div className="header-actions" aria-label="Store actions">
-          <Link href="/search">Search</Link>
-          <CartLink />
-        </div>
-      </header>
-
       <section className="shop-intro section-pad">
         <div className="shop-intro-top">
           <p className="eyebrow">Maison Amiral / Shop</p>
-          <span className="shop-count">{products.length.toString().padStart(2, "0")} objects</span>
+          <span className="shop-count">{products.length.toString().padStart(2, "0")} objects / Edition 001</span>
         </div>
-        <h1>Edition<br />001.</h1>
-        <div className="shop-intro-copy">
-          <p>The first Maison Amiral release. Quiet graphics, deliberate form and pieces intended to live beyond a single season.</p>
-          <p>Johannesburg, South Africa.</p>
+
+        <div className="shop-intro-main">
+          <h1>Edition 001.</h1>
+          <div className="shop-intro-copy">
+            <p>A study in movement, machinery and restraint. Three pieces. One first edition.</p>
+            <p>Johannesburg, South Africa.</p>
+          </div>
         </div>
       </section>
 
-      <section className="shop-grid" aria-label="Maison Amiral products">
-        {products.map((product, index) => (
-          <article className="shop-card" key={product.slug}>
-            <Link className="shop-card-image" href={`/product/${product.slug}`}>
-              <ProductVisual product={product} index={index} />
-              <span className="shop-card-number">{(index + 1).toString().padStart(2, "0")}</span>
-            </Link>
-            <div className="shop-card-info">
-              <div>
-                <p className="product-index">{product.collection}</p>
-                <Link href={`/product/${product.slug}`}><h2>{product.shortName}</h2></Link>
-                <p>{product.description}</p>
+      <section className="shop-collection" aria-label="Maison Amiral Edition 001">
+        <div className="shop-collection-meta">
+          <span>Collection / 001</span>
+          <span>Three objects</span>
+          <span>Johannesburg / 2026</span>
+        </div>
+
+        <div className="shop-grid">
+          {products.map((product, index) => (
+            <article className="shop-card" key={product.slug}>
+              <Link className="shop-card-image" href={`/product/${product.slug}`}>
+                <ProductVisual product={product} index={index} />
+                <span className="shop-card-number">{(index + 1).toString().padStart(2, "0")}</span>
+                <span className="shop-card-view">View piece ↗</span>
+              </Link>
+
+              <div className="shop-card-info">
+                <div className="shop-card-heading">
+                  <div>
+                    <p className="product-index">{product.collection}</p>
+                    <Link href={`/product/${product.slug}`}>
+                      <h2>{product.shortName}</h2>
+                    </Link>
+                  </div>
+                  <span className="shop-card-price">{formatPrice(product.price)}</span>
+                </div>
+                <p className="shop-card-description">{product.description}</p>
               </div>
-              <div className="shop-card-side">
-                <span>{formatPrice(product.price)}</span>
-                <Link className="text-link" href={`/product/${product.slug}`}>View piece <span aria-hidden="true">↗</span></Link>
-              </div>
-            </div>
-          </article>
-        ))}
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="shop-closing section-pad">
+        <div className="shop-closing-index">001 / 003</div>
         <p className="eyebrow">House note / 001</p>
         <p className="shop-closing-copy">We release slowly. Each object earns its place before it enters the collection.</p>
         <Link className="text-link" href="/editorial">Read the editorial <span aria-hidden="true">↗</span></Link>
