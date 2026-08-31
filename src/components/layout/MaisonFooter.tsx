@@ -43,13 +43,16 @@ export function MaisonFooter() {
         </nav>
 
         <div className="ma-footer-cell ma-footer-mark" aria-label="Maison Amiral house mark">
-          <img
-            className="ma-footer-ship"
-            src="/graphics/ship.png"
-            alt="Maison Amiral ship emblem"
-            width="49"
-            height="96"
-          />
+          <svg className="ma-footer-ship-svg" viewBox="0 0 129 256" role="img" aria-label="Maison Amiral ship emblem">
+            <defs>
+              <filter id="footer-ship-solid" x="-20%" y="-20%" width="140%" height="140%">
+                <feMorphology in="SourceAlpha" operator="dilate" radius="1.4" result="expanded" />
+                <feFlood floodColor="#111111" result="paint" />
+                <feComposite in="paint" in2="expanded" operator="in" />
+              </filter>
+            </defs>
+            <image href="/graphics/ship.png" width="129" height="256" filter="url(#footer-ship-solid)" />
+          </svg>
           <span className="ma-footer-mark-caption">HOUSE MARK / 001</span>
         </div>
       </div>
