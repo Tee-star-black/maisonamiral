@@ -51,13 +51,12 @@ export function SiteFrame({ children }: { children: React.ReactNode }) {
         </nav>
 
         <Link className="global-ship-mark" href="/" aria-label="Maison Amiral home">
-          <Image
+          <img
             className="ship-emblem-image"
             src="/graphics/ship.png"
             alt="Maison Amiral ship emblem"
-            width={49}
-            height={96}
-            priority
+            width="49"
+            height="96"
           />
         </Link>
 
