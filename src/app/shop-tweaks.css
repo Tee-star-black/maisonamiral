@@ -1,4 +1,7 @@
-.shop-closing > .eyebrow {
+.shop-closing > .eyebrow,
+.si-research-copy > .si-overline {
   font-size: 7px;
+  line-height: 1.2;
   letter-spacing: 0.14em;
+  font-weight: 500;
 }
