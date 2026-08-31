@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FooterSubscribeForm } from "@/components/subscribe/FooterSubscribeForm";
 
 const shopLinks = [
   ["Shop", "/shop"],
@@ -59,13 +60,9 @@ export function MaisonFooter() {
 
       <div className="ma-footer-info-grid">
         <section className="ma-footer-cell ma-subscribe-panel">
-          <p className="ma-footer-label">Subscribe</p>
-          <p>Collection notes, new releases and occasional observations from the house.</p>
-          <form className="ma-subscribe-form" action="/subscribe" method="get">
-            <label className="sr-only" htmlFor="ma-footer-email">Email address</label>
-            <input id="ma-footer-email" name="email" type="email" placeholder="Enter your email" autoComplete="email" />
-            <button type="submit" aria-label="Continue to subscribe">→</button>
-          </form>
+          <p className="ma-footer-label">House Correspondence</p>
+          <p>Collection notes, new releases and occasional signals from Johannesburg.</p>
+          <FooterSubscribeForm />
         </section>
 
         <section className="ma-footer-cell ma-footer-address">
@@ -83,10 +80,10 @@ export function MaisonFooter() {
         </section>
 
         <section className="ma-footer-cell ma-footer-social">
-          <p className="ma-footer-label">Social</p>
+          <p className="ma-footer-label">Signal</p>
           <span>Instagram</span>
           <span>Johannesburg</span>
-          <span>Maison Amiral</span>
+          <span>Flagship / 001</span>
         </section>
       </div>
 
