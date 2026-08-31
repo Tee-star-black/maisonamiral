@@ -46,20 +46,16 @@
   place-items: center;
   align-content: center;
   gap: 12px;
-  overflow: hidden;
+  overflow: visible;
 }
-.ma-footer-ship {
+.ma-footer-ship-svg {
   display: block;
-  width: 74px;
-  height: auto;
-  object-fit: contain;
-  opacity: 1;
-  filter:
-    brightness(0)
-    drop-shadow(1px 0 0 #111)
-    drop-shadow(-1px 0 0 #111)
-    drop-shadow(0 1px 0 #111)
-    drop-shadow(0 -1px 0 #111);
+  width: 76px;
+  height: 118px;
+  color: #111;
+  overflow: visible;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 .ma-footer-mark-caption { font-size: 7px; letter-spacing: .15em; color: #686862; }
 
@@ -223,7 +219,7 @@
   .ma-footer-top-grid > *:nth-child(even),
   .ma-footer-info-grid > *:nth-child(even) { border-left: 0; }
   .ma-footer-mark { grid-column: auto; }
-  .ma-footer-ship { width: 58px; }
+  .ma-footer-ship-svg { width: 62px; height: 96px; }
   .ma-footer-cell { padding: 16px; }
   .ma-footer-statement h2 { max-width: 420px; }
   .ma-footer-blueprint { min-height: 190px; }
