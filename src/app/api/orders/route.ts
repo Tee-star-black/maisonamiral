@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { getProduct } from "@/data/products";
+import { maisonEmailShell } from "@/lib/email/maisonEmail";
 
 type CartLine = { slug: string; size: string; quantity: number };
 type Customer = {
@@ -71,69 +72,80 @@ async function sendEmail({ to, subject, html }: { to: string; subject: string; h
   }
 }
 
-function invoiceEmail({
-  orderId,
-  customer,
-  lines,
-  subtotal,
-  bank,
-}: {
+function invoiceEmail({ orderId, customer, lines, subtotal, bank }: {
   orderId: string;
   customer: Customer;
   lines: ValidatedLine[];
   subtotal: number;
   bank: { bankName: string; accountName: string; accountNumber: string; branchCode: string; accountType: string };
 }) {
-  const lineRows = lines
-    .map(
-      (line) => `
-        <tr>
-          <td style="padding:12px 0;border-bottom:1px solid #ddd">${escapeHtml(line.name)}<br><span style="color:#777;font-size:12px">Size ${escapeHtml(line.size)} · Qty ${line.quantity}</span></td>
-          <td style="padding:12px 0;border-bottom:1px solid #ddd;text-align:right">${money(line.lineTotal)}</td>
-        </tr>`,
-    )
-    .join("");
+  const lineRows = lines.map((line) => `
+    <tr>
+      <td style="padding:14px 0;border-bottom:1px solid #d9d9d9;">${escapeHtml(line.name)}<br><span style="color:#777;font-size:11px;letter-spacing:.6px;text-transform:uppercase;">Size ${escapeHtml(line.size)} / Qty ${line.quantity}</span></td>
+      <td style="padding:14px 0;border-bottom:1px solid #d9d9d9;text-align:right;">${money(line.lineTotal)}</td>
+    </tr>`).join("");
 
   const delivery = [customer.address1, customer.address2, customer.city, customer.province, customer.postalCode]
     .filter(Boolean)
     .map((part) => escapeHtml(String(part)))
     .join("<br>");
 
-  return `
-  <!doctype html>
-  <html>
-    <body style="margin:0;background:#f3f0e9;color:#111;font-family:Arial,Helvetica,sans-serif">
-      <div style="max-width:720px;margin:0 auto;padding:40px 24px 64px">
-        <p style="font-size:12px;letter-spacing:2px;margin:0 0 40px"><strong>MAISON AMIRAL</strong></p>
-        <p style="font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:#777">Order / Invoice</p>
-        <h1 style="font-size:46px;line-height:1;margin:0 0 12px;font-weight:500">Thank you, ${escapeHtml(customer.firstName)}.</h1>
-        <p style="font-size:16px;line-height:1.6;color:#555;margin:0 0 36px">Your order has been reserved pending EFT payment. Use <strong>${escapeHtml(orderId)}</strong> as your payment reference.</p>
+  return maisonEmailShell({
+    eyebrow: `ORDER / ${orderId}`,
+    title: `Thank you, ${customer.firstName}.`,
+    preheader: `Maison Amiral order ${orderId} and EFT payment details.`,
+    body: `
+      <p style="margin:0 0 30px;max-width:560px;">Your object has been reserved pending EFT payment. Use <strong>${escapeHtml(orderId)}</strong> as the payment reference.</p>
 
-        <table style="width:100%;border-collapse:collapse;margin:0 0 30px">${lineRows}
-          <tr><td style="padding:18px 0;font-weight:bold">Total due</td><td style="padding:18px 0;text-align:right;font-weight:bold">${money(subtotal)}</td></tr>
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 34px;">${lineRows}
+        <tr><td style="padding:18px 0;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;">Total due</td><td style="padding:18px 0;text-align:right;font-weight:bold;">${money(subtotal)}</td></tr>
+      </table>
+
+      <div style="background:#111111;color:#ffffff;padding:22px 20px;margin:0 0 32px;">
+        <p style="margin:0 0 16px;font-size:9px;letter-spacing:1.8px;text-transform:uppercase;color:#a8a8a8;">PAYMENT SIGNAL / EFT</p>
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="font-size:13px;line-height:1.9;color:#ffffff;">
+          <tr><td>Bank</td><td align="right"><strong>${escapeHtml(bank.bankName)}</strong></td></tr>
+          <tr><td>Account name</td><td align="right"><strong>${escapeHtml(bank.accountName)}</strong></td></tr>
+          <tr><td>Account number</td><td align="right"><strong>${escapeHtml(bank.accountNumber)}</strong></td></tr>
+          <tr><td>Account type</td><td align="right"><strong>${escapeHtml(bank.accountType)}</strong></td></tr>
+          <tr><td>Branch code</td><td align="right"><strong>${escapeHtml(bank.branchCode)}</strong></td></tr>
+          <tr><td>Reference</td><td align="right"><strong>${escapeHtml(orderId)}</strong></td></tr>
         </table>
-
-        <div style="border-top:1px solid #111;padding-top:24px;margin-top:20px">
-          <p style="font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:#777">EFT payment details</p>
-          <table style="width:100%;font-size:14px;line-height:1.8">
-            <tr><td>Bank</td><td style="text-align:right"><strong>${escapeHtml(bank.bankName)}</strong></td></tr>
-            <tr><td>Account name</td><td style="text-align:right"><strong>${escapeHtml(bank.accountName)}</strong></td></tr>
-            <tr><td>Account number</td><td style="text-align:right"><strong>${escapeHtml(bank.accountNumber)}</strong></td></tr>
-            <tr><td>Account type</td><td style="text-align:right"><strong>${escapeHtml(bank.accountType)}</strong></td></tr>
-            <tr><td>Branch code</td><td style="text-align:right"><strong>${escapeHtml(bank.branchCode)}</strong></td></tr>
-            <tr><td>Payment reference</td><td style="text-align:right"><strong>${escapeHtml(orderId)}</strong></td></tr>
-          </table>
-        </div>
-
-        <div style="border-top:1px solid #ddd;padding-top:24px;margin-top:34px">
-          <p style="font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:#777">Delivery details</p>
-          <p style="font-size:14px;line-height:1.7">${delivery}<br>${escapeHtml(customer.phone)}</p>
-        </div>
-
-        <p style="margin-top:38px;font-size:13px;line-height:1.6;color:#666">Your order will be processed once payment has been confirmed. Please keep this email for your records.</p>
       </div>
-    </body>
-  </html>`;
+
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;border-top:1px solid #d9d9d9;border-bottom:1px solid #d9d9d9;">
+        <tr>
+          <td style="padding:18px 0;vertical-align:top;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#777;">DELIVERY / JHB</td>
+          <td align="right" style="padding:18px 0;font-size:13px;line-height:1.7;">${delivery}<br>${escapeHtml(customer.phone)}</td>
+        </tr>
+      </table>
+
+      <p style="margin:30px 0 0;color:#666;font-size:12px;">Your order will move to fulfilment once payment is confirmed. Keep this message as your order record.</p>
+    `,
+  });
+}
+
+function ownerOrderEmail({ orderId, customer, lines, subtotal }: { orderId: string; customer: Customer; lines: ValidatedLine[]; subtotal: number }) {
+  const delivery = [customer.address1, customer.address2, customer.city, customer.province, customer.postalCode]
+    .filter(Boolean)
+    .map((part) => escapeHtml(String(part)))
+    .join("<br>");
+
+  return maisonEmailShell({
+    eyebrow: `HOUSE ORDER / ${orderId}`,
+    title: "New order received.",
+    preheader: `New Maison Amiral order ${orderId}.`,
+    body: `
+      <p style="margin:0 0 28px;"><strong>${escapeHtml(customer.firstName)} ${escapeHtml(customer.lastName)}</strong><br>${escapeHtml(customer.email)}<br>${escapeHtml(customer.phone)}</p>
+      <div style="border-top:1px solid #d9d9d9;border-bottom:1px solid #d9d9d9;padding:18px 0;margin-bottom:28px;">
+        ${lines.map((line) => `<p style="margin:8px 0;">${line.quantity} × ${escapeHtml(line.name)} / Size ${escapeHtml(line.size)} <span style="float:right;">${money(line.lineTotal)}</span></p>`).join("")}
+        <p style="margin:18px 0 0;font-weight:bold;">TOTAL <span style="float:right;">${money(subtotal)}</span></p>
+      </div>
+      <p style="margin:0 0 6px;font-size:9px;letter-spacing:1.4px;text-transform:uppercase;color:#777;">DELIVERY</p>
+      <p style="margin:0 0 28px;line-height:1.7;">${delivery}</p>
+      <p style="margin:0;">Await EFT payment using reference <strong>${escapeHtml(orderId)}</strong>.</p>
+    `,
+  });
 }
 
 export async function POST(request: NextRequest) {
@@ -157,13 +169,7 @@ export async function POST(request: NextRequest) {
 
       const lineTotal = product.price * item.quantity;
       subtotal += lineTotal;
-      lines.push({
-        name: product.shortName,
-        size: item.size,
-        quantity: item.quantity,
-        unitPrice: product.price,
-        lineTotal,
-      });
+      lines.push({ name: product.shortName, size: item.size, quantity: item.quantity, unitPrice: product.price, lineTotal });
     }
 
     const orderId = `MA-${randomUUID().split("-")[0].toUpperCase()}`;
@@ -175,28 +181,17 @@ export async function POST(request: NextRequest) {
       accountType: requireEnv("BANK_ACCOUNT_TYPE"),
     };
 
-    const customerHtml = invoiceEmail({ orderId, customer, lines, subtotal, bank });
     await sendEmail({
       to: customer.email,
-      subject: `Maison Amiral order ${orderId} · EFT payment details`,
-      html: customerHtml,
+      subject: `Maison Amiral / Order ${orderId}`,
+      html: invoiceEmail({ orderId, customer, lines, subtotal, bank }),
     });
 
     const ownerEmail = requireEnv("OWNER_ORDER_EMAIL");
-    const ownerHtml = `
-      <div style="font-family:Arial,Helvetica,sans-serif;max-width:720px;margin:auto;padding:32px">
-        <h1>New Maison Amiral order ${escapeHtml(orderId)}</h1>
-        <p><strong>${escapeHtml(customer.firstName)} ${escapeHtml(customer.lastName)}</strong><br>${escapeHtml(customer.email)}<br>${escapeHtml(customer.phone)}</p>
-        <p><strong>Total:</strong> ${money(subtotal)}</p>
-        <ul>${lines.map((line) => `<li>${line.quantity} × ${escapeHtml(line.name)} · Size ${escapeHtml(line.size)} · ${money(line.lineTotal)}</li>`).join("")}</ul>
-        <p><strong>Delivery:</strong><br>${[customer.address1, customer.address2, customer.city, customer.province, customer.postalCode].filter(Boolean).map((part) => escapeHtml(String(part))).join("<br>")}</p>
-        <p>Await EFT payment using reference <strong>${escapeHtml(orderId)}</strong>.</p>
-      </div>`;
-
     await sendEmail({
       to: ownerEmail,
-      subject: `New order ${orderId} · ${money(subtotal)}`,
-      html: ownerHtml,
+      subject: `House order ${orderId} / ${money(subtotal)}`,
+      html: ownerOrderEmail({ orderId, customer, lines, subtotal }),
     });
 
     return NextResponse.json({ orderId, total: subtotal });
