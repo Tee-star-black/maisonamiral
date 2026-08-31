@@ -10,6 +10,7 @@ import "./catalogue.css";
 import "./checkout.css";
 import "./purchase.css";
 import "./eft.css";
+import "./subscribe.css";
 
 const maisonSans = DM_Sans({
   variable: "--font-maison-sans",
