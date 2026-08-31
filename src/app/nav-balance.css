@@ -71,25 +71,24 @@
   height: 58px;
   display: grid;
   place-items: center;
-  color: #111;
+  z-index: 3;
 }
 
-.is-home .global-ship-mark {
-  color: #fff;
-}
-
-.ship-emblem {
+.ship-emblem-image {
   display: block;
-  width: 32px;
-  height: 54px;
-  background: currentColor;
-  -webkit-mask: url('/graphics/ship.png') center / contain no-repeat;
-  mask: url('/graphics/ship.png') center / contain no-repeat;
+  width: 34px;
+  height: 56px;
+  object-fit: contain;
   opacity: 1;
-  transition: transform 260ms ease;
+  filter: brightness(0);
+  transition: transform 260ms ease, filter 260ms ease;
 }
 
-.global-ship-mark:hover .ship-emblem {
+.is-home .ship-emblem-image {
+  filter: brightness(0) invert(1);
+}
+
+.global-ship-mark:hover .ship-emblem-image {
   transform: translateY(-1px) scale(1.04);
 }
 
@@ -122,9 +121,9 @@
     font-size: 8px;
   }
 
-  .ship-emblem {
-    width: 28px;
-    height: 48px;
+  .ship-emblem-image {
+    width: 30px;
+    height: 50px;
   }
 }
 
@@ -146,8 +145,8 @@
     height: 48px;
   }
 
-  .ship-emblem {
-    width: 24px;
-    height: 42px;
+  .ship-emblem-image {
+    width: 26px;
+    height: 44px;
   }
 }
