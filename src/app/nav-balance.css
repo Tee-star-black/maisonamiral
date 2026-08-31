@@ -68,40 +68,29 @@
   transform: none !important;
   justify-self: center;
   width: 88px;
-  height: 54px;
+  height: 58px;
   display: grid;
   place-items: center;
-  isolation: auto;
+  color: #111;
 }
 
-/*
- * The source emblem is white on transparency. Difference blending makes the
- * mark automatically become the inverse of the pixels beneath it:
- * white background -> black ship, dark background -> white ship.
- */
-.global-ship-mark img {
-  width: 27px;
-  height: 51px;
-  object-fit: contain;
-  filter: none !important;
+.is-home .global-ship-mark {
+  color: #fff;
+}
+
+.ship-emblem {
+  display: block;
+  width: 32px;
+  height: 54px;
+  background: currentColor;
+  -webkit-mask: url('/graphics/ship.png') center / contain no-repeat;
+  mask: url('/graphics/ship.png') center / contain no-repeat;
   opacity: 1;
-  mix-blend-mode: difference;
   transition: transform 260ms ease;
-  will-change: transform;
 }
 
-.is-home .global-ship-mark img {
-  filter: none !important;
-  opacity: 1;
-}
-
-.global-ship-mark:hover img {
+.global-ship-mark:hover .ship-emblem {
   transform: translateY(-1px) scale(1.04);
-}
-
-.ship-fallback {
-  font-size: 18px;
-  letter-spacing: .12em;
 }
 
 .page-shop .global-ship-mark,
@@ -132,6 +121,11 @@
   .nav-cart > a {
     font-size: 8px;
   }
+
+  .ship-emblem {
+    width: 28px;
+    height: 48px;
+  }
 }
 
 @media (max-width: 560px) {
@@ -152,8 +146,8 @@
     height: 48px;
   }
 
-  .global-ship-mark img {
+  .ship-emblem {
     width: 24px;
-    height: 44px;
+    height: 42px;
   }
 }
