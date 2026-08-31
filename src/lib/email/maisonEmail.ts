@@ -32,7 +32,11 @@ export function maisonEmailShell({ eyebrow, title, body, preheader = "Maison Ami
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                   <tr>
                     <td style="font-size:10px;letter-spacing:2px;text-transform:uppercase;vertical-align:middle;">MAISON AMIRAL<br><span style="color:#777777;">JOHANNESBURG / HOUSE SIGNAL</span></td>
-                    <td align="right" style="vertical-align:middle;"><img src="${shipUrl}" alt="Maison Amiral" width="34" style="display:block;width:34px;height:auto;filter:brightness(0);" /></td>
+                    <td align="right" style="vertical-align:middle;">
+                      <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;background:#111111;">
+                        <tr><td style="padding:8px 11px;"><img src="${shipUrl}" alt="Maison Amiral" width="28" style="display:block;width:28px;height:auto;border:0;" /></td></tr>
+                      </table>
+                    </td>
                   </tr>
                 </table>
               </td>
