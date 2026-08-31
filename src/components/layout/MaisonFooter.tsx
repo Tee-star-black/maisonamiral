@@ -105,6 +105,7 @@ export function MaisonFooter() {
         <div className="ma-footer-legal">
           <Link href="/privacy">Privacy Policy</Link>
           <Link href="/terms">Terms & Conditions</Link>
+          <Link href="/cookies">Cookie Policy</Link>
           <Link href="/shipping">Shipping</Link>
         </div>
       </div>
