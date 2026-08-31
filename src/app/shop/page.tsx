@@ -45,6 +45,21 @@ export default function ShopPage() {
         </div>
       </section>
 
+      <section className="shop-dark-interlude" aria-label="Edition 001 house statement">
+        <div className="shop-dark-meta">
+          <span>MA / 001</span>
+          <span>OBJECTS IN MOTION</span>
+          <span>JOHANNESBURG / 2026</span>
+        </div>
+        <div className="shop-dark-word" aria-hidden="true">AMIRAL</div>
+        <div className="shop-dark-copy">
+          <p className="eyebrow">House code / 01</p>
+          <p>Quiet from a distance.<br />Specific up close.</p>
+          <span>Built around proportion, graphic tension and movement.</span>
+        </div>
+        <div className="shop-dark-rule" aria-hidden="true" />
+      </section>
+
       <section className="shop-collection" aria-label="Maison Amiral Edition 001">
         <div className="shop-collection-meta">
           <span>Collection / 001</span>
@@ -54,7 +69,7 @@ export default function ShopPage() {
 
         <div className="shop-grid">
           {products.map((product, index) => (
-            <article className="shop-card" key={product.slug}>
+            <article className={`shop-card shop-card-${index + 1}`} key={product.slug}>
               <Link className="shop-card-image" href={`/product/${product.slug}`}>
                 <ProductVisual product={product} index={index} />
                 <span className="shop-card-number">{(index + 1).toString().padStart(2, "0")}</span>
