@@ -1,0 +1,295 @@
+.subscribe-page {
+  background: #fff;
+  color: #111;
+}
+
+.subscribe-hero {
+  position: relative;
+  min-height: 72vh;
+  padding: 48px 28px 32px;
+  border-bottom: 1px solid rgba(17,17,17,.16);
+  display: grid;
+  align-items: end;
+  overflow: hidden;
+}
+
+.subscribe-index {
+  position: absolute;
+  top: 28px;
+  left: 28px;
+  font-size: 9px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.subscribe-word {
+  font-family: var(--font-maison-display), Georgia, serif;
+  font-size: clamp(6rem, 16vw, 17rem);
+  line-height: .68;
+  letter-spacing: -.07em;
+  font-weight: 500;
+}
+
+.subscribe-side-note {
+  position: absolute;
+  right: 28px;
+  bottom: 34px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+  font-size: 8px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #676762;
+}
+
+.subscribe-content {
+  display: grid;
+  grid-template-columns: 1.15fr .85fr;
+  min-height: 62vh;
+  border-bottom: 1px solid rgba(17,17,17,.16);
+}
+
+.subscribe-intro,
+.subscribe-panel {
+  padding: clamp(42px, 7vw, 110px) 28px;
+}
+
+.subscribe-panel {
+  border-left: 1px solid rgba(17,17,17,.16);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 80px;
+}
+
+.subscribe-kicker {
+  margin: 0 0 36px;
+  font-size: 9px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: #686862;
+}
+
+.subscribe-intro h1 {
+  max-width: 760px;
+  margin: 0 0 34px;
+  font-family: var(--font-maison-display), Georgia, serif;
+  font-size: clamp(4.2rem, 7vw, 8rem);
+  line-height: .82;
+  letter-spacing: -.055em;
+  font-weight: 500;
+}
+
+.subscribe-intro > p:last-child {
+  max-width: 620px;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: #393936;
+}
+
+.subscribe-panel-meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px 30px;
+  align-items: baseline;
+  font-size: 10px;
+}
+
+.subscribe-panel-meta span {
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: #777771;
+}
+
+.subscribe-panel-meta strong {
+  font-weight: 500;
+}
+
+.subscribe-form-main label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 9px;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
+.subscribe-field {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  border-top: 1px solid #111;
+  border-bottom: 1px solid #111;
+}
+
+.subscribe-field input,
+.subscribe-field button {
+  border: 0;
+  background: transparent;
+  color: #111;
+  font: inherit;
+}
+
+.subscribe-field input {
+  min-width: 0;
+  padding: 20px 0;
+  outline: 0;
+  font-size: 11px;
+  letter-spacing: .08em;
+}
+
+.subscribe-field button {
+  border-left: 1px solid #111;
+  padding: 0 22px;
+  cursor: pointer;
+  font-size: 10px;
+  letter-spacing: .13em;
+}
+
+.subscribe-field button:hover {
+  background: #111;
+  color: #fff;
+}
+
+.subscribe-privacy {
+  max-width: 520px;
+  margin: 14px 0 0;
+  font-size: 9px;
+  line-height: 1.5;
+  color: #777771;
+}
+
+.subscribe-privacy a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.subscribe-manifesto {
+  position: relative;
+  min-height: 66vh;
+  padding: 40px 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: #050505;
+  color: #fff;
+}
+
+.subscribe-manifesto-number {
+  position: absolute;
+  top: 28px;
+  left: 28px;
+  font-size: 9px;
+  letter-spacing: .14em;
+}
+
+.subscribe-manifesto p {
+  margin: 0 0 18px;
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.55);
+}
+
+.subscribe-manifesto h2 {
+  max-width: 980px;
+  margin: 0 0 30px;
+  font-family: var(--font-maison-display), Georgia, serif;
+  font-size: clamp(4rem, 8vw, 9rem);
+  line-height: .8;
+  letter-spacing: -.055em;
+  font-weight: 500;
+}
+
+.subscribe-manifesto a {
+  width: fit-content;
+  padding-bottom: 4px;
+  border-bottom: 1px solid currentColor;
+  font-size: 10px;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
+.legal-page {
+  min-height: 100vh;
+  padding: 110px 28px 100px;
+  background: #fff;
+}
+
+.legal-page-shell {
+  display: grid;
+  grid-template-columns: minmax(200px,.45fr) minmax(0,1fr);
+  gap: clamp(50px, 9vw, 150px);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.legal-page-index {
+  font-size: 9px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #74746f;
+}
+
+.legal-page-content h1 {
+  margin: 0 0 54px;
+  font-family: var(--font-maison-display), Georgia, serif;
+  font-size: clamp(4.6rem, 8vw, 9rem);
+  line-height: .78;
+  letter-spacing: -.055em;
+  font-weight: 500;
+}
+
+.legal-section {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 30px;
+  padding: 28px 0;
+  border-top: 1px solid rgba(17,17,17,.16);
+}
+
+.legal-section:last-child {
+  border-bottom: 1px solid rgba(17,17,17,.16);
+}
+
+.legal-section span {
+  font-size: 9px;
+  letter-spacing: .12em;
+  color: #74746f;
+}
+
+.legal-section h2 {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.legal-section p {
+  max-width: 760px;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.65;
+  color: #444440;
+}
+
+@media (max-width: 800px) {
+  .subscribe-hero { min-height: 58vh; }
+  .subscribe-content { grid-template-columns: 1fr; }
+  .subscribe-panel { border-left: 0; border-top: 1px solid rgba(17,17,17,.16); gap: 50px; }
+  .subscribe-side-note { display: none; }
+  .legal-page-shell { grid-template-columns: 1fr; gap: 34px; }
+}
+
+@media (max-width: 560px) {
+  .subscribe-hero,
+  .subscribe-intro,
+  .subscribe-panel,
+  .subscribe-manifesto,
+  .legal-page { padding-left: 18px; padding-right: 18px; }
+  .subscribe-index,
+  .subscribe-manifesto-number { left: 18px; }
+  .subscribe-field { grid-template-columns: 1fr; }
+  .subscribe-field button { min-height: 48px; border-left: 0; border-top: 1px solid #111; }
+  .legal-section { grid-template-columns: 1fr; gap: 12px; }
+}
