@@ -51,13 +51,16 @@ export function SiteFrame({ children }: { children: React.ReactNode }) {
         </nav>
 
         <Link className="global-ship-mark" href="/" aria-label="Maison Amiral home">
-          <img
-            className="ship-emblem-image"
-            src="/graphics/ship.png"
-            alt="Maison Amiral ship emblem"
-            width="49"
-            height="96"
-          />
+          <svg className="ship-emblem-svg" viewBox="0 0 129 256" role="img" aria-label="Maison Amiral ship emblem">
+            <defs>
+              <filter id="nav-ship-solid" x="-20%" y="-20%" width="140%" height="140%">
+                <feMorphology in="SourceAlpha" operator="dilate" radius="1.25" result="expanded" />
+                <feFlood floodColor="currentColor" result="paint" />
+                <feComposite in="paint" in2="expanded" operator="in" />
+              </filter>
+            </defs>
+            <image href="/graphics/ship.png" width="129" height="256" filter="url(#nav-ship-solid)" />
+          </svg>
         </Link>
 
         <nav className="global-nav-side global-nav-right" aria-label="Primary navigation right">
