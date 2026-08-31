@@ -181,6 +181,255 @@
 
 .secure-note { margin: 14px 0 0; line-height: 1.5; }
 
+/* Premium Maison Amiral bag */
+.cart-page-premium .cart-shell {
+  padding-top: 92px;
+}
+
+.cart-hero {
+  min-height: 36vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0 0 30px;
+  border-bottom: 1px solid var(--line);
+}
+
+.cart-hero-meta,
+.cart-hero-foot,
+.cart-list-head,
+.cart-product-meta,
+.cart-signature,
+.cart-summary-code {
+  font-size: 8px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.cart-hero-meta,
+.cart-hero-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  color: var(--muted);
+}
+
+.cart-hero h1 {
+  margin: 22px 0 18px;
+  font-family: var(--font-maison-display), Georgia, serif;
+  font-size: clamp(6.5rem, 14vw, 15rem);
+  line-height: .72;
+  letter-spacing: -.075em;
+  font-weight: 500;
+}
+
+.cart-loading { padding: 64px 0; }
+
+.premium-cart-layout {
+  grid-template-columns: minmax(0, 1.55fr) minmax(340px, .62fr);
+  gap: clamp(40px, 5vw, 84px);
+  padding-top: 30px;
+}
+
+.premium-cart-lines { border-top: 0; }
+
+.cart-list-head {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr auto;
+  gap: 20px;
+  padding: 0 0 12px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--ink);
+}
+.cart-list-head span:nth-child(2) { text-align: left; }
+.cart-list-head span:last-child { text-align: right; }
+
+.premium-cart-line {
+  position: relative;
+  grid-template-columns: 34px minmax(150px, 220px) minmax(0, 1fr) auto;
+  gap: clamp(18px, 2vw, 30px);
+  padding: 26px 0;
+  align-items: stretch;
+}
+
+.cart-line-index {
+  padding-top: 4px;
+  color: var(--muted);
+  font-size: 8px;
+  letter-spacing: .13em;
+}
+
+.premium-cart-image {
+  min-height: 0;
+  aspect-ratio: 4 / 5;
+  background: #f4f4f1;
+}
+
+.premium-cart-image .contain-image {
+  object-fit: cover;
+  transition: transform 420ms cubic-bezier(.2,.7,.2,1);
+}
+.premium-cart-image:hover .contain-image { transform: scale(1.018); }
+
+.cart-image-code {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  z-index: 2;
+  font-size: 7px;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
+.premium-cart-copy {
+  padding: 2px 0;
+}
+
+.premium-cart-copy h2 {
+  max-width: 420px;
+  font-family: var(--font-maison-display), Georgia, serif;
+  font-size: clamp(2.1rem, 3.2vw, 4.2rem);
+  line-height: .9;
+  letter-spacing: -.05em;
+  font-weight: 500;
+}
+
+.cart-product-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 18px;
+  color: var(--muted);
+}
+
+.premium-cart-actions {
+  gap: 18px;
+}
+
+.premium-quantity {
+  grid-template-columns: 34px 44px 34px;
+  border-color: rgba(17,17,17,.28);
+}
+.premium-quantity button {
+  transition: background 160ms ease, color 160ms ease;
+}
+.premium-quantity button:hover {
+  background: #111;
+  color: #fff;
+}
+
+.premium-remove {
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: .11em;
+  font-size: 8px;
+}
+.premium-remove:hover { color: #111; }
+
+.premium-cart-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  padding-top: 2px;
+}
+.premium-cart-price span {
+  color: var(--muted);
+  font-size: 7px;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+.premium-cart-price strong {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.premium-cart-summary {
+  position: sticky;
+  top: 92px;
+  padding: 28px;
+  border: 0;
+  background: #0a0a0a;
+  color: #fff;
+  min-height: 560px;
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-summary-code {
+  color: rgba(255,255,255,.42);
+  margin-bottom: 44px;
+}
+
+.premium-cart-summary .eyebrow {
+  color: rgba(255,255,255,.55);
+  margin-bottom: 18px;
+}
+
+.premium-cart-summary h2 {
+  margin: 0 0 50px;
+  font-family: var(--font-maison-display), Georgia, serif;
+  font-size: clamp(3.2rem, 4.6vw, 5.6rem);
+  line-height: .82;
+  letter-spacing: -.055em;
+  font-weight: 500;
+}
+
+.premium-summary-rows {
+  border-top: 1px solid rgba(255,255,255,.28);
+}
+.premium-cart-summary .summary-row {
+  border-bottom-color: rgba(255,255,255,.2);
+  color: rgba(255,255,255,.78);
+}
+.premium-cart-summary .summary-row strong {
+  color: #fff;
+  font-weight: 500;
+}
+
+.premium-summary-total {
+  margin-top: 10px;
+  border-top: 1px solid rgba(255,255,255,.3);
+  color: #fff;
+}
+.premium-summary-total strong { font-weight: 500; }
+
+.premium-checkout-button {
+  margin-top: 2px;
+  background: #fff;
+  color: #111;
+  border-color: #fff;
+  transition: background 180ms ease, color 180ms ease;
+}
+.premium-checkout-button:hover {
+  background: transparent;
+  color: #fff;
+}
+
+.cart-signature {
+  margin-top: auto;
+  padding-top: 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: rgba(255,255,255,.42);
+  line-height: 1.45;
+}
+
+.premium-empty-cart {
+  position: relative;
+  border-bottom: 1px solid var(--line);
+}
+.premium-empty-index {
+  position: absolute;
+  top: 30px;
+  right: 0;
+  color: var(--muted);
+  font-size: 8px;
+  letter-spacing: .13em;
+}
+
 .checkout-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(340px, .55fr);
@@ -280,6 +529,7 @@
   .checkout-layout { grid-template-columns: 1fr; gap: 64px; }
   .cart-summary,
   .checkout-summary { position: static; }
+  .premium-cart-summary { min-height: 500px; }
 }
 
 @media (max-width: 640px) {
@@ -294,4 +544,28 @@
   .field-grid.three-col { grid-template-columns: 1fr; }
   .checkout-form h1 { margin-bottom: 46px; }
   .payment-result-page { padding: 18px; }
+
+  .cart-page-premium .cart-shell { padding-top: 68px; }
+  .cart-hero { min-height: 30vh; }
+  .cart-hero h1 { font-size: clamp(5.3rem, 27vw, 8rem); }
+  .cart-hero-meta,
+  .cart-hero-foot { gap: 12px; }
+  .cart-list-head { display: none; }
+  .premium-cart-line {
+    grid-template-columns: 28px 112px minmax(0,1fr);
+    gap: 14px;
+  }
+  .premium-cart-image { min-height: 0; }
+  .premium-cart-price {
+    grid-column: 3;
+    align-items: flex-start;
+    flex-direction: row;
+    justify-content: flex-start;
+    padding-top: 4px;
+  }
+  .premium-cart-copy h2 { font-size: clamp(2rem, 9vw, 3rem); }
+  .cart-product-meta { gap: 9px; }
+  .premium-cart-actions { align-items: flex-start; }
+  .premium-quantity { grid-template-columns: 32px 38px 32px; }
+  .premium-cart-summary { padding: 24px 20px; min-height: 480px; }
 }
