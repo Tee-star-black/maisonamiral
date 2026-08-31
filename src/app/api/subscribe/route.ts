@@ -31,10 +31,6 @@ async function upsertContact(email: string, firstName?: string) {
       email,
       firstName: firstName || undefined,
       unsubscribed: false,
-      properties: {
-        source: "maisonamiral.co.za",
-        correspondence: "house",
-      },
     }),
   });
 
