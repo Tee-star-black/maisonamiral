@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { CartLink } from "@/components/cart/CartLink";
 import { MaisonFooter } from "@/components/layout/MaisonFooter";
 
@@ -34,7 +34,6 @@ export function SiteFrame({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const pageKey = getPageKey(pathname);
   const isHome = pathname === "/";
-  const [shipFailed, setShipFailed] = useState(false);
   const words = useMemo(
     () => pageWords[pageKey] ?? ["MAISON AMIRAL", "JOHANNESBURG", "OBJECT", "FORM"],
     [pageKey],
@@ -52,18 +51,7 @@ export function SiteFrame({ children }: { children: React.ReactNode }) {
         </nav>
 
         <Link className="global-ship-mark" href="/" aria-label="Maison Amiral home">
-          {!shipFailed ? (
-            <Image
-              src="/graphics/ship.png"
-              alt="Maison Amiral ship emblem"
-              width={49}
-              height={96}
-              priority
-              onError={() => setShipFailed(true)}
-            />
-          ) : (
-            <span className="ship-fallback" aria-hidden="true">MA</span>
-          )}
+          <span className="ship-emblem" aria-hidden="true" />
         </Link>
 
         <nav className="global-nav-side global-nav-right" aria-label="Primary navigation right">
