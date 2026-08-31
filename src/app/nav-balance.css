@@ -1,5 +1,5 @@
 .global-nav {
-  grid-template-columns: 1fr 88px 1fr !important;
+  grid-template-columns: 1fr 96px 1fr !important;
   column-gap: 34px;
   padding-left: clamp(28px, 4vw, 72px);
   padding-right: clamp(28px, 4vw, 72px);
@@ -67,29 +67,42 @@
   top: auto !important;
   transform: none !important;
   justify-self: center;
-  width: 88px;
-  height: 58px;
+  width: 96px;
+  height: 64px;
   display: grid;
   place-items: center;
   z-index: 3;
+  overflow: visible;
 }
 
 .ship-emblem-image {
   display: block;
-  width: 34px;
-  height: 56px;
+  width: 42px;
+  height: 62px;
   object-fit: contain;
-  opacity: 1;
-  filter: brightness(0);
-  transition: transform 260ms ease, filter 260ms ease;
+  opacity: 1 !important;
+  visibility: visible !important;
+  filter:
+    brightness(0)
+    drop-shadow(1px 0 0 #111)
+    drop-shadow(-1px 0 0 #111)
+    drop-shadow(0 1px 0 #111)
+    drop-shadow(0 -1px 0 #111);
+  transition: transform 220ms ease;
 }
 
 .is-home .ship-emblem-image {
-  filter: brightness(0) invert(1);
+  filter:
+    brightness(0)
+    invert(1)
+    drop-shadow(1px 0 0 #fff)
+    drop-shadow(-1px 0 0 #fff)
+    drop-shadow(0 1px 0 #fff)
+    drop-shadow(0 -1px 0 #fff);
 }
 
 .global-ship-mark:hover .ship-emblem-image {
-  transform: translateY(-1px) scale(1.04);
+  transform: translateY(-1px) scale(1.035);
 }
 
 .page-shop .global-ship-mark,
@@ -100,7 +113,7 @@
 
 @media (max-width: 900px) {
   .global-nav {
-    grid-template-columns: 1fr 68px 1fr !important;
+    grid-template-columns: 1fr 76px 1fr !important;
     column-gap: 16px;
     padding-left: 18px;
     padding-right: 18px;
@@ -121,15 +134,20 @@
     font-size: 8px;
   }
 
+  .global-ship-mark {
+    width: 76px;
+    height: 56px;
+  }
+
   .ship-emblem-image {
-    width: 30px;
-    height: 50px;
+    width: 36px;
+    height: 54px;
   }
 }
 
 @media (max-width: 560px) {
   .global-nav {
-    grid-template-columns: 1fr 58px 1fr !important;
+    grid-template-columns: 1fr 64px 1fr !important;
     column-gap: 10px;
     padding-left: 14px;
     padding-right: 14px;
@@ -141,12 +159,12 @@
   }
 
   .global-ship-mark {
-    width: 58px;
-    height: 48px;
+    width: 64px;
+    height: 50px;
   }
 
   .ship-emblem-image {
-    width: 26px;
-    height: 44px;
+    width: 30px;
+    height: 46px;
   }
 }
