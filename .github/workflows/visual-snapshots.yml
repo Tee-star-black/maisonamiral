@@ -1,0 +1,58 @@
+name: Maison Visual Snapshots
+
+on:
+  push:
+    branches:
+      - feature/homepage-assets
+  workflow_dispatch:
+
+jobs:
+  snapshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install app dependencies
+        run: npm ci
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start Maison
+        run: |
+          npm run dev -- --hostname 127.0.0.1 > /tmp/maison-next.log 2>&1 &
+          echo $! > /tmp/maison-next.pid
+          for i in {1..60}; do
+            if curl --silent --fail http://127.0.0.1:3000 >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          cat /tmp/maison-next.log
+          exit 1
+
+      - name: Capture full-page snapshots
+        run: node scripts/capture-snapshots.mjs
+
+      - name: Upload page snapshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: maison-amiral-page-snapshots
+          path: snapshots/*.png
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Show Next log on failure
+        if: failure()
+        run: cat /tmp/maison-next.log || true
