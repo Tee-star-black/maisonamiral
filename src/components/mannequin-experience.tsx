@@ -1,248 +1,256 @@
 "use client";
 
-import type {
-  CSSProperties,
-  KeyboardEvent,
-  PointerEvent as ReactPointerEvent,
-} from "react";
+import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatPrice, products } from "@/data/products";
+import { LookFigure, type LookView } from "./look-figure";
 import styles from "./mannequin-experience.module.css";
 
-const ROTATION_LIMIT = 26;
+const TILT_LIMIT = 18;
+const TRANSITION_MS = 360;
+
+type Drag = { id: number; x: number; y: number; tilt: number; moved: boolean };
+type NavigateEvent = { preventDefault: () => void };
 
 export function MannequinExperience() {
   const router = useRouter();
+  const id = useId();
+  const titleId = `${id}-title`;
+  const noteId = `${id}-note`;
   const [activeIndex, setActiveIndex] = useState(3);
-  const [rotation, setRotation] = useState(-4);
+  const [view, setView] = useState<LookView>("front");
+  const [tilt, setTilt] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const dragStart = useRef<{ x: number; rotation: number } | null>(null);
-  const didDrag = useRef(false);
-
+  const timer = useRef<number | null>(null);
+  const navigating = useRef(false);
+  const drag = useRef<Drag | null>(null);
+  const suppressClick = useRef(false);
   const product = products[activeIndex];
+  const alternateView: LookView = view === "front" ? "back" : "front";
+  const href = `/shop/${product.slug}`;
+  const photoIndex = view === "back" && product.images[1] ? 1 : 0;
+  const photo = product.images[photoIndex];
 
-  const productStyle = {
-    "--shirt-tone": product.tone,
-    "--shirt-ink": product.ink,
-  } as CSSProperties;
+  useEffect(() => {
+    return () => {
+      if (timer.current !== null) window.clearTimeout(timer.current);
+    };
+  }, []);
 
-  function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
-    if (isTransitioning) return;
-    dragStart.current = { x: event.clientX, rotation };
-    didDrag.current = false;
-    event.currentTarget.setPointerCapture(event.pointerId);
+  function cancelTransition() {
+    if (timer.current !== null) window.clearTimeout(timer.current);
+    timer.current = null;
+    navigating.current = false;
+    setIsTransitioning(false);
   }
 
-  function handlePointerMove(event: ReactPointerEvent<HTMLDivElement>) {
-    if (!dragStart.current || isTransitioning) return;
-
-    const delta = event.clientX - dragStart.current.x;
-    if (Math.abs(delta) > 4) didDrag.current = true;
-
-    const nextRotation = dragStart.current.rotation + delta * 0.12;
-    setRotation(Math.max(-ROTATION_LIMIT, Math.min(ROTATION_LIMIT, nextRotation)));
+  function chooseProduct(index: number) {
+    cancelTransition();
+    drag.current = null;
+    suppressClick.current = false;
+    setActiveIndex(index);
+    setTilt(0);
   }
 
-  function handlePointerUp(event: ReactPointerEvent<HTMLDivElement>) {
-    dragStart.current = null;
+  function chooseView(nextView: LookView) {
+    cancelTransition();
+    drag.current = null;
+    suppressClick.current = false;
+    setView(nextView);
+    setTilt(0);
+  }
+
+  // onNavigate preserves modified clicks, new tabs and native no-JS links.
+  function openProduct(event: NavigateEvent) {
+    if (navigating.current) {
+      event.preventDefault();
+      return;
+    }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    event.preventDefault();
+    navigating.current = true;
+    setIsTransitioning(true);
+    timer.current = window.setTimeout(() => {
+      timer.current = null;
+      router.push(href);
+    }, TRANSITION_MS);
+  }
+
+  function startDrag(event: ReactPointerEvent<HTMLDivElement>) {
+    // Buttons change views; only the figure and sheet are draggable.
+    if (!event.isPrimary || event.button !== 0 || navigating.current) return;
+    suppressClick.current = false;
+    if ((event.target as Element).closest("button")) return;
+    drag.current = { id: event.pointerId, x: event.clientX, y: event.clientY, tilt, moved: false };
+  }
+
+  function moveDrag(event: ReactPointerEvent<HTMLDivElement>) {
+    const origin = drag.current;
+    if (!origin || origin.id !== event.pointerId) return;
+    const dx = event.clientX - origin.x;
+    const dy = event.clientY - origin.y;
+    if (!origin.moved) {
+      if (Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) {
+        drag.current = null;
+        return;
+      }
+      if (Math.abs(dx) < 8) return;
+      origin.moved = true;
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }
+    suppressClick.current = true;
+    setTilt(Math.max(-TILT_LIMIT, Math.min(TILT_LIMIT, origin.tilt + dx * 0.12)));
+  }
+
+  function endDrag(event: ReactPointerEvent<HTMLDivElement>) {
+    if (drag.current?.id !== event.pointerId) return;
+    if (event.type === "pointercancel") suppressClick.current = false;
+    drag.current = null;
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
   }
 
-  function openProduct() {
-    if (didDrag.current || isTransitioning) return;
-
-    setIsTransitioning(true);
-    window.setTimeout(() => {
-      router.push(`/shop/${product.slug}`);
-    }, 360);
-  }
-
-  function handleGarmentKeyDown(event: KeyboardEvent<SVGGElement>) {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      openProduct();
-    }
-  }
-
-  function chooseProduct(index: number) {
-    setActiveIndex(index);
-    setRotation(-4);
-    setIsTransitioning(false);
-  }
-
   return (
-    <section className={styles.experience} aria-labelledby="mannequin-title">
-      <div className={styles.headingRow}>
+    <section id="shop-the-look" className={styles.experience} aria-labelledby={titleId}>
+      <header className={styles.heading}>
         <div>
-          <p className={styles.eyebrow}>Interactive atelier / Edition 001</p>
-          <h2 id="mannequin-title">
-            Dress the <em>form.</em>
-          </h2>
+          <p className={styles.eyebrow}>Maison Amiral / The wardrobe study</p>
+          <h2 id={titleId}>Anatomy of a <em>look.</em></h2>
+        </div>
+        <p className={styles.intro}>One silhouette. Every perspective.<br />Select the piece. Make it yours.</p>
+      </header>
+
+      <div className={styles.sheet}>
+        <div className={styles.sheetHeader}>
+          <span>MA / Edition 001</span>
+          <span>Figure {String(activeIndex + 1).padStart(2, "0")}</span>
+          <span>Front &amp; reverse</span>
         </div>
 
-        <div className={styles.headingMeta}>
-          <span>02 / Digital fitting room</span>
-          <p className={styles.intro}>
-            Rotate the atelier form, switch the piece, then enter the product story.
-          </p>
-        </div>
-      </div>
-
-      <div className={styles.experienceGrid} style={productStyle}>
-        <div
-          className={styles.stage}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerUp}
-          aria-label="Interactive atelier form. Drag left or right to rotate."
-        >
-          <div className={styles.stageWord} aria-hidden="true">
-            {product.artMark}
-          </div>
-
-          <div className={styles.stageLabel} aria-hidden="true">
-            <span>Drag</span>
-            <span>↔</span>
-            <span>Rotate</span>
-          </div>
-
-          <div className={styles.stageEdition} aria-hidden="true">
-            MA / 001
-          </div>
-
-          <div
-            className={`${styles.figureWrap} ${isTransitioning ? styles.figureFocus : ""}`}
-            style={{ "--rotation": `${rotation}deg` } as CSSProperties}
-          >
-            <svg
-              className={styles.figure}
-              viewBox="0 0 420 700"
-              role="img"
-              aria-label={`${product.name} displayed on a sculptural fashion form`}
+        <div className={styles.layout}>
+          <div className={styles.study}>
+            <div
+              className={styles.drawing}
+              role="group"
+              aria-label={`${product.name}, ${view} silhouette`}
+              aria-describedby={noteId}
+              onDragStart={(event) => event.preventDefault()}
+              onPointerDown={startDrag}
+              onPointerMove={moveDrag}
+              onPointerUp={endDrag}
+              onPointerCancel={endDrag}
+              onLostPointerCapture={() => { drag.current = null; }}
+              onClickCapture={(event) => {
+                if (suppressClick.current && event.detail > 0) {
+                  suppressClick.current = false;
+                  event.preventDefault();
+                  event.stopPropagation();
+                }
+              }}
+              onKeyDown={(event) => { if (event.key === "Escape") cancelTransition(); }}
             >
-              <defs>
-                <linearGradient id="formFinish" x1="0" x2="1" y1="0" y2="1">
-                  <stop offset="0" stopColor="#f0ece3" />
-                  <stop offset="0.42" stopColor="#bbb3a6" />
-                  <stop offset="0.72" stopColor="#eee9df" />
-                  <stop offset="1" stopColor="#989084" />
-                </linearGradient>
-                <linearGradient id="standFinish" x1="0" x2="1">
-                  <stop offset="0" stopColor="#6d675e" />
-                  <stop offset="0.5" stopColor="#e0dbd2" />
-                  <stop offset="1" stopColor="#5b554e" />
-                </linearGradient>
-                <filter id="formShadow" x="-35%" y="-25%" width="170%" height="165%">
-                  <feDropShadow dx="0" dy="20" stdDeviation="18" floodOpacity="0.42" />
-                </filter>
-              </defs>
+              <span className={styles.plateNumber} aria-hidden="true">0{activeIndex + 1}</span>
+              <svg className={styles.leaders} viewBox="0 0 1000 780" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M45 269 H241 L407 242 H480" />
+                <path d="M45 470 H230 L381 350 H459" />
+                <circle cx="480" cy="242" r="4" />
+                <circle cx="459" cy="350" r="4" />
+              </svg>
 
-              <g className={styles.formBody} filter="url(#formShadow)">
-                <ellipse cx="210" cy="111" rx="31" ry="12" fill="url(#formFinish)" />
-                <path
-                  d="M184 110 C185 128 181 141 170 153 L250 153 C239 141 235 128 236 110 Z"
-                  fill="url(#formFinish)"
-                />
-                <path
-                  d="M210 143 C168 143 139 157 117 185 C137 218 148 255 151 307 C154 362 166 406 190 432 C197 440 203 445 210 449 C217 445 223 440 230 432 C254 406 266 362 269 307 C272 255 283 218 303 185 C281 157 252 143 210 143 Z"
-                  fill="url(#formFinish)"
-                />
-                <path
-                  d="M184 433 C191 444 201 450 210 454 C219 450 229 444 236 433 L227 507 L193 507 Z"
-                  fill="url(#formFinish)"
-                />
-              </g>
+              <Link href={href} onNavigate={openProduct} className={styles.pieceCallout} draggable={false}>
+                <span className={styles.label}>01 / The piece</span>
+                <strong>{product.name}</strong>
+                <span>{formatPrice(product.price)} <span aria-hidden="true">&#8599;</span></span>
+              </Link>
+              <div className={styles.detailCallout}>
+                <span className={styles.label}>02 / The silhouette</span>
+                <p>Front to back.<br />A different perspective.</p>
+                <button type="button" onClick={() => chooseView(alternateView)}>View {alternateView} <span aria-hidden="true">&#8594;</span></button>
+              </div>
 
-              <g className={styles.stand} aria-hidden="true">
-                <rect x="205" y="500" width="10" height="126" rx="5" fill="url(#standFinish)" />
-                <ellipse cx="210" cy="636" rx="82" ry="13" fill="#736c62" />
-                <ellipse cx="210" cy="631" rx="82" ry="13" fill="url(#standFinish)" />
-              </g>
-
-              <g
-                className={styles.shirt}
-                role="button"
-                tabIndex={0}
-                aria-label={`View ${product.name}, ${formatPrice(product.price)}`}
-                onClick={openProduct}
-                onKeyDown={handleGarmentKeyDown}
+              <div
+                className={`${styles.figureWrap} ${isTransitioning ? styles.figureFocus : ""}`}
+                style={{ "--tilt": `${tilt}deg` } as CSSProperties}
               >
-                <path
-                  className={styles.shirtShape}
-                  d="M151 162 C169 151 189 146 210 146 C231 146 251 151 269 162 L303 180 L330 228 L292 254 L272 225 L272 345 C257 368 237 381 210 381 C183 381 163 368 148 345 L148 225 L128 254 L90 228 L117 180 Z"
-                />
-                <path className={styles.shirtShoulderShade} d="M126 182 C153 199 173 207 210 207 C247 207 267 199 294 182" />
-                <path className={styles.collar} d="M177 158 C182 181 238 181 243 158" />
-                <path className={styles.shirtFold} d="M177 221 C172 258 174 307 181 347" />
-                <path className={styles.shirtFold} d="M243 221 C248 258 246 307 239 347" />
-                <path className={styles.shirtHem} d="M151 344 C171 356 190 361 210 361 C230 361 249 356 269 344" />
-                <text className={styles.shirtMark} x="210" y="276" textAnchor="middle">
-                  {product.artMark}
-                </text>
-              </g>
-            </svg>
+                <LookFigure product={product} view={view} className={styles.figure} />
+                <Link
+                  href={href}
+                  onNavigate={openProduct}
+                  className={styles.garmentHitArea}
+                  draggable={false}
+                  aria-label={`Explore ${product.name}, ${formatPrice(product.price)}`}
+                >
+                  <span className={styles.hotspot} aria-hidden="true">01 <span>&#8599;</span></span>
+                </Link>
+              </div>
+
+              <button
+                type="button"
+                className={styles.reverse}
+                onClick={() => chooseView(alternateView)}
+                aria-label={`Show ${alternateView} of the ${product.name} silhouette`}
+              >
+                <LookFigure product={product} view={alternateView} className={styles.figure} />
+                <span>03 / {alternateView} view <span aria-hidden="true">&#8599;</span></span>
+              </button>
+              <span className={styles.viewCaption}>{view} / Illustrated silhouette</span>
+            </div>
+
+            <div className={styles.viewControls}>
+              <div className={styles.views} role="group" aria-label="Figure view">
+                <button type="button" aria-pressed={view === "front"} onClick={() => chooseView("front")}>Front</button>
+                <button type="button" aria-pressed={view === "back"} onClick={() => chooseView("back")}>Back</button>
+              </div>
+              <div className={styles.tiltControls} role="group" aria-label="Perspective controls">
+                <button type="button" aria-label="Tilt left" onClick={() => setTilt((value) => Math.max(-TILT_LIMIT, value - 6))}>&#8592;</button>
+                <button type="button" onClick={() => setTilt(0)}>Reset</button>
+                <button type="button" aria-label="Tilt right" onClick={() => setTilt((value) => Math.min(TILT_LIMIT, value + 6))}>&#8594;</button>
+              </div>
+            </div>
           </div>
 
-          <button type="button" className={styles.garmentTag} onClick={openProduct}>
-            <span>{product.name}</span>
-            <strong>{formatPrice(product.price)}</strong>
-            <span aria-hidden="true">↗</span>
-          </button>
+          <aside className={styles.details} aria-label="Choose a collection piece">
+            <p className={styles.label}>The selected piece</p>
+            <div aria-live="polite" aria-atomic="true">
+              <h3>{product.name}</h3>
+              <p className={styles.price}>{formatPrice(product.price)} <span>/ {product.edition}</span></p>
+            </div>
+            {photo ? (
+              <Link href={href} onNavigate={openProduct} className={styles.photograph}>
+                <Image src={photo} alt={`${product.name}, ${photoIndex === 0 ? "front" : "back"} editorial photograph`} fill sizes="(max-width: 640px) 85vw, (max-width: 1100px) 40vw, 270px" />
+                <span>Product photograph <span aria-hidden="true">&#8599;</span></span>
+              </Link>
+            ) : (
+              <div className={styles.missingPhoto}>
+                <p>Illustrated study</p>
+                <span>Product photographs have not been supplied for this piece.</span>
+              </div>
+            )}
+            <p className={styles.copy}>{product.shortDescription}</p>
+            <Link href={href} onNavigate={openProduct} className={styles.enterButton}>
+              {isTransitioning ? "Opening piece" : "Explore piece"} <span aria-hidden="true">&#8599;</span>
+            </Link>
+            <div className={styles.selectorList} role="group" aria-label="Collection pieces">
+              {products.map((item, index) => (
+                <button key={item.slug} type="button" className={styles.selector} aria-pressed={activeIndex === index} onClick={() => chooseProduct(index)}>
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <span className={styles.swatch} style={{ backgroundColor: item.tone }} aria-hidden="true" />
+                  <strong>{item.name}</strong>
+                  <span aria-hidden="true">{activeIndex === index ? "\u2197" : "+"}</span>
+                </button>
+              ))}
+            </div>
+          </aside>
         </div>
 
-        <aside className={styles.controls} aria-label="Select a Maison Amiral piece">
-          <div className={styles.activeProduct} aria-live="polite">
-            <div className={styles.activeProductTopline}>
-              <p>{String(activeIndex + 1).padStart(2, "0")} / 04</p>
-              <span>{product.edition}</span>
-            </div>
-
-            <div className={styles.productPreview} aria-hidden="true">
-              {product.images[0] ? (
-                <Image
-                  src={product.images[0]}
-                  alt=""
-                  fill
-                  sizes="180px"
-                  className={styles.productPreviewImage}
-                />
-              ) : (
-                <span>{product.artMark}</span>
-              )}
-            </div>
-
-            <h3>{product.name}</h3>
-            <span className={styles.activePrice}>{formatPrice(product.price)}</span>
-            <p className={styles.productCopy}>{product.shortDescription}</p>
-
-            <button type="button" className={styles.enterButton} onClick={openProduct}>
-              Explore piece <span aria-hidden="true">↗</span>
-            </button>
-          </div>
-
-          <div className={styles.selectorList}>
-            {products.map((item, index) => (
-              <button
-                key={item.slug}
-                type="button"
-                className={`${styles.selector} ${index === activeIndex ? styles.selectorActive : ""}`}
-                onClick={() => chooseProduct(index)}
-                aria-pressed={index === activeIndex}
-              >
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <strong>{item.name}</strong>
-                <span>{formatPrice(item.price)}</span>
-              </button>
-            ))}
-          </div>
-
-          <p className={styles.interactionHint}>Touch + drag on mobile / mouse + drag on desktop</p>
-        </aside>
+        <footer className={styles.sheetFooter}>
+          <p id={noteId}>Illustrated styling study, not an exact fit or print preview. Trousers and shoes are styling only. Refer to product photographs for garment detail.</p>
+          <span>Drag gently to tilt / Tap 01 to explore</span>
+        </footer>
       </div>
     </section>
   );
