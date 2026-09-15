@@ -1,12 +1,18 @@
 "use client";
 
 import type { CSSProperties, KeyboardEvent, PointerEvent as ReactPointerEvent } from "react";
+import Image from "next/image";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatPrice, products } from "@/data/products";
 import styles from "./mannequin-experience.module.css";
 
 const ROTATION_LIMIT = 34;
+
+const backdropBySlug: Record<string, string | undefined> = {
+  "automobile-tee": "/graphics/wheel.png",
+  "emblem-tee": "/products/emblem/front-edit.jpeg",
+};
 
 export function MannequinExperience() {
   const router = useRouter();
@@ -17,6 +23,7 @@ export function MannequinExperience() {
   const didDrag = useRef(false);
 
   const product = products[activeIndex];
+  const backdrop = backdropBySlug[product.slug];
 
   const productStyle = {
     "--shirt-tone": product.tone,
@@ -84,6 +91,26 @@ export function MannequinExperience() {
           onPointerCancel={handlePointerUp}
           aria-label="Interactive mannequin. Drag left or right to rotate."
         >
+          {backdrop ? (
+            <div className={styles.stageBackdrop} aria-hidden="true">
+              <Image
+                src={backdrop}
+                alt=""
+                fill
+                sizes="(max-width: 900px) 100vw, 70vw"
+                className={styles.stageBackdropImage}
+              />
+            </div>
+          ) : product.slug === "flag-staple-tee" ? (
+            <video className={styles.stageBackdropVideo} autoPlay muted loop playsInline aria-hidden="true">
+              <source src="/video/flag.mp4" type="video/mp4" />
+            </video>
+          ) : (
+            <div className={styles.typographicBackdrop} aria-hidden="true">
+              GUERRILLA
+            </div>
+          )}
+
           <div className={styles.stageLabel} aria-hidden="true">
             <span>Drag</span>
             <span>↔</span>
