@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MannequinExperience } from "@/components/mannequin-experience";
 
 const navItems = [
   ["Shop", "/shop"],
@@ -77,6 +78,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <MannequinExperience />
 
       <section className="featured section-pad">
         <div className="section-heading-row">
