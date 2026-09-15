@@ -6,7 +6,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatPrice, products } from "@/data/products";
-import { LookFigure } from "./look-figure";
 import { RealisticMannequin3D } from "./mannequin/realistic-mannequin-3d";
 import styles from "./mannequin-experience.module.css";
 
@@ -68,10 +67,10 @@ export function MannequinExperience() {
   const sceneStyle = {
     "--shirt-tone": product.tone,
     "--shirt-ink": product.ink,
-    width: "min(66vw, 760px)",
+    width: "min(62vw, 720px)",
     maxWidth: "100%",
-    height: "min(74vh, 760px)",
-    minHeight: "560px",
+    height: "min(76vh, 760px)",
+    minHeight: "600px",
     transform: "none",
   } as CSSProperties;
 
@@ -114,7 +113,7 @@ export function MannequinExperience() {
 
               <div className={styles.detailCallout}>
                 <span className={styles.label}>02 / The model</span>
-                <p>Real-time WebGL.<br />Drag to rotate. Scroll to zoom.</p>
+                <p>Live 3D mannequin.<br />Drag to rotate. Scroll to zoom.</p>
               </div>
 
               <div className={`${styles.figureWrap} ${isTransitioning ? styles.figureFocus : ""}`} style={sceneStyle}>
@@ -127,11 +126,6 @@ export function MannequinExperience() {
                 />
               </div>
 
-              <div className={styles.reverse} aria-label={`${product.name} styling reference`}>
-                <LookFigure product={product} view="back" className={styles.figure} />
-                <span>03 / silhouette reference</span>
-              </div>
-
               <span className={styles.viewCaption}>360° / Live rendered mannequin</span>
             </div>
 
@@ -141,7 +135,7 @@ export function MannequinExperience() {
                 <button type="button" disabled>Wheel / zoom</button>
               </div>
               <div className={styles.tiltControls} role="group" aria-label="Scene status">
-                <button type="button" disabled>WebGL</button>
+                <button type="button" disabled>Three.js</button>
                 <button type="button" disabled>Live</button>
               </div>
             </div>
