@@ -1,4 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
+import { EditionGallery } from "@/components/edition-gallery";
 import { MannequinExperience } from "@/components/mannequin-experience";
 
 const navItems = [
@@ -84,25 +86,33 @@ export default function Home() {
       <section className="featured section-pad">
         <div className="section-heading-row">
           <p className="eyebrow">Selected / 001</p>
-          <Link className="text-link" href="/shop">
-            View all <span aria-hidden="true">↗</span>
+          <Link className="text-link" href="/shop/emblem-tee">
+            View piece <span aria-hidden="true">↗</span>
           </Link>
         </div>
 
-        <div className="product-stage">
-          <div className="product-art" aria-hidden="true">
-            <span className="product-art-word">AMIRAL</span>
+        <Link className="product-stage" href="/shop/emblem-tee" aria-label="View Emblem Tee">
+          <div className="product-art">
+            <Image
+              src="/products/emblem/front-edit.jpeg"
+              alt="Maison Amiral Emblem Tee editorial front view"
+              fill
+              sizes="(max-width: 900px) 100vw, 94vw"
+              className="featured-product-image"
+            />
           </div>
 
           <div className="product-meta">
             <div>
               <p className="product-index">01</p>
-              <h3>Flagship Emblem Tee</h3>
+              <h3>Emblem Tee</h3>
             </div>
             <div className="product-price">R450</div>
           </div>
-        </div>
+        </Link>
       </section>
+
+      <EditionGallery />
 
       <section className="editorial-banner">
         <div className="editorial-overlay">
