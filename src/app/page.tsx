@@ -16,14 +16,18 @@ export default function Home() {
     <main>
       <section className="hero hero-campaign">
         <div className="hero-media" aria-hidden="true">
-          <Image
-            src="/products/emblem/front-edit.jpeg"
-            alt=""
-            fill
-            priority
-            sizes="100vw"
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            poster="/products/emblem/front-edit.jpeg"
             className="hero-media-image"
-          />
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          >
+            <source src="/video/flag.mp4" type="video/mp4" />
+          </video>
           <div className="hero-media-wash" />
         </div>
 
