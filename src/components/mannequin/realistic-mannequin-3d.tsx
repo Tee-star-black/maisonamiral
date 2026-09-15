@@ -1,8 +1,8 @@
 "use client";
 
-import { ContactShadows, Environment, OrbitControls, RoundedBox, Text } from "@react-three/drei";
+import { ContactShadows, OrbitControls, RoundedBox, Text } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 
 export type RealisticMannequin3DProps = {
@@ -12,6 +12,8 @@ export type RealisticMannequin3DProps = {
   productName: string;
   onProductOpen: () => void;
 };
+
+const targetScale = new THREE.Vector3(1, 1, 1);
 
 function Limb({
   position,
@@ -46,10 +48,13 @@ function MannequinModel({ shirtTone, shirtInk, artMark, productName, onProductOp
     [shirtTone],
   );
 
+  useEffect(() => () => shirtMaterial.dispose(), [shirtMaterial]);
+
   useFrame((state, delta) => {
     if (!group.current) return;
-    const targetScale = hovered ? 1.025 : 1;
-    group.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 1 - Math.exp(-8 * delta));
+    const scale = hovered ? 1.025 : 1;
+    targetScale.set(scale, scale, scale);
+    group.current.scale.lerp(targetScale, 1 - Math.exp(-8 * delta));
     group.current.position.y = Math.sin(state.clock.elapsedTime * 0.9) * 0.012;
   });
 
@@ -74,7 +79,6 @@ function MannequinModel({ shirtTone, shirtInk, artMark, productName, onProductOp
       <Limb position={[1.02, 2.88, 0]} rotation={[0, 0, 0.08]} scale={[0.9, 1.06, 0.9]} />
       <Limb position={[-1.12, 1.62, 0.01]} rotation={[0, 0, 0.03]} scale={[0.78, 1.04, 0.78]} />
       <Limb position={[1.12, 1.62, 0.01]} rotation={[0, 0, -0.03]} scale={[0.78, 1.04, 0.78]} />
-
       <Limb position={[-0.47, 0.45, 0]} scale={[1.08, 1.66, 1.08]} />
       <Limb position={[0.47, 0.45, 0]} scale={[1.08, 1.66, 1.08]} />
       <Limb position={[-0.47, -1.5, 0]} scale={[0.92, 1.5, 0.92]} />
@@ -95,17 +99,20 @@ function MannequinModel({ shirtTone, shirtInk, artMark, productName, onProductOp
           onProductOpen();
         }}
       >
-        <RoundedBox args={[2.22, 2.1, 0.62]} radius={0.18} smoothness={8} position={[0, 3.02, 0.04]} castShadow material={shirtMaterial}>
-          <meshPhysicalMaterial {...shirtMaterial} />
-        </RoundedBox>
+        <RoundedBox
+          args={[2.22, 2.1, 0.62]}
+          radius={0.18}
+          smoothness={8}
+          position={[0, 3.02, 0.04]}
+          castShadow
+          material={shirtMaterial}
+        />
 
         <mesh position={[-1.38, 3.2, 0.02]} rotation={[0, 0, -0.49]} castShadow material={shirtMaterial}>
           <boxGeometry args={[0.82, 1.25, 0.54]} />
-          <meshPhysicalMaterial {...shirtMaterial} />
         </mesh>
         <mesh position={[1.38, 3.2, 0.02]} rotation={[0, 0, 0.49]} castShadow material={shirtMaterial}>
           <boxGeometry args={[0.82, 1.25, 0.54]} />
-          <meshPhysicalMaterial {...shirtMaterial} />
         </mesh>
 
         <mesh position={[0, 3.92, 0.22]} rotation={[Math.PI / 2, 0, 0]}>
@@ -153,16 +160,13 @@ export function RealisticMannequin3D(props: RealisticMannequin3DProps) {
     >
       <color attach="background" args={["#0b0b0b"]} />
       <fog attach="fog" args={["#0b0b0b", 9.5, 15]} />
-
-      <ambientLight intensity={0.62} />
+      <hemisphereLight args={["#fff8ec", "#20242c", 1.35]} />
       <spotLight position={[4.8, 8.2, 6]} intensity={85} angle={0.32} penumbra={0.7} castShadow color="#fff5e8" />
       <spotLight position={[-4.5, 5.4, 3]} intensity={42} angle={0.42} penumbra={0.85} color="#d8e2ff" />
       <pointLight position={[0, 0.5, -4]} intensity={20} color="#ffffff" />
 
       <MannequinModel {...props} />
-
       <ContactShadows position={[0, -4.85, 0]} opacity={0.58} scale={8} blur={2.8} far={5} />
-      <Environment preset="studio" environmentIntensity={0.42} />
 
       <OrbitControls
         makeDefault
