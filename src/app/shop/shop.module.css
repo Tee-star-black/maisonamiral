@@ -1,0 +1,143 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 36px 18px;
+}
+
+.card {
+  display: grid;
+  gap: 14px;
+}
+
+.visual {
+  position: relative;
+  min-height: min(58vw, 680px);
+  overflow: hidden;
+  background: var(--product-tone);
+  color: var(--product-ink);
+  border: 1px solid rgba(17, 17, 17, 0.12);
+}
+
+.image {
+  object-fit: cover;
+  transition: transform 650ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.art {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.art::before,
+.art::after {
+  content: "";
+  position: absolute;
+  border: 1px solid currentColor;
+  opacity: 0.18;
+}
+
+.art::before {
+  width: 74%;
+  height: 74%;
+  border-radius: 50%;
+}
+
+.art::after {
+  width: 38%;
+  height: 118%;
+  transform: rotate(31deg);
+}
+
+.artMark {
+  position: relative;
+  z-index: 2;
+  font-size: clamp(3.8rem, 10vw, 9rem);
+  font-weight: 700;
+  line-height: 0.8;
+  letter-spacing: -0.07em;
+}
+
+.mediaLabel {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  z-index: 3;
+  padding: 5px 7px;
+  background: rgba(243, 240, 233, 0.82);
+  color: #111;
+  backdrop-filter: blur(8px);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.meta {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+  align-items: start;
+  padding-top: 12px;
+  border-top: 1px solid rgba(17, 17, 17, 0.22);
+}
+
+.edition,
+.price,
+.description {
+  margin: 0;
+}
+
+.edition {
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.meta h2 {
+  margin: 0 0 8px;
+  font-size: clamp(1.8rem, 3vw, 3.1rem);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+}
+
+.description {
+  max-width: 430px;
+  color: #5b574f;
+  line-height: 1.45;
+}
+
+.price {
+  font-size: 13px;
+}
+
+.card:hover .image,
+.card:focus-visible .image {
+  transform: scale(1.025);
+}
+
+.card:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 5px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .image {
+    transition: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 46px;
+  }
+
+  .visual {
+    min-height: 118vw;
+  }
+}
