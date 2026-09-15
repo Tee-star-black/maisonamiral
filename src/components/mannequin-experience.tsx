@@ -74,12 +74,17 @@ export function MannequinExperience() {
     <section className={styles.experience} aria-labelledby="mannequin-title">
       <div className={styles.headingRow}>
         <div>
-          <p className={styles.eyebrow}>Interactive look / Edition 001</p>
-          <h2 id="mannequin-title">Wear the collection.</h2>
+          <p className={styles.eyebrow}>Interactive atelier / Edition 001</p>
+          <h2 id="mannequin-title">
+            Dress the <em>figure.</em>
+          </h2>
         </div>
-        <p className={styles.intro}>
-          Rotate the figure. Change the piece. Select the garment to enter its product story.
-        </p>
+        <div className={styles.headingMeta}>
+          <span>02 / Digital fitting room</span>
+          <p className={styles.intro}>
+            Rotate the form. Change the piece. Select the garment to enter its product story.
+          </p>
+        </div>
       </div>
 
       <div className={styles.experienceGrid} style={productStyle}>
@@ -117,6 +122,10 @@ export function MannequinExperience() {
             <span>Rotate</span>
           </div>
 
+          <div className={styles.stageEdition} aria-hidden="true">
+            MA / 001
+          </div>
+
           <div
             className={`${styles.figureWrap} ${isTransitioning ? styles.figureFocus : ""}`}
             style={{ "--rotation": `${rotation}deg` } as CSSProperties}
@@ -128,17 +137,12 @@ export function MannequinExperience() {
               aria-label={`${product.name} displayed on a mannequin`}
             >
               <defs>
-                <linearGradient id="mannequinSkin" x1="0" x2="1" y1="0" y2="1">
-                  <stop offset="0" stopColor="#eeeae1" />
-                  <stop offset="0.5" stopColor="#c9c3b8" />
-                  <stop offset="1" stopColor="#f7f4ee" />
-                </linearGradient>
                 <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
-                  <feDropShadow dx="0" dy="11" stdDeviation="10" floodOpacity="0.16" />
+                  <feDropShadow dx="0" dy="16" stdDeviation="12" floodOpacity="0.28" />
                 </filter>
               </defs>
 
-              <g className={styles.body} fill="url(#mannequinSkin)" filter="url(#softShadow)">
+              <g className={styles.body} fill="#d9d2c7" filter="url(#softShadow)">
                 <ellipse cx="180" cy="68" rx="46" ry="57" />
                 <rect x="160" y="116" width="40" height="68" rx="18" />
                 <path d="M132 173 C151 158 209 158 228 173 L245 322 C228 350 206 365 180 365 C154 365 132 350 115 322 Z" />
@@ -168,14 +172,38 @@ export function MannequinExperience() {
             </svg>
           </div>
 
+          <button type="button" className={styles.garmentTag} onClick={openProduct}>
+            <span>{product.name}</span>
+            <strong>{formatPrice(product.price)}</strong>
+            <span aria-hidden="true">↗</span>
+          </button>
+
           <div className={styles.floor} aria-hidden="true" />
         </div>
 
         <aside className={styles.controls} aria-label="Select a Maison Amiral piece">
           <div className={styles.activeProduct}>
-            <p>{String(activeIndex + 1).padStart(2, "0")} / 04</p>
+            <div className={styles.activeProductTopline}>
+              <p>{String(activeIndex + 1).padStart(2, "0")} / 04</p>
+              <span>{product.edition}</span>
+            </div>
+
+            <div className={styles.productPreview} aria-hidden="true">
+              {product.images[0] ? (
+                <Image
+                  src={product.images[0]}
+                  alt=""
+                  fill
+                  sizes="180px"
+                  className={styles.productPreviewImage}
+                />
+              ) : (
+                <span>{product.artMark}</span>
+              )}
+            </div>
+
             <h3>{product.name}</h3>
-            <span>{formatPrice(product.price)}</span>
+            <span className={styles.activePrice}>{formatPrice(product.price)}</span>
             <p className={styles.productCopy}>{product.shortDescription}</p>
             <button type="button" className={styles.enterButton} onClick={openProduct}>
               Explore piece <span aria-hidden="true">↗</span>
@@ -201,7 +229,7 @@ export function MannequinExperience() {
             ))}
           </div>
 
-          <p className={styles.interactionHint}>Touch + drag on mobile. Mouse + drag on desktop.</p>
+          <p className={styles.interactionHint}>Touch + drag on mobile / mouse + drag on desktop</p>
         </aside>
       </div>
     </section>
