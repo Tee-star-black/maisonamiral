@@ -92,13 +92,13 @@ export default function Home() {
         </div>
 
         <Link className="product-stage" href="/shop/emblem-tee" aria-label="View Emblem Tee">
-          <div className="product-art">
+          <div className="product-art" style={{ position: "relative" }}>
             <Image
               src="/products/emblem/front-edit.jpeg"
               alt="Maison Amiral Emblem Tee editorial front view"
               fill
               sizes="(max-width: 900px) 100vw, 94vw"
-              className="featured-product-image"
+              style={{ objectFit: "cover" }}
             />
           </div>
 
