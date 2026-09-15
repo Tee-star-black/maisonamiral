@@ -14,8 +14,20 @@ const navItems = [
 export default function Home() {
   return (
     <main>
-      <section className="hero">
-        <header className="site-header">
+      <section className="hero hero-campaign">
+        <div className="hero-media" aria-hidden="true">
+          <Image
+            src="/products/emblem/front-edit.jpeg"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="hero-media-image"
+          />
+          <div className="hero-media-wash" />
+        </div>
+
+        <header className="site-header hero-header">
           <Link className="brand" href="/" aria-label="Maison Amiral home">
             MAISON AMIRAL
           </Link>
@@ -34,17 +46,18 @@ export default function Home() {
           </div>
         </header>
 
-        <div className="hero-grid">
+        <div className="hero-grid hero-grid-campaign">
           <div className="hero-kicker">
-            <span>Johannesburg</span>
-            <span>Edition 001</span>
+            <span>Johannesburg / South Africa</span>
+            <span>Edition 001 / 2026</span>
           </div>
 
-          <div className="hero-title-wrap">
-            <h1 className="hero-title">
+          <div className="hero-title-wrap hero-title-campaign-wrap">
+            <p className="hero-edition-mark">Objects for presence</p>
+            <h1 className="hero-title hero-title-campaign">
               MAISON
               <br />
-              AMIRAL
+              <span>AMIRAL</span>
             </h1>
           </div>
 
@@ -54,20 +67,46 @@ export default function Home() {
               made with intent.
             </p>
 
-            <Link className="text-link" href="/shop">
-              Explore the collection <span aria-hidden="true">↗</span>
-            </Link>
+            <div className="hero-cta-group">
+              <Link className="hero-cta" href="/shop">
+                Enter Edition 001 <span aria-hidden="true">↗</span>
+              </Link>
+              <span className="hero-scroll">Scroll to explore ↓</span>
+            </div>
           </div>
         </div>
+
+        <p className="hero-vertical-note" aria-hidden="true">
+          Johannesburg atelier / 26.2048° S
+        </p>
       </section>
 
+      <div className="collection-ticker" aria-label="Maison Amiral design language">
+        <div className="collection-ticker-track">
+          <span>Edition 001</span>
+          <span>Movement</span>
+          <span>Machinery</span>
+          <span>Memory</span>
+          <span>Johannesburg</span>
+          <span>Edition 001</span>
+          <span>Movement</span>
+          <span>Machinery</span>
+          <span>Memory</span>
+          <span>Johannesburg</span>
+        </div>
+      </div>
+
       <section className="statement section-pad">
-        <p className="eyebrow">Maison Amiral / Philosophy</p>
+        <div className="statement-topline">
+          <p className="eyebrow">Maison Amiral / Philosophy</p>
+          <span>01 / Manifesto</span>
+        </div>
+
         <div className="statement-grid">
           <h2>
             Silence is
             <br />
-            the new luxury.
+            <em>the new luxury.</em>
           </h2>
           <div className="statement-copy">
             <p>
@@ -77,6 +116,9 @@ export default function Home() {
             <p>
               We make pieces that do not ask for attention. They hold it.
             </p>
+            <Link className="text-link" href="/editorial">
+              Read the house statement <span aria-hidden="true">↗</span>
+            </Link>
           </div>
         </div>
       </section>
@@ -85,29 +127,40 @@ export default function Home() {
 
       <section className="featured section-pad">
         <div className="section-heading-row">
-          <p className="eyebrow">Selected / 001</p>
+          <div>
+            <p className="eyebrow">Selected / 001</p>
+            <h2 className="featured-heading">The house emblem.</h2>
+          </div>
           <Link className="text-link" href="/shop/emblem-tee">
             View piece <span aria-hidden="true">↗</span>
           </Link>
         </div>
 
-        <Link className="product-stage" href="/shop/emblem-tee" aria-label="View Emblem Tee">
-          <div className="product-art" style={{ position: "relative" }}>
+        <Link className="featured-layout" href="/shop/emblem-tee" aria-label="View Emblem Tee">
+          <div className="product-art">
             <Image
-              src="/products/emblem/front-edit.jpeg"
-              alt="Maison Amiral Emblem Tee editorial front view"
+              src="/products/emblem/back-editorial.jpeg"
+              alt="Maison Amiral Emblem Tee editorial back view"
               fill
-              sizes="(max-width: 900px) 100vw, 94vw"
-              style={{ objectFit: "cover" }}
+              sizes="(max-width: 900px) 100vw, 68vw"
+              className="featured-product-image"
             />
+            <span className="featured-image-label">Edition 001 / Rear study</span>
           </div>
 
-          <div className="product-meta">
+          <div className="featured-copy-panel">
+            <p className="product-index">04 / 04</p>
             <div>
-              <p className="product-index">01</p>
               <h3>Emblem Tee</h3>
+              <p>
+                The house mark reduced to its clearest form. A relaxed silhouette,
+                quiet structure and a graphic identity designed to live beyond a season.
+              </p>
             </div>
-            <div className="product-price">R450</div>
+            <div className="featured-panel-bottom">
+              <span>R450</span>
+              <span>Explore piece ↗</span>
+            </div>
           </div>
         </Link>
       </section>
@@ -115,9 +168,17 @@ export default function Home() {
       <EditionGallery />
 
       <section className="editorial-banner">
+        <video className="editorial-banner-video" autoPlay muted loop playsInline aria-hidden="true">
+          <source src="/video/flag.mp4" type="video/mp4" />
+        </video>
+        <div className="editorial-banner-wash" aria-hidden="true" />
         <div className="editorial-overlay">
           <p className="eyebrow light">Editorial / Vol. 01</p>
-          <h2>Shadow.<br />Structure.<br />Movement.</h2>
+          <h2>
+            Shadow.<br />
+            Structure.<br />
+            <em>Movement.</em>
+          </h2>
           <Link className="text-link light" href="/editorial">
             Read the statement <span aria-hidden="true">↗</span>
           </Link>
