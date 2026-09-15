@@ -68,8 +68,52 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 46%, rgba(255, 255, 255, 0.82), transparent 48%);
+  z-index: 1;
+  background:
+    radial-gradient(circle at 50% 46%, rgba(255, 255, 255, 0.76), transparent 48%),
+    linear-gradient(180deg, rgba(216, 211, 202, 0.08), rgba(216, 211, 202, 0.54));
   pointer-events: none;
+}
+
+.stageBackdrop,
+.stageBackdropVideo,
+.typographicBackdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.stageBackdrop {
+  overflow: hidden;
+}
+
+.stageBackdropImage {
+  object-fit: cover;
+  filter: grayscale(1) contrast(0.94) brightness(1.03);
+  opacity: 0.35;
+  transform: scale(1.025);
+}
+
+.stageBackdropVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.06);
+  opacity: 0.3;
+}
+
+.typographicBackdrop {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: #111;
+  font-size: clamp(5rem, 15vw, 15rem);
+  font-weight: 700;
+  line-height: 0.75;
+  letter-spacing: -0.08em;
+  opacity: 0.055;
+  transform: rotate(-8deg) scale(1.08);
 }
 
 .stageLabel {
@@ -302,6 +346,10 @@
   .figureFocus {
     animation: none;
     opacity: 0;
+  }
+
+  .stageBackdropVideo {
+    display: none;
   }
 }
 
