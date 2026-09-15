@@ -1,6 +1,6 @@
 "use client";
 
-import { ContactShadows, OrbitControls, RoundedBox, Text } from "@react-three/drei";
+import { ContactShadows, Html, OrbitControls, RoundedBox } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
@@ -120,17 +120,11 @@ function MannequinModel({ shirtTone, shirtInk, artMark, productName, onProductOp
           <meshStandardMaterial color={shirtInk} roughness={0.75} />
         </mesh>
 
-        <Text
-          position={[0, 3.03, 0.365]}
-          fontSize={0.24}
-          letterSpacing={0.1}
-          color={shirtInk}
-          anchorX="center"
-          anchorY="middle"
-          maxWidth={1.6}
-        >
-          {artMark}
-        </Text>
+        <Html position={[0, 3.03, 0.37]} center transform distanceFactor={5.2} style={{ pointerEvents: "none" }}>
+          <span style={{ color: shirtInk, fontSize: 16, fontWeight: 700, letterSpacing: ".16em", whiteSpace: "nowrap" }}>
+            {artMark}
+          </span>
+        </Html>
       </group>
 
       <mesh position={[-0.47, -2.58, 0.18]} scale={[0.48, 0.24, 0.92]} castShadow>
@@ -142,9 +136,11 @@ function MannequinModel({ shirtTone, shirtInk, artMark, productName, onProductOp
         <meshPhysicalMaterial color="#171717" roughness={0.72} />
       </mesh>
 
-      <Text position={[0, -3.22, 0]} fontSize={0.14} letterSpacing={0.13} color="#a8a096" anchorX="center">
-        {productName.toUpperCase()}
-      </Text>
+      <Html position={[0, -3.22, 0]} center transform distanceFactor={7} style={{ pointerEvents: "none" }}>
+        <span style={{ color: "#a8a096", fontSize: 11, letterSpacing: ".13em", whiteSpace: "nowrap", textTransform: "uppercase" }}>
+          {productName}
+        </span>
+      </Html>
     </group>
   );
 }
