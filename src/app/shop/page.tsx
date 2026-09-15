@@ -11,16 +11,66 @@ export const metadata: Metadata = {
   description: "Shop the Maison Amiral collection from Johannesburg.",
 };
 
+function ProductVisual({ slug, name, artMark, image }: { slug: string; name: string; artMark: string; image?: string }) {
+  if (slug === "automobile-tee") {
+    return (
+      <Image
+        src="/graphics/wheel.png"
+        alt={`${name} visual study`}
+        fill
+        sizes="(max-width: 760px) 100vw, 50vw"
+        className={`${styles.image} ${styles.wheelImage}`}
+      />
+    );
+  }
+
+  if (slug === "flag-staple-tee") {
+    return (
+      <video className={styles.video} autoPlay muted loop playsInline aria-label={`${name} moving flag study`}>
+        <source src="/video/flag.mp4" type="video/mp4" />
+      </video>
+    );
+  }
+
+  if (image) {
+    return (
+      <Image
+        src={image}
+        alt={`${name} product image`}
+        fill
+        sizes="(max-width: 760px) 100vw, 50vw"
+        className={styles.image}
+      />
+    );
+  }
+
+  return (
+    <div className={styles.art} aria-hidden="true">
+      <span className={styles.artMark}>{artMark}</span>
+      <span className={styles.artSubline}>Johannesburg / Edition 001</span>
+    </div>
+  );
+}
+
 export default function ShopPage() {
   return (
     <EditorialPage
       eyebrow="Collection / 001"
       title="The first objects."
-      intro="A restrained first collection shaped by movement, machinery and memory."
+      intro="Four studies in movement, machinery, memory and restraint. Designed in Johannesburg and built to hold presence without asking for it."
     >
+      <div className={styles.collectionIntro}>
+        <span>Edition 001 / 04 objects</span>
+        <span>R450 each</span>
+      </div>
+
       <div className={styles.grid}>
-        {products.map((product) => (
-          <Link href={`/shop/${product.slug}`} key={product.slug} className={styles.card}>
+        {products.map((product, index) => (
+          <Link
+            href={`/shop/${product.slug}`}
+            key={product.slug}
+            className={`${styles.card} ${index % 2 === 1 ? styles.offsetCard : ""}`}
+          >
             <div
               className={styles.visual}
               style={{
@@ -28,22 +78,16 @@ export default function ShopPage() {
                 "--product-ink": product.ink,
               } as CSSProperties}
             >
-              {product.images[0] ? (
-                <Image
-                  src={product.images[0]}
-                  alt={`${product.name} product image`}
-                  fill
-                  sizes="(max-width: 760px) 100vw, 50vw"
-                  className={styles.image}
-                />
-              ) : (
-                <div className={styles.art} aria-hidden="true">
-                  <span className={styles.artMark}>{product.artMark}</span>
-                </div>
-              )}
+              <ProductVisual
+                slug={product.slug}
+                name={product.name}
+                artMark={product.artMark}
+                image={product.images[0]}
+              />
               <span className={styles.mediaLabel}>
-                {product.images[0] ? "Product view" : "Edition study"}
+                {String(index + 1).padStart(2, "0")} / 04
               </span>
+              <span className={styles.viewLabel}>View object ↗</span>
             </div>
 
             <article className={styles.meta}>
