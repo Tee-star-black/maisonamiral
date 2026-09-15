@@ -1,0 +1,158 @@
+.section {
+  padding: 120px 28px;
+  border-top: 1px solid var(--line);
+  background: #f3f0e9;
+}
+
+.heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.55fr);
+  gap: 60px;
+  align-items: end;
+  margin-bottom: 48px;
+}
+
+.eyebrow {
+  margin: 0 0 24px;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.heading h2 {
+  margin: 0;
+  font-size: clamp(4rem, 8.5vw, 9rem);
+  font-weight: 500;
+  line-height: 0.85;
+  letter-spacing: -0.07em;
+}
+
+.copy {
+  max-width: 390px;
+  margin: 0;
+  color: #514d46;
+  font-size: clamp(1rem, 1.2vw, 1.2rem);
+  line-height: 1.5;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1.55fr 0.9fr 0.9fr;
+  grid-template-rows: minmax(320px, 42vw) minmax(260px, 30vw);
+  gap: 14px;
+}
+
+.frame {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: #d8d4cc;
+  isolation: isolate;
+}
+
+.heroImage {
+  grid-row: 1 / span 2;
+}
+
+.tallImage {
+  grid-column: 2 / span 2;
+}
+
+.productImage {
+  min-height: 260px;
+}
+
+.image {
+  object-fit: cover;
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1), filter 450ms ease;
+}
+
+.frame:hover .image,
+.frame:focus-visible .image {
+  transform: scale(1.025);
+  filter: contrast(1.03);
+}
+
+.frame:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 4px;
+}
+
+.imageIndex {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  z-index: 2;
+  padding: 5px 7px;
+  background: rgba(243, 240, 233, 0.86);
+  backdrop-filter: blur(8px);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+}
+
+.footerRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding-top: 18px;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.footerRow a {
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .image {
+    transition: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .heading {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .copy {
+    max-width: 560px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: minmax(440px, 80vw) minmax(280px, 54vw) minmax(260px, 50vw);
+  }
+
+  .heroImage {
+    grid-column: 1 / span 2;
+    grid-row: auto;
+  }
+
+  .tallImage {
+    grid-column: 1 / span 2;
+  }
+}
+
+@media (max-width: 640px) {
+  .section {
+    padding: 78px 18px;
+  }
+
+  .heading h2 {
+    font-size: clamp(3.5rem, 18vw, 6rem);
+  }
+
+  .grid {
+    gap: 8px;
+    grid-template-rows: 115vw 72vw 62vw;
+  }
+
+  .footerRow {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
