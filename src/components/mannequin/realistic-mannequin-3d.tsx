@@ -12,8 +12,72 @@ export type RealisticMannequin3DProps = {
   onProductOpen: () => void;
 };
 
-const MANNEQUIN_URL =
-  "https://cdn.3dassets.dev/assets/25259/v1/model.glb";
+const MANNEQUIN_URL = "/models/maison-human-mannequin.glb";
+
+function applyRelaxedHumanPose(model: THREE.Object3D) {
+  const rotateInParentSpace = (
+    boneName: string,
+    axis: THREE.Vector3,
+    angle: number,
+  ) => {
+    const bone = model.getObjectByName(boneName);
+    if (!(bone instanceof THREE.Bone)) return;
+
+    const delta = new THREE.Quaternion().setFromAxisAngle(axis, angle);
+    bone.quaternion.premultiply(delta);
+  };
+
+  // The CC0 source arrives in a T-pose. Bring the arms down into a quiet,
+  // natural retail stance without baking a second asset or shipping an
+  // animation runtime.
+  rotateInParentSpace(
+    "upper_arm.L",
+    new THREE.Vector3(0, 0, 1),
+    -1.17,
+  );
+  rotateInParentSpace(
+    "upper_arm.R",
+    new THREE.Vector3(0, 0, 1),
+    1.17,
+  );
+
+  // A slight forward fall and elbow bend prevents the silhouette from
+  // reading like a rigid anatomical reference model.
+  rotateInParentSpace(
+    "upper_arm.L",
+    new THREE.Vector3(1, 0, 0),
+    -0.08,
+  );
+  rotateInParentSpace(
+    "upper_arm.R",
+    new THREE.Vector3(1, 0, 0),
+    -0.08,
+  );
+  rotateInParentSpace(
+    "forearm.L",
+    new THREE.Vector3(1, 0, 0),
+    -0.1,
+  );
+  rotateInParentSpace(
+    "forearm.R",
+    new THREE.Vector3(1, 0, 0),
+    -0.1,
+  );
+
+  const upperSpine = model.getObjectByName("spine.003");
+  if (upperSpine instanceof THREE.Bone) {
+    upperSpine.rotation.z += 0.012;
+    upperSpine.rotation.x -= 0.018;
+  }
+
+  const neck = model.getObjectByName("spine.005");
+  if (neck instanceof THREE.Bone) {
+    neck.rotation.z -= 0.01;
+    neck.rotation.y += 0.025;
+  }
+
+  model.updateMatrixWorld(true);
+}
 
 function createFabricTexture() {
   const canvas = document.createElement("canvas");
@@ -217,6 +281,16 @@ export function RealisticMannequin3D({
     const mannequinRoot = new THREE.Group();
     figure.add(mannequinRoot);
 
+    const mannequinMaterial = new THREE.MeshPhysicalMaterial({
+      color: "#c8c0b5",
+      roughness: 0.56,
+      metalness: 0,
+      clearcoat: 0.035,
+      clearcoatRoughness: 0.9,
+      sheen: 0.08,
+      sheenColor: new THREE.Color("#e1dbd2"),
+    });
+
     const fabricTexture = createFabricTexture();
     const shirtMaterial = new THREE.MeshPhysicalMaterial({
       color: shirtTone,
@@ -350,7 +424,9 @@ export function RealisticMannequin3D({
         if (disposed) return;
 
         const model = gltf.scene;
-        model.name = "MAISON_MANNEQUIN_BASE";
+        model.name = "MAISON_HUMAN_MANNEQUIN";
+
+        applyRelaxedHumanPose(model);
 
         model.traverse((node) => {
           if (!(node instanceof THREE.Mesh)) return;
@@ -358,20 +434,17 @@ export function RealisticMannequin3D({
           node.castShadow = true;
           node.receiveShadow = true;
 
-          const materials = Array.isArray(node.material)
+          const sourceMaterials = Array.isArray(node.material)
             ? node.material
             : [node.material];
 
-          materials.forEach((material) => {
-            if (
-              material instanceof THREE.MeshStandardMaterial ||
-              material instanceof THREE.MeshPhysicalMaterial
-            ) {
-              material.roughness = Math.max(material.roughness, 0.72);
-              material.metalness = Math.min(material.metalness, 0.05);
-              material.needsUpdate = true;
-            }
-          });
+          sourceMaterials.forEach((material) => material.dispose());
+
+          // Keep anatomical detail and realistic proportions while treating
+          // the body as a sculptural fashion mannequin rather than a lifelike
+          // person. This avoids uncanny skin rendering and keeps attention on
+          // the garment.
+          node.material = mannequinMaterial;
         });
 
         const initialBounds = new THREE.Box3().setFromObject(model);
@@ -680,6 +753,7 @@ export function RealisticMannequin3D({
       shirtMaterialRef.current = null;
       printMaterialRef.current = null;
 
+      mannequinMaterial.dispose();
       fabricTexture.dispose();
       trouserLegGeometry.dispose();
       trouserMaterial.dispose();
@@ -726,7 +800,7 @@ export function RealisticMannequin3D({
           {hasError
             ? "3D preview unavailable"
             : isReady
-              ? "GLB figure / live material"
+              ? "Human mannequin / live garment"
               : "Loading digital look"}
         </span>
         <span>Drag · pinch · wheel · double-click reset</span>
