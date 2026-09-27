@@ -9,6 +9,8 @@ export type MaisonProduct = {
   tone: string;
   ink: string;
   images: string[];
+  frontArtworkImage?: string;
+  backArtworkImage?: string;
 };
 
 export const products: MaisonProduct[] = [
@@ -68,6 +70,8 @@ export const products: MaisonProduct[] = [
       "/products/emblem/front.jpeg",
       "/products/emblem/back.jpeg",
     ],
+    frontArtworkImage: "/products/emblem/front.jpeg",
+    backArtworkImage: "/products/emblem/back.jpeg",
   },
 ];
 
