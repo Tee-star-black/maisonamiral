@@ -6,8 +6,8 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 export type RealisticMannequin3DProps = {
   shirtTone: string;
-  shirtInk: string;
-  artMark: string;
+  frontArtworkImage?: string;
+  backArtworkImage?: string;
   productName: string;
   onProductOpen: () => void;
 };
@@ -93,37 +93,57 @@ function createFabricTexture() {
   return texture;
 }
 
-function createPrintTexture(artMark: string, ink: string) {
-  const canvas = document.createElement("canvas");
-  canvas.width = 1024;
-  canvas.height = 512;
+type ArtworkCrop = { x: number; y: number; width: number; height: number };
 
-  const context = canvas.getContext("2d");
-  if (context) {
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    context.fillStyle = ink;
-    context.textAlign = "center";
-    context.textBaseline = "middle";
+// Sample the actual product photograph. Its surrounding black fabric is
+// removed so the printed colours sit directly on the 3D cotton material.
+function loadPrintTexture(
+  src: string,
+  crop: ArtworkCrop,
+  onLoad: (texture: THREE.CanvasTexture) => void,
+) {
+  const image = new window.Image();
+  image.onload = () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 512;
+    canvas.height = Math.round(512 * crop.height / crop.width);
+    const context = canvas.getContext("2d");
+    if (!context) return;
 
-    context.font = "500 34px Arial";
-    context.fillText("MAISON AMIRAL", canvas.width / 2, 96);
+    context.drawImage(image, crop.x, crop.y, crop.width, crop.height,
+      0, 0, canvas.width, canvas.height);
+    const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < pixels.data.length; i += 4) {
+      const r = pixels.data[i];
+      const g = pixels.data[i + 1];
+      const b = pixels.data[i + 2];
+      const brightest = Math.max(r, g, b);
+      const chroma = brightest - Math.min(r, g, b);
+      // Neutral dark pixels belong to the photographed shirt. Feather the
+      // edge to avoid the JPEG's faint rectangular border around the print.
+      pixels.data[i + 3] = Math.round(255 * THREE.MathUtils.smoothstep(
+        Math.max(brightest, chroma * 2.2), 42, 96,
+      ));
+    }
+    context.putImageData(pixels, 0, 0);
 
-    context.font = "700 116px Georgia";
-    context.fillText(artMark, canvas.width / 2, 252);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    onLoad(texture);
+  };
+  image.src = src;
+  return () => { image.onload = null; image.src = ""; };
+}
 
-    context.font = "500 22px Arial";
-    context.fillText(
-      "JOHANNESBURG / EDITION 001",
-      canvas.width / 2,
-      404,
-    );
+function createCurvedPrint(width: number, height: number, material: THREE.MeshStandardMaterial) {
+  const geometry = new THREE.PlaneGeometry(width, height, 20, 24);
+  const positions = geometry.getAttribute("position");
+  for (let i = 0; i < positions.count; i += 1) {
+    const x = positions.getX(i) / (width / 2);
+    positions.setZ(i, -0.006 * x * x);
   }
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.needsUpdate = true;
-
-  return texture;
+  geometry.computeVertexNormals();
+  return new THREE.Mesh(geometry, material);
 }
 
 function installGarmentCoverageMask(
@@ -248,8 +268,8 @@ function findPrimaryGarmentMesh(root: THREE.Object3D) {
 
 export function RealisticMannequin3D({
   shirtTone,
-  shirtInk,
-  artMark,
+  frontArtworkImage,
+  backArtworkImage,
   productName,
   onProductOpen,
 }: RealisticMannequin3DProps) {
@@ -258,35 +278,17 @@ export function RealisticMannequin3D({
   const shirtMaterialRef = useRef<THREE.MeshPhysicalMaterial | null>(
     null,
   );
-  const printMaterialRef = useRef<THREE.MeshBasicMaterial | null>(null);
-  const printTextureRef = useRef<THREE.CanvasTexture | null>(null);
+  const initialToneRef = useRef(shirtTone);
+  const printsRef = useRef<Array<{
+    mesh: THREE.Mesh;
+    material: THREE.MeshStandardMaterial;
+  }>>([]);
   const [isReady, setIsReady] = useState(false);
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     openProductRef.current = onProductOpen;
   }, [onProductOpen]);
-
-  useEffect(() => {
-    const material = shirtMaterialRef.current;
-    if (material) {
-      material.color.set(shirtTone);
-      material.sheenColor.set(shirtTone);
-      material.needsUpdate = true;
-    }
-
-    const printMaterial = printMaterialRef.current;
-    if (printMaterial) {
-      const nextTexture = createPrintTexture(artMark, shirtInk);
-      const previousTexture = printTextureRef.current;
-
-      printTextureRef.current = nextTexture;
-      printMaterial.map = nextTexture;
-      printMaterial.needsUpdate = true;
-
-      previousTexture?.dispose();
-    }
-  }, [artMark, shirtInk, shirtTone]);
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -346,13 +348,13 @@ export function RealisticMannequin3D({
     figure.add(mannequinRoot, garmentRoot);
 
     const mannequinMaterial = new THREE.MeshPhysicalMaterial({
-      color: "#c9c2b8",
-      roughness: 0.62,
+      color: "#c5c0b6",
+      roughness: 0.72,
       metalness: 0,
       clearcoat: 0.02,
       clearcoatRoughness: 0.95,
-      sheen: 0.04,
-      sheenColor: new THREE.Color("#e4ded6"),
+      sheen: 0.025,
+      sheenColor: new THREE.Color("#d8d3cb"),
     });
 
     const updateCoverageMask = installGarmentCoverageMask(
@@ -363,39 +365,45 @@ export function RealisticMannequin3D({
     const fabricTexture = createFabricTexture();
 
     const shirtMaterial = new THREE.MeshPhysicalMaterial({
-      color: shirtTone,
-      roughness: 0.82,
+      color: initialToneRef.current,
+      roughness: 0.91,
       metalness: 0,
-      sheen: 0.28,
-      sheenColor: new THREE.Color(shirtTone),
-      sheenRoughness: 0.88,
-      clearcoat: 0.008,
-      clearcoatRoughness: 1,
+      sheen: 0.16,
+      sheenColor: new THREE.Color(initialToneRef.current),
+      sheenRoughness: 0.94,
       bumpMap: fabricTexture,
-      bumpScale: 0.01,
+      bumpScale: 0.005,
       side: THREE.DoubleSide,
     });
 
     shirtMaterialRef.current = shirtMaterial;
 
-    const initialPrintTexture = createPrintTexture(artMark, shirtInk);
-    printTextureRef.current = initialPrintTexture;
-
-    const printMaterial = new THREE.MeshBasicMaterial({
-      map: initialPrintTexture,
+    const frontPrintMaterial = new THREE.MeshStandardMaterial({
       transparent: true,
       depthWrite: false,
-      side: THREE.DoubleSide,
+      alphaTest: 0.08,
+      roughness: 0.95,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
     });
-    printMaterialRef.current = printMaterial;
+    const frontPrint = createCurvedPrint(0.44, 0.62, frontPrintMaterial);
+    frontPrint.name = "MAISON_FRONT_PRINT";
+    frontPrint.position.set(0, 2.55, 0.352);
+    frontPrint.rotation.x = 0.02;
+    frontPrint.visible = false;
+    garmentRoot.add(frontPrint);
 
-    const printPlane = new THREE.Mesh(
-      new THREE.PlaneGeometry(0.56, 0.27),
-      printMaterial,
-    );
-    printPlane.name = "MAISON_PRINT";
-    printPlane.position.set(0, 2.57, 0.39);
-    garmentRoot.add(printPlane);
+    const backPrintMaterial = frontPrintMaterial.clone();
+    const backPrint = createCurvedPrint(0.105, 0.14, backPrintMaterial);
+    backPrint.name = "MAISON_BACK_PRINT";
+    backPrint.position.set(0, 2.93, -0.09);
+    backPrint.rotation.y = Math.PI;
+    backPrint.visible = false;
+    garmentRoot.add(backPrint);
+    printsRef.current = [
+      { mesh: frontPrint, material: frontPrintMaterial },
+      { mesh: backPrint, material: backPrintMaterial },
+    ];
 
     // Invisible interaction volume so the product remains clickable even
     // though the actual garment is loaded asynchronously.
@@ -910,16 +918,54 @@ export function RealisticMannequin3D({
         mount.removeChild(renderer.domElement);
       }
 
-      printTextureRef.current?.dispose();
-      printTextureRef.current = null;
       shirtMaterialRef.current = null;
-      printMaterialRef.current = null;
+      printsRef.current = [];
 
       fabricTexture.dispose();
       disposeObject(scene);
       renderer.dispose();
     };
   }, []);
+
+  useEffect(() => {
+    const material = shirtMaterialRef.current;
+    if (material) {
+      material.color.set(shirtTone);
+      material.sheenColor.set(shirtTone);
+    }
+  }, [shirtTone]);
+
+  useEffect(() => {
+    const sources = [
+      { src: frontArtworkImage, crop: { x: 293, y: 316, width: 294, height: 440 } },
+      { src: backArtworkImage, crop: { x: 415, y: 273, width: 68, height: 101 } },
+    ];
+    const cancelLoads: Array<() => void> = [];
+    const textures: THREE.CanvasTexture[] = [];
+
+    printsRef.current.forEach(({ mesh, material }, index) => {
+      mesh.visible = false;
+      material.map = null;
+      material.needsUpdate = true;
+      const { src, crop } = sources[index];
+      if (!src) return;
+      cancelLoads.push(loadPrintTexture(src, crop, (texture) => {
+        textures.push(texture);
+        material.map = texture;
+        material.needsUpdate = true;
+        mesh.visible = true;
+      }));
+    });
+
+    return () => {
+      cancelLoads.forEach((cancel) => cancel());
+      textures.forEach((texture) => texture.dispose());
+      printsRef.current.forEach(({ mesh, material }) => {
+        mesh.visible = false;
+        material.map = null;
+      });
+    };
+  }, [frontArtworkImage, backArtworkImage]);
 
   return (
     <div
@@ -959,7 +1005,9 @@ export function RealisticMannequin3D({
           {hasError
             ? "3D preview unavailable"
             : isReady
-              ? "Human mannequin / real garment mesh"
+              ? frontArtworkImage
+                ? "Emblem Tee / product artwork study"
+                : "Garment colour study / artwork pending"
               : "Loading digital look"}
         </span>
         <span>Drag · pinch · wheel · double-click reset</span>

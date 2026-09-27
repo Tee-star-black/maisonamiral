@@ -114,8 +114,8 @@ export function MannequinExperience() {
               <div className={`${styles.figureWrap} ${isTransitioning ? styles.figureFocus : ""}`} style={sceneStyle}>
                 <RealisticMannequin3D
                   shirtTone={product.tone}
-                  shirtInk={product.ink}
-                  artMark={product.artMark}
+                  frontArtworkImage={product.frontArtworkImage}
+                  backArtworkImage={product.backArtworkImage}
                   productName={product.name}
                   onProductOpen={beginOpen}
                 />
@@ -180,7 +180,7 @@ export function MannequinExperience() {
         </div>
 
         <footer className={styles.sheetFooter}>
-          <p id={noteId}>Interactive digital fitting study. The figure uses a rigged anatomical human GLB posed as a sculptural fashion mannequin; the garment layer updates live by piece, colour and artwork while product photography remains the final reference for fabric detail.</p>
+          <p id={noteId}>Interactive digital fitting study. The Emblem Tee uses artwork sampled from its product photographs. The other pieces are colour studies until their final product artwork is supplied; photography remains the reference for exact fabric and fit.</p>
           <span>Drag to orbit / Pinch or scroll to zoom / Tap garment to explore</span>
         </footer>
       </div>
