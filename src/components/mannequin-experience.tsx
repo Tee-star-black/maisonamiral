@@ -180,7 +180,7 @@ export function MannequinExperience() {
         </div>
 
         <footer className={styles.sheetFooter}>
-          <p id={noteId}>Interactive digital fitting study. The Emblem Tee uses artwork sampled from its product photographs. The other pieces are colour studies until their final product artwork is supplied; photography remains the reference for exact fabric and fit.</p>
+          <p id={noteId}>Interactive digital fitting study. The shirt mesh is fitted to the mannequin. The Emblem Tee uses artwork sampled from its product photographs. The other pieces are colour studies until their final product artwork is supplied; photography remains the reference for exact fabric and fit.</p>
           <span>Drag to orbit / Pinch or scroll to zoom / Tap garment to explore</span>
         </footer>
       </div>

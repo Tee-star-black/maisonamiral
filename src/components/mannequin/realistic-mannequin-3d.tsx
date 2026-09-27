@@ -13,7 +13,6 @@ export type RealisticMannequin3DProps = {
 };
 
 const MANNEQUIN_URL = "/models/maison-human-mannequin.glb";
-const GARMENT_URL = "/models/maison-tee.glb";
 
 const DEFAULT_CAMERA_DISTANCE = 8.55;
 const CAMERA_MIN_DISTANCE = 6.9;
@@ -146,6 +145,116 @@ function createCurvedPrint(width: number, height: number, material: THREE.MeshSt
   return new THREE.Mesh(geometry, material);
 }
 
+function createFittedTee(material: THREE.MeshPhysicalMaterial) {
+  const tee = new THREE.Group();
+  tee.name = "MAISON_FITTED_TEE";
+  const segments = 40;
+  const rings = [
+    { y: 1.97, width: 0.375, depth: 0.225 },
+    { y: 2.04, width: 0.382, depth: 0.226 },
+    { y: 2.42, width: 0.405, depth: 0.235 },
+    { y: 2.75, width: 0.438, depth: 0.255 },
+    { y: 2.96, width: 0.425, depth: 0.245 },
+    { y: 3.04, width: 0.355, depth: 0.210 },
+  ];
+  const positions: number[] = [];
+  const uvs: number[] = [];
+  const indices: number[] = [];
+
+  for (const ring of rings) {
+    for (let j = 0; j <= segments; j += 1) {
+      const angle = j * Math.PI * 2 / segments;
+      positions.push(Math.sin(angle) * ring.width, ring.y,
+        0.045 + Math.cos(angle) * ring.depth);
+      uvs.push(j / segments, (ring.y - 1.97) / 1.07);
+    }
+  }
+  for (let i = 0; i < rings.length - 1; i += 1) {
+    for (let j = 0; j < segments; j += 1) {
+      const a = i * (segments + 1) + j;
+      const b = a + 1;
+      const c = a + segments + 1;
+      indices.push(a, b, c, b, c + 1, c);
+    }
+  }
+
+  // The top surface meets a real neck opening instead of closing over the
+  // mannequin's throat like the original hanging-shirt asset did.
+  const collarStart = positions.length / 3;
+  for (let j = 0; j <= segments; j += 1) {
+    const angle = j * Math.PI * 2 / segments;
+    positions.push(Math.sin(angle) * 0.165, 3.045,
+      0.045 + Math.cos(angle) * 0.118);
+    uvs.push(j / segments, 1);
+  }
+  const topStart = (rings.length - 1) * (segments + 1);
+  for (let j = 0; j < segments; j += 1) {
+    const a = topStart + j;
+    const b = a + 1;
+    const c = collarStart + j;
+    indices.push(a, b, c, b, c + 1, c);
+  }
+
+  const torsoGeometry = new THREE.BufferGeometry();
+  torsoGeometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  torsoGeometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+  torsoGeometry.setIndex(indices);
+  torsoGeometry.computeVertexNormals();
+  const torso = new THREE.Mesh(torsoGeometry, material);
+  torso.castShadow = true;
+  torso.receiveShadow = true;
+  tee.add(torso);
+
+  for (const side of [-1, 1]) {
+    const sleevePositions: number[] = [];
+    const sleeveUVs: number[] = [];
+    const sleeveIndices: number[] = [];
+    const sleeveRings = [
+      { x: 0.345, y: 2.88, ry: 0.19, rz: 0.21 },
+      { x: 0.47, y: 2.85, ry: 0.185, rz: 0.20 },
+      { x: 0.665, y: 2.73, ry: 0.15, rz: 0.165 },
+    ];
+    for (const ring of sleeveRings) {
+      for (let j = 0; j <= 20; j += 1) {
+        const angle = j * Math.PI / 10;
+        sleevePositions.push(side * ring.x,
+          ring.y + Math.cos(angle) * ring.ry,
+          0.045 + Math.sin(angle) * ring.rz);
+        sleeveUVs.push(ring.x, j / 20);
+      }
+    }
+    for (let i = 0; i < sleeveRings.length - 1; i += 1) {
+      for (let j = 0; j < 20; j += 1) {
+        const a = i * 21 + j;
+        const b = a + 1;
+        const c = a + 21;
+        if (side === 1) sleeveIndices.push(a, b, c, b, c + 1, c);
+        else sleeveIndices.push(a, c, b, b, c, c + 1);
+      }
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.Float32BufferAttribute(sleevePositions, 3));
+    geometry.setAttribute("uv", new THREE.Float32BufferAttribute(sleeveUVs, 2));
+    geometry.setIndex(sleeveIndices);
+    geometry.computeVertexNormals();
+    const sleeve = new THREE.Mesh(geometry, material);
+    sleeve.castShadow = true;
+    sleeve.receiveShadow = true;
+    tee.add(sleeve);
+  }
+
+  const collar = new THREE.Mesh(
+    new THREE.TorusGeometry(0.165, 0.014, 8, 48),
+    material,
+  );
+  collar.rotation.x = Math.PI / 2;
+  collar.scale.y = 0.72;
+  collar.position.set(0, 3.047, 0.045);
+  collar.castShadow = true;
+  tee.add(collar);
+  return tee;
+}
+
 function installGarmentCoverageMask(
   material: THREE.MeshPhysicalMaterial,
   figure: THREE.Object3D,
@@ -196,25 +305,19 @@ bool maisonNeckOpening =
 // torso silhouette, so hide every body fragment inside the clothing volume
 // regardless of depth. This also removes arms that cross in front of the tee.
 bool maisonInsideTee =
-  abs(maisonP.x) < 0.72 &&
-  maisonP.y > 2.08 &&
-  maisonP.y < 3.17 &&
+  abs(maisonP.x) < 0.36 &&
+  maisonP.y > 2.04 &&
+  maisonP.y < 3.005 &&
   !maisonNeckOpening;
 
-bool maisonInsideSleeves =
-  abs(maisonP.x) < 0.86 &&
-  maisonP.y > 2.55 &&
-  maisonP.y < 3.11 &&
-  !maisonNeckOpening;
-
-if (maisonInsideTee || maisonInsideSleeves) {
+if (maisonInsideTee) {
   discard;
 }`,
       );
   };
 
   material.customProgramCacheKey = () =>
-    "maison-real-garment-coverage-v1";
+    "maison-fitted-garment-coverage-v2";
   material.needsUpdate = true;
 
   return () => {
@@ -247,25 +350,6 @@ function disposeObject(object: THREE.Object3D) {
   });
 }
 
-function findPrimaryGarmentMesh(root: THREE.Object3D) {
-  let primary: THREE.Mesh | null = null;
-  let primaryScore = -1;
-
-  root.traverse((node) => {
-    if (!(node instanceof THREE.Mesh)) return;
-
-    const position = node.geometry.getAttribute("position");
-    const score = position?.count ?? 0;
-
-    if (score > primaryScore) {
-      primaryScore = score;
-      primary = node;
-    }
-  });
-
-  return primary;
-}
-
 export function RealisticMannequin3D({
   shirtTone,
   frontArtworkImage,
@@ -296,7 +380,6 @@ export function RealisticMannequin3D({
 
     let disposed = false;
     let mannequinLoaded = false;
-    let garmentLoaded = false;
 
     const smallScreen = window.matchMedia(
       "(max-width: 700px)",
@@ -306,7 +389,7 @@ export function RealisticMannequin3D({
     ).matches;
 
     const markReady = () => {
-      if (!disposed && mannequinLoaded && garmentLoaded) {
+      if (!disposed && mannequinLoaded) {
         setIsReady(true);
       }
     };
@@ -377,6 +460,7 @@ export function RealisticMannequin3D({
     });
 
     shirtMaterialRef.current = shirtMaterial;
+    garmentRoot.add(createFittedTee(shirtMaterial));
 
     const frontPrintMaterial = new THREE.MeshStandardMaterial({
       transparent: true,
@@ -388,15 +472,14 @@ export function RealisticMannequin3D({
     });
     const frontPrint = createCurvedPrint(0.44, 0.62, frontPrintMaterial);
     frontPrint.name = "MAISON_FRONT_PRINT";
-    frontPrint.position.set(0, 2.55, 0.352);
-    frontPrint.rotation.x = 0.02;
+    frontPrint.position.set(0, 2.55, 0.317);
     frontPrint.visible = false;
     garmentRoot.add(frontPrint);
 
     const backPrintMaterial = frontPrintMaterial.clone();
     const backPrint = createCurvedPrint(0.105, 0.14, backPrintMaterial);
     backPrint.name = "MAISON_BACK_PRINT";
-    backPrint.position.set(0, 2.93, -0.09);
+    backPrint.position.set(0, 2.93, -0.195);
     backPrint.rotation.y = Math.PI;
     backPrint.visible = false;
     garmentRoot.add(backPrint);
@@ -516,96 +599,6 @@ export function RealisticMannequin3D({
         mannequinRoot.add(model);
 
         mannequinLoaded = true;
-        markReady();
-      },
-      undefined,
-      () => {
-        if (disposed) return;
-        setHasError(true);
-      },
-    );
-
-    loader.load(
-      GARMENT_URL,
-      (gltf) => {
-        if (disposed) return;
-
-        const garmentModel = gltf.scene;
-        garmentModel.name = "MAISON_REAL_TEE";
-
-        const primary = findPrimaryGarmentMesh(garmentModel);
-
-        if (!primary) {
-          setHasError(true);
-          return;
-        }
-
-        // This source asset also contains its retail hanger. The largest
-        // geometry is the actual shirt, so keep that and remove every helper
-        // mesh instead of shipping a hanger through the mannequin's neck.
-        garmentModel.traverse((node) => {
-          if (!(node instanceof THREE.Mesh)) return;
-
-          node.visible = node === primary;
-
-          if (node === primary) {
-            const originalMaterials = Array.isArray(node.material)
-              ? node.material
-              : [node.material];
-
-            originalMaterials.forEach((material) =>
-              material.dispose(),
-            );
-
-            node.material = shirtMaterial;
-            node.castShadow = true;
-            node.receiveShadow = true;
-          }
-        });
-
-        garmentModel.updateMatrixWorld(true);
-
-        const sourceBounds = new THREE.Box3().setFromObject(primary);
-        const sourceSize = sourceBounds.getSize(new THREE.Vector3());
-        const targetHeight = 1.08;
-        const uniformScale =
-          sourceSize.y > 0 ? targetHeight / sourceSize.y : 1;
-
-        // Hanging garments are naturally flatter than a worn tee. Expand
-        // depth only, keeping the original shoulder and sleeve silhouette.
-        garmentModel.scale.set(
-          uniformScale * 1.02,
-          uniformScale * 1.01,
-          uniformScale * 1.75,
-        );
-        garmentModel.updateMatrixWorld(true);
-
-        const fittedBounds = new THREE.Box3().setFromObject(primary);
-        const fittedCenter = fittedBounds.getCenter(
-          new THREE.Vector3(),
-        );
-
-        const garmentOffsetX = 0;
-        const garmentOffsetY = -0.06;
-        const garmentOffsetZ = 0.14;
-
-        garmentModel.position.set(
-          -fittedCenter.x + garmentOffsetX,
-          2.54 - fittedCenter.y + garmentOffsetY,
-          -fittedCenter.z + garmentOffsetZ,
-        );
-
-        garmentModel.rotation.set(
-          0.02,
-          0,
-          0,
-        );
-
-        garmentModel.updateMatrixWorld(true);
-
-        garmentRoot.add(garmentModel);
-
-        garmentLoaded = true;
         markReady();
       },
       undefined,
