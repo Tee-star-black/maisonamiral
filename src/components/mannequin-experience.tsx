@@ -67,10 +67,10 @@ export function MannequinExperience() {
   const sceneStyle = {
     "--shirt-tone": product.tone,
     "--shirt-ink": product.ink,
-    width: "min(62vw, 720px)",
+    width: "min(68vw, 780px)",
     maxWidth: "100%",
-    height: "min(76vh, 760px)",
-    minHeight: "600px",
+    height: "min(78vh, 820px)",
+    minHeight: "640px",
     transform: "none",
   } as CSSProperties;
 
@@ -78,11 +78,11 @@ export function MannequinExperience() {
     <section id="shop-the-look" className={styles.experience} aria-labelledby={titleId}>
       <header className={styles.heading}>
         <div>
-          <p className={styles.eyebrow}>Maison Amiral / 3D wardrobe study</p>
-          <h2 id={titleId}>Anatomy of a <em>look.</em></h2>
+          <p className={styles.eyebrow}>Maison Amiral / Digital atelier</p>
+          <h2 id={titleId}>The garment, <em>in motion.</em></h2>
         </div>
         <p className={styles.intro}>
-          Rotate the figure. Zoom in. Change the piece.<br />Select the garment to enter its product story.
+          Inspect the silhouette in 360°. Change the piece.<br />Enter the product story without leaving the atelier.
         </p>
       </header>
 
@@ -90,7 +90,7 @@ export function MannequinExperience() {
         <div className={styles.sheetHeader}>
           <span>MA / Edition 001</span>
           <span>Figure {String(activeIndex + 1).padStart(2, "0")}</span>
-          <span>Real-time 3D / 360°</span>
+          <span>GLB / GLB / Live</span>
         </div>
 
         <div className={styles.layout}>
@@ -113,7 +113,7 @@ export function MannequinExperience() {
 
               <div className={styles.detailCallout}>
                 <span className={styles.label}>02 / The model</span>
-                <p>Live 3D mannequin.<br />Drag to rotate. Scroll to zoom.</p>
+                <p>Imported retail mannequin.<br />Live garment layer. Drag, pinch and zoom.</p>
               </div>
 
               <div className={`${styles.figureWrap} ${isTransitioning ? styles.figureFocus : ""}`} style={sceneStyle}>
@@ -126,17 +126,17 @@ export function MannequinExperience() {
                 />
               </div>
 
-              <span className={styles.viewCaption}>360° / Live rendered mannequin</span>
+              <span className={styles.viewCaption}>360° / Digital fitting study</span>
             </div>
 
             <div className={styles.viewControls}>
               <div className={styles.views} role="group" aria-label="3D interaction instructions">
-                <button type="button" disabled>Drag / rotate</button>
-                <button type="button" disabled>Wheel / zoom</button>
+                <button type="button" disabled>Drag / orbit</button>
+                <button type="button" disabled>Pinch / wheel</button>
               </div>
               <div className={styles.tiltControls} role="group" aria-label="Scene status">
                 <button type="button" disabled>Three.js</button>
-                <button type="button" disabled>Live</button>
+                <button type="button" disabled>WebGL</button>
               </div>
             </div>
           </div>
@@ -185,8 +185,8 @@ export function MannequinExperience() {
         </div>
 
         <footer className={styles.sheetFooter}>
-          <p id={noteId}>Interactive 3D styling study. The digital garment communicates silhouette, colour and placement; product photography remains the reference for exact fabric and print detail.</p>
-          <span>Drag to rotate / Scroll to zoom / Tap the shirt to explore</span>
+          <p id={noteId}>Interactive digital fitting study. The mannequin is a real GLB asset; the garment layer updates live by piece, colour and artwork while product photography remains the final reference for fabric detail.</p>
+          <span>Drag to orbit / Pinch or scroll to zoom / Tap garment to explore</span>
         </footer>
       </div>
     </section>
