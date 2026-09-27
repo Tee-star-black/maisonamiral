@@ -113,7 +113,7 @@ export function MannequinExperience() {
 
               <div className={styles.detailCallout}>
                 <span className={styles.label}>02 / The model</span>
-                <p>Imported retail mannequin.<br />Live garment layer. Drag, pinch and zoom.</p>
+                <p>Anatomical human mannequin.<br />Relaxed fashion stance. Drag, pinch and zoom.</p>
               </div>
 
               <div className={`${styles.figureWrap} ${isTransitioning ? styles.figureFocus : ""}`} style={sceneStyle}>
@@ -185,7 +185,7 @@ export function MannequinExperience() {
         </div>
 
         <footer className={styles.sheetFooter}>
-          <p id={noteId}>Interactive digital fitting study. The mannequin is a real GLB asset; the garment layer updates live by piece, colour and artwork while product photography remains the final reference for fabric detail.</p>
+          <p id={noteId}>Interactive digital fitting study. The figure uses a rigged anatomical human GLB posed as a sculptural fashion mannequin; the garment layer updates live by piece, colour and artwork while product photography remains the final reference for fabric detail.</p>
           <span>Drag to orbit / Pinch or scroll to zoom / Tap garment to explore</span>
         </footer>
       </div>
