@@ -1,10 +1,10 @@
 .experience {
-  --study-paper: #f7f5ef;
+  --study-paper: #f4f1e9;
   --study-ink: #22241f;
   --study-muted: #66675f;
   --study-line: #d3d1c8;
   padding: clamp(56px, 7vw, 110px) clamp(18px, 4vw, 64px);
-  background: #e9e6de;
+  background: #dedbd2;
   color: var(--study-ink);
   scroll-margin-top: 24px;
 }
@@ -35,9 +35,9 @@
 .intro { margin: 0 0 4px; color: var(--study-muted); font-size: 14px; line-height: 1.6; }
 .sheet { max-width: 1440px; margin-inline: auto; background: var(--study-paper); border: 1px solid var(--study-line); }
 .sheetHeader { display: flex; justify-content: space-between; gap: 12px; padding: 18px 26px; border-bottom: 1px solid var(--study-line); }
-.layout { display: grid; grid-template-columns: minmax(0, 1fr) 310px; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; }
 .study { min-width: 0; display: flex; flex-direction: column; }
-.drawing { position: relative; flex: 1; min-height: 590px; aspect-ratio: 1000 / 780; overflow: hidden; isolation: isolate; touch-action: pan-y; user-select: none; cursor: grab; }
+.drawing { position: relative; flex: 1; min-height: 660px; aspect-ratio: 1000 / 780; overflow: hidden; isolation: isolate; touch-action: pan-y; user-select: none; cursor: grab; }
 .drawing:active { cursor: grabbing; }
 .plateNumber { position: absolute; top: 3%; left: 3.5%; color: #e3e0d6; font: italic 72px/1 Georgia, serif; pointer-events: none; }
 .leaders { position: absolute; inset: 0; width: 100%; height: 100%; fill: var(--study-paper); stroke: #9a9b8e; stroke-width: 1; pointer-events: none; }
@@ -51,7 +51,7 @@
 .detailCallout { top: 51%; }
 .detailCallout p { font: 400 15px/1.4 Georgia, serif; margin: 10px 0; }
 .detailCallout button { padding: 10px 0; border: 0; background: none; color: inherit; font: inherit; font-size: 11px; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
-.figureWrap { position: absolute; top: 4%; bottom: 7%; left: 48%; aspect-ratio: 360 / 760; transform: translateX(-50%) perspective(1100px) rotateY(var(--tilt, 0deg)); transform-origin: 50% 32%; transition: transform 150ms ease-out; }
+.figureWrap { position: absolute; top: 4%; bottom: 7%; left: 51%; aspect-ratio: 360 / 760; transform: translateX(-50%) perspective(1100px) rotateY(var(--tilt, 0deg)); transform-origin: 50% 32%; transition: transform 150ms ease-out; }
 .figure { display: block; width: 100%; height: 100%; }
 .garmentHitArea { position: absolute; top: 20%; left: 20%; width: 60%; height: 29%; display: grid; place-items: center; color: inherit; cursor: pointer; }
 .hotspot { position: absolute; right: -12px; top: 40%; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 12px; min-width: 60px; min-height: 44px; background: var(--study-paper); border: 1px solid #686b5d; font: 10px/1 Arial, sans-serif; letter-spacing: 0.08em; box-shadow: 3px 4px 0 #00000012; transition: transform 200ms ease, background-color 200ms ease; }
@@ -65,7 +65,7 @@
 .views, .tiltControls { display: flex; align-items: center; gap: 4px; }
 .viewControls button { min-width: 44px; min-height: 44px; border: 0; background: none; color: var(--study-muted); font: inherit; cursor: pointer; padding: 8px 14px; }
 .views button[aria-pressed="true"] { color: var(--study-ink); box-shadow: inset 0 -1px currentColor; }
-.details { padding: 26px; border-left: 1px solid var(--study-line); min-width: 0; }
+.details { padding: 30px; border-left: 1px solid var(--study-line); min-width: 0; }
 .details > .label { margin: 0 0 18px; color: var(--study-muted); }
 .details h3 { margin: 0 0 10px; font: 400 clamp(1.8rem, 2.6vw, 2.7rem)/1.04 Georgia, serif; letter-spacing: -0.035em; }
 .price { margin: 0 0 22px; font-size: 13px; }
@@ -78,7 +78,7 @@
 .missingPhoto p { margin: 0; font: italic 22px Georgia, serif; }
 .missingPhoto > span { color: var(--study-muted); font-size: 12px; line-height: 1.55; }
 .copy { color: var(--study-muted); font-size: 13px; line-height: 1.65; margin: 20px 0; }
-.enterButton { min-height: 48px; display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: var(--study-ink); color: var(--study-paper); }
+.enterButton { min-height: 48px; display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: #171816; color: var(--study-paper); }
 .enterButton:hover { background: #44473c; }
 .selectorList { margin-top: 25px; border-top: 1px solid var(--study-line); }
 .selector { display: grid; grid-template-columns: 19px 12px minmax(0, 1fr) 12px; gap: 9px; align-items: center; width: 100%; min-height: 54px; padding: 13px 0; border: 0; border-bottom: 1px solid var(--study-line); background: none; color: var(--study-muted); text-align: left; cursor: pointer; }
@@ -147,4 +147,46 @@
   .figureFocus { animation: none; }
   .figureWrap { transform: translateX(-50%); }
   .garmentHitArea:hover .hotspot, .reverse:hover .figure, .photograph:hover img { transform: none; }
+}
+
+
+/* Digital atelier refinement */
+.sheet {
+  box-shadow: 0 24px 70px rgba(31, 31, 27, 0.06);
+}
+
+.drawing::after {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  border: 1px solid rgba(34, 36, 31, 0.08);
+  pointer-events: none;
+}
+
+.figureWrap {
+  background: #e9e5dc;
+  border-left: 1px solid rgba(34, 36, 31, 0.08);
+  border-right: 1px solid rgba(34, 36, 31, 0.08);
+}
+
+.details h3 {
+  max-width: 10ch;
+}
+
+.enterButton {
+  transition: background-color 180ms ease, letter-spacing 180ms ease;
+}
+
+.enterButton:hover {
+  letter-spacing: 0.12em;
+}
+
+@media (max-width: 640px) {
+  .drawing::after {
+    inset: 10px;
+  }
+
+  .figureWrap {
+    border-inline: 0;
+  }
 }
