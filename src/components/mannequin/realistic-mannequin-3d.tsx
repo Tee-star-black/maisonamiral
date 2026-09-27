@@ -566,9 +566,9 @@ export function RealisticMannequin3D({
         // Hanging garments are naturally flatter than a worn tee. Expand
         // depth only, keeping the original shoulder and sleeve silhouette.
         garmentModel.scale.set(
-          uniformScale,
-          uniformScale,
-          uniformScale * 2.05,
+          uniformScale * 1.02,
+          uniformScale * 1.01,
+          uniformScale * 1.75,
         );
         garmentModel.updateMatrixWorld(true);
 
@@ -577,11 +577,22 @@ export function RealisticMannequin3D({
           new THREE.Vector3(),
         );
 
+        const garmentOffsetX = 0;
+        const garmentOffsetY = -0.06;
+        const garmentOffsetZ = 0.14;
+
         garmentModel.position.set(
-          -fittedCenter.x,
-          2.54 - fittedCenter.y,
-          -fittedCenter.z,
+          -fittedCenter.x + garmentOffsetX,
+          2.54 - fittedCenter.y + garmentOffsetY,
+          -fittedCenter.z + garmentOffsetZ,
         );
+
+        garmentModel.rotation.set(
+          0.02,
+          0,
+          0,
+        );
+
         garmentModel.updateMatrixWorld(true);
 
         garmentRoot.add(garmentModel);
