@@ -13,6 +13,9 @@ export type RealisticMannequin3DProps = {
 };
 
 const MANNEQUIN_URL = "/models/maison-human-mannequin.glb";
+const DEFAULT_CAMERA_DISTANCE = 8.35;
+const CAMERA_MIN_DISTANCE = 6.8;
+const CAMERA_MAX_DISTANCE = 10.6;
 
 function applyRelaxedHumanPose(model: THREE.Object3D) {
   const rotateInParentSpace = (
@@ -27,9 +30,7 @@ function applyRelaxedHumanPose(model: THREE.Object3D) {
     bone.quaternion.premultiply(delta);
   };
 
-  // The CC0 source arrives in a T-pose. Bring the arms down into a quiet,
-  // natural retail stance without baking a second asset or shipping an
-  // animation runtime.
+  // Lower both arms from the source T-pose.
   rotateInParentSpace(
     "upper_arm.L",
     new THREE.Vector3(0, 0, 1),
@@ -41,39 +42,39 @@ function applyRelaxedHumanPose(model: THREE.Object3D) {
     1.17,
   );
 
-  // A slight forward fall and elbow bend prevents the silhouette from
-  // reading like a rigid anatomical reference model.
+  // Keep the arms slightly behind the shirt plane so the garment reads
+  // cleanly from the front and avoids the clipping seen in the first pass.
   rotateInParentSpace(
     "upper_arm.L",
     new THREE.Vector3(1, 0, 0),
-    -0.08,
+    0.11,
   );
   rotateInParentSpace(
     "upper_arm.R",
     new THREE.Vector3(1, 0, 0),
-    -0.08,
+    0.11,
   );
   rotateInParentSpace(
     "forearm.L",
     new THREE.Vector3(1, 0, 0),
-    -0.1,
+    0.07,
   );
   rotateInParentSpace(
     "forearm.R",
     new THREE.Vector3(1, 0, 0),
-    -0.1,
+    0.07,
   );
 
   const upperSpine = model.getObjectByName("spine.003");
   if (upperSpine instanceof THREE.Bone) {
-    upperSpine.rotation.z += 0.012;
-    upperSpine.rotation.x -= 0.018;
+    upperSpine.rotation.z += 0.009;
+    upperSpine.rotation.x -= 0.012;
   }
 
   const neck = model.getObjectByName("spine.005");
   if (neck instanceof THREE.Bone) {
-    neck.rotation.z -= 0.01;
-    neck.rotation.y += 0.025;
+    neck.rotation.z -= 0.008;
+    neck.rotation.y += 0.018;
   }
 
   model.updateMatrixWorld(true);
@@ -110,7 +111,7 @@ function createFabricTexture() {
   const texture = new THREE.CanvasTexture(canvas);
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(10, 10);
+  texture.repeat.set(12, 12);
   texture.colorSpace = THREE.NoColorSpace;
   texture.needsUpdate = true;
   return texture;
@@ -128,14 +129,14 @@ function createPrintTexture(artMark: string, ink: string) {
     context.textAlign = "center";
     context.textBaseline = "middle";
 
-    context.font = "500 42px Arial";
-    context.fillText("MAISON AMIRAL", canvas.width / 2, 94);
+    context.font = "500 38px Arial";
+    context.fillText("MAISON AMIRAL", canvas.width / 2, 92);
 
-    context.font = "700 138px Georgia";
-    context.fillText(artMark, canvas.width / 2, 255);
+    context.font = "700 126px Georgia";
+    context.fillText(artMark, canvas.width / 2, 252);
 
-    context.font = "500 28px Arial";
-    context.fillText("JOHANNESBURG / EDITION 001", canvas.width / 2, 410);
+    context.font = "500 24px Arial";
+    context.fillText("JOHANNESBURG / EDITION 001", canvas.width / 2, 406);
   }
 
   const texture = new THREE.CanvasTexture(canvas);
@@ -144,55 +145,71 @@ function createPrintTexture(artMark: string, ink: string) {
   return texture;
 }
 
-function createGarmentGeometry() {
+function createGarmentBodyGeometry() {
   const shape = new THREE.Shape();
 
-  shape.moveTo(-0.2, 0.72);
-  shape.lineTo(-0.36, 0.7);
-  shape.lineTo(-0.59, 0.55);
-  shape.lineTo(-0.77, 0.22);
-  shape.lineTo(-0.59, 0.11);
-  shape.lineTo(-0.49, 0.26);
-  shape.lineTo(-0.43, -0.7);
-  shape.lineTo(0.43, -0.7);
-  shape.lineTo(0.49, 0.26);
-  shape.lineTo(0.59, 0.11);
-  shape.lineTo(0.77, 0.22);
-  shape.lineTo(0.59, 0.55);
-  shape.lineTo(0.36, 0.7);
-  shape.lineTo(0.2, 0.72);
+  shape.moveTo(-0.2, 0.74);
+  shape.lineTo(-0.39, 0.67);
+  shape.lineTo(-0.46, 0.51);
+  shape.lineTo(-0.43, -0.58);
+  shape.lineTo(0.43, -0.58);
+  shape.lineTo(0.46, 0.51);
+  shape.lineTo(0.39, 0.67);
+  shape.lineTo(0.2, 0.74);
   shape.closePath();
 
   const neck = new THREE.Path();
-  neck.absellipse(0, 0.69, 0.2, 0.13, 0, Math.PI * 2, false, 0);
+  neck.absellipse(0, 0.63, 0.18, 0.095, 0, Math.PI * 2, false, 0);
   shape.holes.push(neck);
 
   const geometry = new THREE.ExtrudeGeometry(shape, {
-    depth: 0.62,
+    depth: 0.32,
     bevelEnabled: true,
-    bevelSegments: 4,
-    bevelSize: 0.035,
-    bevelThickness: 0.035,
-    curveSegments: 32,
+    bevelSegments: 3,
+    bevelSize: 0.018,
+    bevelThickness: 0.018,
+    curveSegments: 28,
     steps: 1,
   });
 
-  geometry.translate(0, 0, -0.31);
+  geometry.translate(0, 0, -0.16);
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+function createSleeveGeometry() {
+  const geometry = new THREE.CylinderGeometry(
+    0.19,
+    0.165,
+    0.43,
+    24,
+    2,
+    false,
+  );
+  geometry.scale(1, 1, 0.72);
   geometry.computeVertexNormals();
   return geometry;
 }
 
 function disposeObject(object: THREE.Object3D) {
+  const disposedGeometries = new Set<THREE.BufferGeometry>();
+  const disposedMaterials = new Set<THREE.Material>();
+
   object.traverse((node) => {
     if (!(node instanceof THREE.Mesh)) return;
 
-    node.geometry.dispose();
+    if (!disposedGeometries.has(node.geometry)) {
+      disposedGeometries.add(node.geometry);
+      node.geometry.dispose();
+    }
 
     const materials = Array.isArray(node.material)
       ? node.material
       : [node.material];
 
     materials.forEach((material) => {
+      if (disposedMaterials.has(material)) return;
+      disposedMaterials.add(material);
       material.dispose();
     });
   });
@@ -248,11 +265,11 @@ export function RealisticMannequin3D({
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color("#e9e5dc");
-    scene.fog = new THREE.Fog("#e9e5dc", 7.2, 12);
+    scene.fog = new THREE.Fog("#e9e5dc", 9.2, 14.2);
 
-    const camera = new THREE.PerspectiveCamera(29, 1, 0.1, 40);
-    camera.position.set(0, 1.82, 6.7);
-    camera.lookAt(0, 1.72, 0);
+    const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 40);
+    camera.position.set(0, 1.82, DEFAULT_CAMERA_DISTANCE);
+    camera.lookAt(0, 1.82, 0);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: !smallScreen,
@@ -275,7 +292,7 @@ export function RealisticMannequin3D({
     mount.appendChild(renderer.domElement);
 
     const figure = new THREE.Group();
-    figure.rotation.y = -0.13;
+    figure.rotation.y = -0.035;
     scene.add(figure);
 
     const mannequinRoot = new THREE.Group();
@@ -283,40 +300,57 @@ export function RealisticMannequin3D({
 
     const mannequinMaterial = new THREE.MeshPhysicalMaterial({
       color: "#c8c0b5",
-      roughness: 0.56,
+      roughness: 0.6,
       metalness: 0,
-      clearcoat: 0.035,
-      clearcoatRoughness: 0.9,
-      sheen: 0.08,
+      clearcoat: 0.025,
+      clearcoatRoughness: 0.92,
+      sheen: 0.06,
       sheenColor: new THREE.Color("#e1dbd2"),
     });
 
     const fabricTexture = createFabricTexture();
     const shirtMaterial = new THREE.MeshPhysicalMaterial({
       color: shirtTone,
-      roughness: 0.78,
+      roughness: 0.82,
       metalness: 0,
-      sheen: 0.32,
+      sheen: 0.22,
       sheenColor: new THREE.Color(shirtTone),
-      sheenRoughness: 0.8,
-      clearcoat: 0.025,
-      clearcoatRoughness: 0.9,
+      sheenRoughness: 0.88,
+      clearcoat: 0.01,
+      clearcoatRoughness: 1,
       bumpMap: fabricTexture,
-      bumpScale: 0.018,
+      bumpScale: 0.012,
     });
 
     shirtMaterialRef.current = shirtMaterial;
 
     const garment = new THREE.Mesh(
-      createGarmentGeometry(),
+      createGarmentBodyGeometry(),
       shirtMaterial,
     );
-    garment.name = "MAISON_GARMENT";
-    garment.position.set(0, 2.43, 0.015);
-    garment.scale.set(0.94, 1, 0.98);
+    garment.name = "MAISON_GARMENT_BODY";
+    garment.position.set(0, 2.49, 0.005);
     garment.castShadow = true;
     garment.receiveShadow = true;
     figure.add(garment);
+
+    const sleeveGeometry = createSleeveGeometry();
+
+    const leftSleeve = new THREE.Mesh(sleeveGeometry, shirtMaterial);
+    leftSleeve.name = "MAISON_GARMENT_SLEEVE_LEFT";
+    leftSleeve.position.set(-0.535, 2.96, 0.005);
+    leftSleeve.rotation.z = 0.54;
+    leftSleeve.castShadow = true;
+    leftSleeve.receiveShadow = true;
+    figure.add(leftSleeve);
+
+    const rightSleeve = new THREE.Mesh(sleeveGeometry, shirtMaterial);
+    rightSleeve.name = "MAISON_GARMENT_SLEEVE_RIGHT";
+    rightSleeve.position.set(0.535, 2.96, 0.005);
+    rightSleeve.rotation.z = -0.54;
+    rightSleeve.castShadow = true;
+    rightSleeve.receiveShadow = true;
+    figure.add(rightSleeve);
 
     const initialPrintTexture = createPrintTexture(artMark, shirtInk);
     printTextureRef.current = initialPrintTexture;
@@ -330,44 +364,13 @@ export function RealisticMannequin3D({
     printMaterialRef.current = printMaterial;
 
     const printPlane = new THREE.Mesh(
-      new THREE.PlaneGeometry(0.83, 0.42),
+      new THREE.PlaneGeometry(0.61, 0.3),
       printMaterial,
     );
     printPlane.name = "MAISON_PRINT";
-    printPlane.position.set(0, 2.5, 0.357);
+    printPlane.position.set(0, 2.62, 0.184);
     printPlane.castShadow = false;
     figure.add(printPlane);
-
-    const trouserMaterial = new THREE.MeshStandardMaterial({
-      color: "#20201f",
-      roughness: 0.9,
-      metalness: 0,
-    });
-
-    const waist = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.47, 0.44, 0.38, 36),
-      trouserMaterial,
-    );
-    waist.scale.z = 0.7;
-    waist.position.set(0, 1.58, 0);
-    waist.castShadow = true;
-    figure.add(waist);
-
-    const trouserLegGeometry = new THREE.CylinderGeometry(
-      0.265,
-      0.225,
-      1.48,
-      32,
-    );
-
-    [-0.245, 0.245].forEach((x) => {
-      const leg = new THREE.Mesh(trouserLegGeometry, trouserMaterial);
-      leg.scale.z = 0.72;
-      leg.position.set(x, 0.79, 0);
-      leg.castShadow = true;
-      leg.receiveShadow = true;
-      figure.add(leg);
-    });
 
     const floor = new THREE.Mesh(
       new THREE.PlaneGeometry(14, 14),
@@ -382,19 +385,19 @@ export function RealisticMannequin3D({
     scene.add(floor);
 
     const backdrop = new THREE.Mesh(
-      new THREE.PlaneGeometry(11, 8),
+      new THREE.PlaneGeometry(12, 8),
       new THREE.MeshStandardMaterial({
         color: "#e9e5dc",
         roughness: 1,
       }),
     );
-    backdrop.position.set(0, 3.1, -2.75);
+    backdrop.position.set(0, 3.1, -3.2);
     backdrop.receiveShadow = true;
     scene.add(backdrop);
 
-    scene.add(new THREE.HemisphereLight("#fffdf8", "#827d75", 1.95));
+    scene.add(new THREE.HemisphereLight("#fffdf8", "#827d75", 1.85));
 
-    const key = new THREE.DirectionalLight("#fffaf1", 4);
+    const key = new THREE.DirectionalLight("#fffaf1", 3.7);
     key.position.set(4.2, 6.5, 5.2);
     key.castShadow = true;
     key.shadow.mapSize.set(
@@ -402,18 +405,18 @@ export function RealisticMannequin3D({
       smallScreen ? 512 : 1024,
     );
     key.shadow.camera.near = 0.1;
-    key.shadow.camera.far = 15;
+    key.shadow.camera.far = 16;
     key.shadow.camera.left = -3;
     key.shadow.camera.right = 3;
     key.shadow.camera.top = 6;
     key.shadow.camera.bottom = -1;
     scene.add(key);
 
-    const fill = new THREE.DirectionalLight("#d7dde8", 1.35);
+    const fill = new THREE.DirectionalLight("#d7dde8", 1.2);
     fill.position.set(-4, 3.8, 3.8);
     scene.add(fill);
 
-    const rim = new THREE.DirectionalLight("#ffffff", 1.9);
+    const rim = new THREE.DirectionalLight("#ffffff", 1.6);
     rim.position.set(0.5, 4.3, -4.5);
     scene.add(rim);
 
@@ -439,11 +442,6 @@ export function RealisticMannequin3D({
             : [node.material];
 
           sourceMaterials.forEach((material) => material.dispose());
-
-          // Keep anatomical detail and realistic proportions while treating
-          // the body as a sculptural fashion mannequin rather than a lifelike
-          // person. This avoids uncanny skin rendering and keeps attention on
-          // the garment.
           node.material = mannequinMaterial;
         });
 
@@ -475,6 +473,12 @@ export function RealisticMannequin3D({
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
     const pointers = new Map<number, { x: number; y: number }>();
+    const garmentHitTargets = [
+      garment,
+      leftSleeve,
+      rightSleeve,
+      printPlane,
+    ];
 
     let dragging = false;
     let moved = false;
@@ -484,10 +488,10 @@ export function RealisticMannequin3D({
     let previousPinchDistance = 0;
     let velocityY = 0;
     let targetRotationX = 0;
-    let targetRotationY = -0.13;
-    let cameraDistance = 6.7;
+    let targetRotationY = -0.035;
+    let cameraDistance = DEFAULT_CAMERA_DISTANCE;
     let hover = false;
-    let idleUntil = performance.now() + 900;
+    let idleUntil = performance.now() + 1100;
 
     const updatePointer = (event: PointerEvent) => {
       const rect = renderer.domElement.getBoundingClientRect();
@@ -498,7 +502,9 @@ export function RealisticMannequin3D({
     const hitGarment = (event: PointerEvent) => {
       updatePointer(event);
       raycaster.setFromCamera(pointer, camera);
-      return raycaster.intersectObjects([garment, printPlane], false).length > 0;
+      return (
+        raycaster.intersectObjects(garmentHitTargets, false).length > 0
+      );
     };
 
     const pointerDistance = () => {
@@ -554,9 +560,9 @@ export function RealisticMannequin3D({
 
         if (previousPinchDistance > 0) {
           cameraDistance = THREE.MathUtils.clamp(
-            cameraDistance + (previousPinchDistance - distance) * 0.012,
-            5.25,
-            8.4,
+            cameraDistance + (previousPinchDistance - distance) * 0.014,
+            CAMERA_MIN_DISTANCE,
+            CAMERA_MAX_DISTANCE,
           );
         }
 
@@ -578,16 +584,15 @@ export function RealisticMannequin3D({
 
       targetRotationY += dx * 0.007;
       targetRotationX = THREE.MathUtils.clamp(
-        targetRotationX + dy * 0.0022,
-        -0.11,
-        0.11,
+        targetRotationX + dy * 0.002,
+        -0.095,
+        0.095,
       );
       velocityY = dx * 0.001;
     };
 
     const endPointer = (event: PointerEvent) => {
-      const wasTracked = pointers.has(event.pointerId);
-      if (!wasTracked) return;
+      if (!pointers.has(event.pointerId)) return;
 
       const shouldOpen =
         pointers.size === 1 &&
@@ -614,16 +619,16 @@ export function RealisticMannequin3D({
       event.preventDefault();
       idleUntil = performance.now() + 2200;
       cameraDistance = THREE.MathUtils.clamp(
-        cameraDistance + event.deltaY * 0.004,
-        5.25,
-        8.4,
+        cameraDistance + event.deltaY * 0.0045,
+        CAMERA_MIN_DISTANCE,
+        CAMERA_MAX_DISTANCE,
       );
     };
 
     const onDoubleClick = () => {
       targetRotationX = 0;
-      targetRotationY = -0.13;
-      cameraDistance = 6.7;
+      targetRotationY = -0.035;
+      cameraDistance = DEFAULT_CAMERA_DISTANCE;
       idleUntil = performance.now() + 1800;
     };
 
@@ -684,7 +689,7 @@ export function RealisticMannequin3D({
         pointers.size === 0 &&
         performance.now() > idleUntil
       ) {
-        targetRotationY += delta * 0.13;
+        targetRotationY += delta * 0.105;
       }
 
       targetRotationY += velocityY;
@@ -695,7 +700,7 @@ export function RealisticMannequin3D({
       figure.rotation.x +=
         (targetRotationX - figure.rotation.x) * 0.075;
 
-      const targetScale = hover ? 1.008 : 1;
+      const targetScale = hover ? 1.004 : 1;
       const nextScale = THREE.MathUtils.lerp(
         figure.scale.x,
         targetScale,
@@ -705,7 +710,7 @@ export function RealisticMannequin3D({
 
       camera.position.z +=
         (cameraDistance - camera.position.z) * 0.09;
-      camera.lookAt(0, 1.72, 0);
+      camera.lookAt(0, 1.82, 0);
 
       renderer.render(scene, camera);
     };
@@ -755,8 +760,6 @@ export function RealisticMannequin3D({
 
       mannequinMaterial.dispose();
       fabricTexture.dispose();
-      trouserLegGeometry.dispose();
-      trouserMaterial.dispose();
       disposeObject(scene);
       renderer.dispose();
     };
@@ -800,7 +803,7 @@ export function RealisticMannequin3D({
           {hasError
             ? "3D preview unavailable"
             : isReady
-              ? "Human mannequin / live garment"
+              ? "Human mannequin / fitted garment"
               : "Loading digital look"}
         </span>
         <span>Drag · pinch · wheel · double-click reset</span>
