@@ -67,11 +67,6 @@ export function MannequinExperience() {
   const sceneStyle = {
     "--shirt-tone": product.tone,
     "--shirt-ink": product.ink,
-    width: "min(68vw, 780px)",
-    maxWidth: "100%",
-    height: "min(78vh, 820px)",
-    minHeight: "640px",
-    transform: "none",
   } as CSSProperties;
 
   return (
@@ -90,7 +85,7 @@ export function MannequinExperience() {
         <div className={styles.sheetHeader}>
           <span>MA / Edition 001</span>
           <span>Figure {String(activeIndex + 1).padStart(2, "0")}</span>
-          <span>GLB / GLB / Live</span>
+          <span>GLB / Three.js / Live</span>
         </div>
 
         <div className={styles.layout}>
