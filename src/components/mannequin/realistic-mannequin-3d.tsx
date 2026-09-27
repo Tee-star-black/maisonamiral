@@ -13,7 +13,7 @@ export type RealisticMannequin3DProps = {
 };
 
 const MANNEQUIN_URL =
-  "https://cdn.3dassets.dev/assets/35473/v1/model.glb";
+  "https://cdn.3dassets.dev/assets/25259/v1/model.glb";
 
 function createFabricTexture() {
   const canvas = document.createElement("canvas");
@@ -65,15 +65,12 @@ function createPrintTexture(artMark: string, ink: string) {
     context.textBaseline = "middle";
 
     context.font = "500 42px Arial";
-    context.letterSpacing = "12px";
     context.fillText("MAISON AMIRAL", canvas.width / 2, 94);
 
     context.font = "700 138px Georgia";
-    context.letterSpacing = "4px";
     context.fillText(artMark, canvas.width / 2, 255);
 
     context.font = "500 28px Arial";
-    context.letterSpacing = "9px";
     context.fillText("JOHANNESBURG / EDITION 001", canvas.width / 2, 410);
   }
 
