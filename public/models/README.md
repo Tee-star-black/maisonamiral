@@ -13,12 +13,13 @@ showroom pose, mannequin material, garment layer, lighting and interaction at
 runtime in Three.js.
 
 
-## External garment
+## maison-tee.glb
 
-Runtime source: 3DAssets.dev — "T shirt on a hanger (Clothing Rail and Wardrobe)"
+Source: 3DAssets.dev — "T shirt on a hanger (Clothing Rail and Wardrobe)"
 Model: https://cdn.3dassets.dev/assets/35447/v1/model.glb
 License: CC0 1.0 Universal
 
-The showroom keeps the largest garment mesh, discards the retail hanger/helper
+The garment is served locally with the mannequin. The showroom keeps the largest
+garment mesh, discards the retail hanger/helper
 geometry at runtime, recolours the shirt with Maison product data, expands its
 depth to fit the mannequin, and layers the Maison artwork separately.

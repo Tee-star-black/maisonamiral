@@ -13,44 +13,40 @@ export type RealisticMannequin3DProps = {
 };
 
 const MANNEQUIN_URL = "/models/maison-human-mannequin.glb";
-const GARMENT_URL =
-  "https://cdn.3dassets.dev/assets/35447/v1/model.glb";
+const GARMENT_URL = "/models/maison-tee.glb";
 
 const DEFAULT_CAMERA_DISTANCE = 8.55;
 const CAMERA_MIN_DISTANCE = 6.9;
 const CAMERA_MAX_DISTANCE = 11.1;
 
 function applyRelaxedHumanPose(model: THREE.Object3D) {
-  const rotateBone = (
-    boneName: string,
-    axis: THREE.Vector3,
-    angle: number,
-  ) => {
+  // GLTFLoader sanitizes Blender's dotted bone names (upper_arm.L ->
+  // upper_armL). The source arms already slope down; ease them closer to
+  // the sides in the model's coordinate system, where Z is left/right.
+  model.updateMatrixWorld(true);
+  const rotateBone = (boneName: string, angle: number) => {
     const bone = model.getObjectByName(boneName);
     if (!(bone instanceof THREE.Bone)) return;
 
+    const parentRotation = new THREE.Quaternion();
+    bone.parent?.getWorldQuaternion(parentRotation);
+    const axis = new THREE.Vector3(1, 0, 0)
+      .applyQuaternion(parentRotation.invert());
     const delta = new THREE.Quaternion().setFromAxisAngle(axis, angle);
     bone.quaternion.premultiply(delta);
+    bone.updateMatrixWorld(true);
   };
 
-  // Source mannequin is a T-pose. Bring the arms almost vertically down so
-  // the silhouette reads as a fashion mannequin, not a rigging reference.
-  rotateBone("upper_arm.L", new THREE.Vector3(0, 0, 1), -1.47);
-  rotateBone("upper_arm.R", new THREE.Vector3(0, 0, 1), 1.47);
+  rotateBone("upper_armL", -0.35);
+  rotateBone("upper_armR", 0.35);
 
-  // Let the wrists fall slightly behind the front garment plane.
-  rotateBone("upper_arm.L", new THREE.Vector3(1, 0, 0), 0.06);
-  rotateBone("upper_arm.R", new THREE.Vector3(1, 0, 0), 0.06);
-  rotateBone("forearm.L", new THREE.Vector3(1, 0, 0), 0.04);
-  rotateBone("forearm.R", new THREE.Vector3(1, 0, 0), 0.04);
-
-  const upperSpine = model.getObjectByName("spine.003");
+  const upperSpine = model.getObjectByName("spine003");
   if (upperSpine instanceof THREE.Bone) {
     upperSpine.rotation.z += 0.008;
     upperSpine.rotation.x -= 0.01;
   }
 
-  const neck = model.getObjectByName("spine.005");
+  const neck = model.getObjectByName("spine005");
   if (neck instanceof THREE.Bone) {
     neck.rotation.z -= 0.006;
     neck.rotation.y += 0.014;
@@ -398,7 +394,7 @@ export function RealisticMannequin3D({
       printMaterial,
     );
     printPlane.name = "MAISON_PRINT";
-    printPlane.position.set(0, 2.57, 0.225);
+    printPlane.position.set(0, 2.57, 0.39);
     garmentRoot.add(printPlane);
 
     // Invisible interaction volume so the product remains clickable even
@@ -475,6 +471,10 @@ export function RealisticMannequin3D({
         model.name = "MAISON_HUMAN_MANNEQUIN";
 
         applyRelaxedHumanPose(model);
+        // This GLB faces along +X, with its shoulders spread along Z.
+        // Turn its face toward the camera (+Z) before fitting the tee.
+        model.rotation.y = -Math.PI / 2;
+        model.updateMatrixWorld(true);
 
         model.traverse((node) => {
           if (!(node instanceof THREE.Mesh)) return;
