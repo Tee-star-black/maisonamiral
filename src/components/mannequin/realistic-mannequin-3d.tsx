@@ -470,7 +470,7 @@ export function RealisticMannequin3D({
       printMaterial,
     );
     printPlane.name = "MAISON_PRINT";
-    printPlane.position.set(0, 2.6, 0.126);
+    printPlane.position.set(0, 2.6, 0.132);
     printPlane.castShadow = false;
     figure.add(printPlane);
 
@@ -544,11 +544,6 @@ export function RealisticMannequin3D({
             : [node.material];
 
           sourceMaterials.forEach((material) => material.dispose());
-
-          if (node instanceof THREE.SkinnedMesh) {
-            trimBodyUnderGarment(node);
-          }
-
           node.material = mannequinMaterial;
         });
 
@@ -565,9 +560,20 @@ export function RealisticMannequin3D({
         model.position.x -= center.x;
         model.position.z -= center.z;
         model.position.y -= bounds.min.y;
-        model.updateMatrixWorld(true);
 
         mannequinRoot.add(model);
+        model.updateMatrixWorld(true);
+
+        // Trim the body only after the model has been posed, scaled and
+        // positioned. The coverage volumes are expressed in showroom space,
+        // so doing this earlier would leave the torso intact and recreate the
+        // exact clipping we are trying to eliminate.
+        model.traverse((node) => {
+          if (node instanceof THREE.SkinnedMesh) {
+            trimBodyUnderGarment(node);
+          }
+        });
+
         setIsReady(true);
       },
       undefined,
