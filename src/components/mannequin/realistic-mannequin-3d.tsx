@@ -173,7 +173,27 @@ function createGarmentBodyGeometry() {
   });
 
   geometry.translate(0, 0, -0.11);
+
+  const position = geometry.getAttribute("position");
+  for (let i = 0; i < position.count; i += 1) {
+    const x = position.getX(i);
+    const y = position.getY(i);
+    const z = position.getZ(i);
+
+    const chest = Math.exp(-Math.pow((y - 0.28) / 0.42, 2));
+    const sideFalloff = 1 - Math.min(Math.abs(x) / 0.46, 1) * 0.28;
+
+    if (z >= 0) {
+      position.setZ(i, z + chest * sideFalloff * 0.06);
+    } else {
+      position.setZ(i, z - chest * 0.025);
+    }
+  }
+
+  position.needsUpdate = true;
   geometry.computeVertexNormals();
+  geometry.computeBoundingBox();
+  geometry.computeBoundingSphere();
   return geometry;
 }
 
@@ -184,111 +204,106 @@ function createSleeveGeometry() {
     0.34,
     24,
     1,
-    false,
+    true,
   );
   geometry.scale(1, 1, 0.68);
   geometry.computeVertexNormals();
   return geometry;
 }
 
-function pointToSegmentDistance(
-  point: THREE.Vector3,
-  start: THREE.Vector3,
-  end: THREE.Vector3,
+function installGarmentCoverageMask(
+  material: THREE.MeshPhysicalMaterial,
+  figure: THREE.Object3D,
 ) {
-  const segment = end.clone().sub(start);
-  const denominator = segment.lengthSq();
-  if (denominator === 0) return point.distanceTo(start);
+  const worldToFigure = { value: new THREE.Matrix4() };
 
-  const t = THREE.MathUtils.clamp(
-    point.clone().sub(start).dot(segment) / denominator,
-    0,
-    1,
-  );
-  const closest = start.clone().add(segment.multiplyScalar(t));
-  return point.distanceTo(closest);
-}
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.maisonWorldToFigure = worldToFigure;
 
-function isCoveredByGarment(point: THREE.Vector3) {
-  const neckOpening =
-    Math.abs(point.x) < 0.17 &&
-    point.y > 2.98 &&
-    Math.abs(point.z) < 0.2;
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        "#include <common>",
+        `#include <common>
+uniform mat4 maisonWorldToFigure;
+varying vec3 vMaisonFigurePosition;`,
+      )
+      .replace(
+        "#include <project_vertex>",
+        `vMaisonFigurePosition = (
+  maisonWorldToFigure *
+  modelMatrix *
+  vec4(transformed, 1.0)
+).xyz;
+#include <project_vertex>`,
+      );
 
-  const torso =
-    Math.abs(point.x) < 0.43 &&
-    point.y > 1.95 &&
-    point.y < 3.13 &&
-    Math.abs(point.z) < 0.24 &&
-    !neckOpening;
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        "#include <common>",
+        `#include <common>
+varying vec3 vMaisonFigurePosition;
 
-  const leftUpperArm =
-    pointToSegmentDistance(
-      point,
-      new THREE.Vector3(-0.35, 3.02, 0),
-      new THREE.Vector3(-0.58, 2.67, 0),
-    ) < 0.17;
+float maisonSegmentDistance(vec3 p, vec3 a, vec3 b) {
+  vec3 pa = p - a;
+  vec3 ba = b - a;
+  float denominator = max(dot(ba, ba), 0.00001);
+  float h = clamp(dot(pa, ba) / denominator, 0.0, 1.0);
+  return length(pa - ba * h);
+}`,
+      )
+      .replace(
+        "#include <clipping_planes_fragment>",
+        `#include <clipping_planes_fragment>
 
-  const rightUpperArm =
-    pointToSegmentDistance(
-      point,
-      new THREE.Vector3(0.35, 3.02, 0),
-      new THREE.Vector3(0.58, 2.67, 0),
-    ) < 0.17;
+vec3 maisonP = vMaisonFigurePosition;
 
-  return torso || leftUpperArm || rightUpperArm;
-}
+vec2 maisonNeckDelta = vec2(
+  maisonP.x / 0.17,
+  (maisonP.y - 3.09) / 0.105
+);
 
-function trimBodyUnderGarment(mesh: THREE.SkinnedMesh) {
-  const geometry = mesh.geometry.clone();
-  const position = geometry.getAttribute("position");
-  const sourceIndex = geometry.getIndex();
+bool maisonNeckOpening =
+  dot(maisonNeckDelta, maisonNeckDelta) < 1.0 &&
+  abs(maisonP.z) < 0.34;
 
-  if (!position) return;
+bool maisonTorsoCovered =
+  abs(maisonP.x) < 0.5 &&
+  maisonP.y > 1.92 &&
+  maisonP.y < 3.18 &&
+  abs(maisonP.z) < 0.36 &&
+  !maisonNeckOpening;
 
-  mesh.geometry = geometry;
-  mesh.updateMatrixWorld(true);
+bool maisonLeftSleeveCovered =
+  maisonSegmentDistance(
+    maisonP,
+    vec3(-0.34, 3.03, 0.0),
+    vec3(-0.61, 2.67, 0.0)
+  ) < 0.185;
 
-  const triangleCount = sourceIndex
-    ? sourceIndex.count / 3
-    : position.count / 3;
-  const kept: number[] = [];
-  const a = new THREE.Vector3();
-  const b = new THREE.Vector3();
-  const d = new THREE.Vector3();
-  const centroid = new THREE.Vector3();
+bool maisonRightSleeveCovered =
+  maisonSegmentDistance(
+    maisonP,
+    vec3(0.34, 3.03, 0.0),
+    vec3(0.61, 2.67, 0.0)
+  ) < 0.185;
 
-  const readVertex = (index: number, target: THREE.Vector3) => {
-    target.fromBufferAttribute(position, index);
-    mesh.applyBoneTransform(index, target);
-    target.applyMatrix4(mesh.matrixWorld);
+if (
+  maisonTorsoCovered ||
+  maisonLeftSleeveCovered ||
+  maisonRightSleeveCovered
+) {
+  discard;
+}`,
+      );
   };
 
-  for (let triangle = 0; triangle < triangleCount; triangle += 1) {
-    const i0 = sourceIndex
-      ? sourceIndex.getX(triangle * 3)
-      : triangle * 3;
-    const i1 = sourceIndex
-      ? sourceIndex.getX(triangle * 3 + 1)
-      : triangle * 3 + 1;
-    const i2 = sourceIndex
-      ? sourceIndex.getX(triangle * 3 + 2)
-      : triangle * 3 + 2;
+  material.customProgramCacheKey = () => "maison-garment-coverage-v3";
+  material.needsUpdate = true;
 
-    readVertex(i0, a);
-    readVertex(i1, b);
-    readVertex(i2, d);
-
-    centroid.copy(a).add(b).add(d).multiplyScalar(1 / 3);
-
-    if (!isCoveredByGarment(centroid)) {
-      kept.push(i0, i1, i2);
-    }
-  }
-
-  geometry.setIndex(kept);
-  geometry.computeBoundingBox();
-  geometry.computeBoundingSphere();
+  return () => {
+    figure.updateWorldMatrix(true, false);
+    worldToFigure.value.copy(figure.matrixWorld).invert();
+  };
 }
 
 function disposeObject(object: THREE.Object3D) {
@@ -407,6 +422,11 @@ export function RealisticMannequin3D({
       sheen: 0.06,
       sheenColor: new THREE.Color("#e1dbd2"),
     });
+
+    const updateGarmentCoverageMask = installGarmentCoverageMask(
+      mannequinMaterial,
+      figure,
+    );
 
     const fabricTexture = createFabricTexture();
     const shirtMaterial = new THREE.MeshPhysicalMaterial({
@@ -563,16 +583,6 @@ export function RealisticMannequin3D({
 
         mannequinRoot.add(model);
         model.updateMatrixWorld(true);
-
-        // Trim the body only after the model has been posed, scaled and
-        // positioned. The coverage volumes are expressed in showroom space,
-        // so doing this earlier would leave the torso intact and recreate the
-        // exact clipping we are trying to eliminate.
-        model.traverse((node) => {
-          if (node instanceof THREE.SkinnedMesh) {
-            trimBodyUnderGarment(node);
-          }
-        });
 
         setIsReady(true);
       },
@@ -825,6 +835,7 @@ export function RealisticMannequin3D({
         (cameraDistance - camera.position.z) * 0.09;
       camera.lookAt(0, 1.95, 0);
 
+      updateGarmentCoverageMask();
       renderer.render(scene, camera);
     };
 
