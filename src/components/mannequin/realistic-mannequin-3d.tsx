@@ -13,9 +13,9 @@ export type RealisticMannequin3DProps = {
 };
 
 const MANNEQUIN_URL = "/models/maison-human-mannequin.glb";
-const DEFAULT_CAMERA_DISTANCE = 8.35;
-const CAMERA_MIN_DISTANCE = 6.8;
-const CAMERA_MAX_DISTANCE = 10.6;
+const DEFAULT_CAMERA_DISTANCE = 8.9;
+const CAMERA_MIN_DISTANCE = 7.2;
+const CAMERA_MAX_DISTANCE = 11.2;
 
 function applyRelaxedHumanPose(model: THREE.Object3D) {
   const rotateInParentSpace = (
@@ -47,22 +47,22 @@ function applyRelaxedHumanPose(model: THREE.Object3D) {
   rotateInParentSpace(
     "upper_arm.L",
     new THREE.Vector3(1, 0, 0),
-    0.11,
+    0.18,
   );
   rotateInParentSpace(
     "upper_arm.R",
     new THREE.Vector3(1, 0, 0),
-    0.11,
+    0.18,
   );
   rotateInParentSpace(
     "forearm.L",
     new THREE.Vector3(1, 0, 0),
-    0.07,
+    0.1,
   );
   rotateInParentSpace(
     "forearm.R",
     new THREE.Vector3(1, 0, 0),
-    0.07,
+    0.1,
   );
 
   const upperSpine = model.getObjectByName("spine.003");
@@ -148,47 +148,147 @@ function createPrintTexture(artMark: string, ink: string) {
 function createGarmentBodyGeometry() {
   const shape = new THREE.Shape();
 
-  shape.moveTo(-0.2, 0.74);
-  shape.lineTo(-0.39, 0.67);
-  shape.lineTo(-0.46, 0.51);
-  shape.lineTo(-0.43, -0.58);
-  shape.lineTo(0.43, -0.58);
-  shape.lineTo(0.46, 0.51);
-  shape.lineTo(0.39, 0.67);
-  shape.lineTo(0.2, 0.74);
+  shape.moveTo(-0.18, 0.72);
+  shape.lineTo(-0.34, 0.66);
+  shape.lineTo(-0.41, 0.5);
+  shape.lineTo(-0.39, -0.52);
+  shape.lineTo(0.39, -0.52);
+  shape.lineTo(0.41, 0.5);
+  shape.lineTo(0.34, 0.66);
+  shape.lineTo(0.18, 0.72);
   shape.closePath();
 
   const neck = new THREE.Path();
-  neck.absellipse(0, 0.63, 0.18, 0.095, 0, Math.PI * 2, false, 0);
+  neck.absellipse(0, 0.61, 0.16, 0.085, 0, Math.PI * 2, false, 0);
   shape.holes.push(neck);
 
   const geometry = new THREE.ExtrudeGeometry(shape, {
-    depth: 0.32,
+    depth: 0.22,
     bevelEnabled: true,
-    bevelSegments: 3,
-    bevelSize: 0.018,
-    bevelThickness: 0.018,
-    curveSegments: 28,
+    bevelSegments: 2,
+    bevelSize: 0.012,
+    bevelThickness: 0.012,
+    curveSegments: 24,
     steps: 1,
   });
 
-  geometry.translate(0, 0, -0.16);
+  geometry.translate(0, 0, -0.11);
   geometry.computeVertexNormals();
   return geometry;
 }
 
 function createSleeveGeometry() {
   const geometry = new THREE.CylinderGeometry(
-    0.19,
-    0.165,
-    0.43,
+    0.16,
+    0.145,
+    0.34,
     24,
-    2,
+    1,
     false,
   );
-  geometry.scale(1, 1, 0.72);
+  geometry.scale(1, 1, 0.68);
   geometry.computeVertexNormals();
   return geometry;
+}
+
+function pointToSegmentDistance(
+  point: THREE.Vector3,
+  start: THREE.Vector3,
+  end: THREE.Vector3,
+) {
+  const segment = end.clone().sub(start);
+  const denominator = segment.lengthSq();
+  if (denominator === 0) return point.distanceTo(start);
+
+  const t = THREE.MathUtils.clamp(
+    point.clone().sub(start).dot(segment) / denominator,
+    0,
+    1,
+  );
+  const closest = start.clone().add(segment.multiplyScalar(t));
+  return point.distanceTo(closest);
+}
+
+function isCoveredByGarment(point: THREE.Vector3) {
+  const neckOpening =
+    Math.abs(point.x) < 0.17 &&
+    point.y > 2.98 &&
+    Math.abs(point.z) < 0.2;
+
+  const torso =
+    Math.abs(point.x) < 0.43 &&
+    point.y > 1.95 &&
+    point.y < 3.13 &&
+    Math.abs(point.z) < 0.24 &&
+    !neckOpening;
+
+  const leftUpperArm =
+    pointToSegmentDistance(
+      point,
+      new THREE.Vector3(-0.35, 3.02, 0),
+      new THREE.Vector3(-0.58, 2.67, 0),
+    ) < 0.17;
+
+  const rightUpperArm =
+    pointToSegmentDistance(
+      point,
+      new THREE.Vector3(0.35, 3.02, 0),
+      new THREE.Vector3(0.58, 2.67, 0),
+    ) < 0.17;
+
+  return torso || leftUpperArm || rightUpperArm;
+}
+
+function trimBodyUnderGarment(mesh: THREE.SkinnedMesh) {
+  const geometry = mesh.geometry.clone();
+  const position = geometry.getAttribute("position");
+  const sourceIndex = geometry.getIndex();
+
+  if (!position) return;
+
+  mesh.geometry = geometry;
+  mesh.updateMatrixWorld(true);
+
+  const triangleCount = sourceIndex
+    ? sourceIndex.count / 3
+    : position.count / 3;
+  const kept: number[] = [];
+  const a = new THREE.Vector3();
+  const b = new THREE.Vector3();
+  const d = new THREE.Vector3();
+  const centroid = new THREE.Vector3();
+
+  const readVertex = (index: number, target: THREE.Vector3) => {
+    target.fromBufferAttribute(position, index);
+    mesh.applyBoneTransform(index, target);
+    target.applyMatrix4(mesh.matrixWorld);
+  };
+
+  for (let triangle = 0; triangle < triangleCount; triangle += 1) {
+    const i0 = sourceIndex
+      ? sourceIndex.getX(triangle * 3)
+      : triangle * 3;
+    const i1 = sourceIndex
+      ? sourceIndex.getX(triangle * 3 + 1)
+      : triangle * 3 + 1;
+    const i2 = sourceIndex
+      ? sourceIndex.getX(triangle * 3 + 2)
+      : triangle * 3 + 2;
+
+    readVertex(i0, a);
+    readVertex(i1, b);
+    readVertex(i2, d);
+
+    centroid.copy(a).add(b).add(d).multiplyScalar(1 / 3);
+
+    if (!isCoveredByGarment(centroid)) {
+      kept.push(i0, i1, i2);
+    }
+  }
+
+  geometry.setIndex(kept);
+  geometry.computeBoundingBox();
+  geometry.computeBoundingSphere();
 }
 
 function disposeObject(object: THREE.Object3D) {
@@ -268,8 +368,8 @@ export function RealisticMannequin3D({
     scene.fog = new THREE.Fog("#e9e5dc", 9.2, 14.2);
 
     const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 40);
-    camera.position.set(0, 1.82, DEFAULT_CAMERA_DISTANCE);
-    camera.lookAt(0, 1.82, 0);
+    camera.position.set(0, 1.86, DEFAULT_CAMERA_DISTANCE);
+    camera.lookAt(0, 1.95, 0);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: !smallScreen,
@@ -292,7 +392,7 @@ export function RealisticMannequin3D({
     mount.appendChild(renderer.domElement);
 
     const figure = new THREE.Group();
-    figure.rotation.y = -0.035;
+    figure.rotation.y = 0;
     scene.add(figure);
 
     const mannequinRoot = new THREE.Group();
@@ -329,7 +429,7 @@ export function RealisticMannequin3D({
       shirtMaterial,
     );
     garment.name = "MAISON_GARMENT_BODY";
-    garment.position.set(0, 2.49, 0.005);
+    garment.position.set(0, 2.48, 0);
     garment.castShadow = true;
     garment.receiveShadow = true;
     figure.add(garment);
@@ -338,16 +438,18 @@ export function RealisticMannequin3D({
 
     const leftSleeve = new THREE.Mesh(sleeveGeometry, shirtMaterial);
     leftSleeve.name = "MAISON_GARMENT_SLEEVE_LEFT";
-    leftSleeve.position.set(-0.535, 2.96, 0.005);
-    leftSleeve.rotation.z = 0.54;
+    leftSleeve.position.set(-0.47, 2.9, 0);
+    leftSleeve.rotation.z = 0.68;
+    leftSleeve.rotation.y = 0.08;
     leftSleeve.castShadow = true;
     leftSleeve.receiveShadow = true;
     figure.add(leftSleeve);
 
     const rightSleeve = new THREE.Mesh(sleeveGeometry, shirtMaterial);
     rightSleeve.name = "MAISON_GARMENT_SLEEVE_RIGHT";
-    rightSleeve.position.set(0.535, 2.96, 0.005);
-    rightSleeve.rotation.z = -0.54;
+    rightSleeve.position.set(0.47, 2.9, 0);
+    rightSleeve.rotation.z = -0.68;
+    rightSleeve.rotation.y = -0.08;
     rightSleeve.castShadow = true;
     rightSleeve.receiveShadow = true;
     figure.add(rightSleeve);
@@ -368,7 +470,7 @@ export function RealisticMannequin3D({
       printMaterial,
     );
     printPlane.name = "MAISON_PRINT";
-    printPlane.position.set(0, 2.62, 0.184);
+    printPlane.position.set(0, 2.6, 0.126);
     printPlane.castShadow = false;
     figure.add(printPlane);
 
@@ -442,6 +544,11 @@ export function RealisticMannequin3D({
             : [node.material];
 
           sourceMaterials.forEach((material) => material.dispose());
+
+          if (node instanceof THREE.SkinnedMesh) {
+            trimBodyUnderGarment(node);
+          }
+
           node.material = mannequinMaterial;
         });
 
@@ -488,7 +595,7 @@ export function RealisticMannequin3D({
     let previousPinchDistance = 0;
     let velocityY = 0;
     let targetRotationX = 0;
-    let targetRotationY = -0.035;
+    let targetRotationY = 0;
     let cameraDistance = DEFAULT_CAMERA_DISTANCE;
     let hover = false;
     let idleUntil = performance.now() + 1100;
@@ -627,7 +734,7 @@ export function RealisticMannequin3D({
 
     const onDoubleClick = () => {
       targetRotationX = 0;
-      targetRotationY = -0.035;
+      targetRotationY = 0;
       cameraDistance = DEFAULT_CAMERA_DISTANCE;
       idleUntil = performance.now() + 1800;
     };
@@ -710,7 +817,7 @@ export function RealisticMannequin3D({
 
       camera.position.z +=
         (cameraDistance - camera.position.z) * 0.09;
-      camera.lookAt(0, 1.82, 0);
+      camera.lookAt(0, 1.95, 0);
 
       renderer.render(scene, camera);
     };
