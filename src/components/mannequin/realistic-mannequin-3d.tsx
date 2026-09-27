@@ -34,12 +34,12 @@ function applyRelaxedHumanPose(model: THREE.Object3D) {
   rotateInParentSpace(
     "upper_arm.L",
     new THREE.Vector3(0, 0, 1),
-    -1.17,
+    -1.43,
   );
   rotateInParentSpace(
     "upper_arm.R",
     new THREE.Vector3(0, 0, 1),
-    1.17,
+    1.43,
   );
 
   // Keep the arms slightly behind the shirt plane so the garment reads
@@ -258,46 +258,32 @@ float maisonSegmentDistance(vec3 p, vec3 a, vec3 b) {
 vec3 maisonP = vMaisonFigurePosition;
 
 vec2 maisonNeckDelta = vec2(
-  maisonP.x / 0.17,
-  (maisonP.y - 3.09) / 0.105
+  maisonP.x / 0.19,
+  (maisonP.y - 3.09) / 0.12
 );
 
 bool maisonNeckOpening =
-  dot(maisonNeckDelta, maisonNeckDelta) < 1.0 &&
-  abs(maisonP.z) < 0.34;
+  dot(maisonNeckDelta, maisonNeckDelta) < 1.0;
 
 bool maisonTorsoCovered =
-  abs(maisonP.x) < 0.5 &&
-  maisonP.y > 1.92 &&
-  maisonP.y < 3.18 &&
-  abs(maisonP.z) < 0.36 &&
+  abs(maisonP.x) < 0.68 &&
+  maisonP.y > 2.08 &&
+  maisonP.y < 3.17 &&
   !maisonNeckOpening;
 
-bool maisonLeftSleeveCovered =
-  maisonSegmentDistance(
-    maisonP,
-    vec3(-0.34, 3.03, 0.0),
-    vec3(-0.61, 2.67, 0.0)
-  ) < 0.185;
+bool maisonShoulderAndSleeveCovered =
+  abs(maisonP.x) < 0.84 &&
+  maisonP.y > 2.54 &&
+  maisonP.y < 3.12 &&
+  !maisonNeckOpening;
 
-bool maisonRightSleeveCovered =
-  maisonSegmentDistance(
-    maisonP,
-    vec3(0.34, 3.03, 0.0),
-    vec3(0.61, 2.67, 0.0)
-  ) < 0.185;
-
-if (
-  maisonTorsoCovered ||
-  maisonLeftSleeveCovered ||
-  maisonRightSleeveCovered
-) {
+if (maisonTorsoCovered || maisonShoulderAndSleeveCovered) {
   discard;
 }`,
       );
   };
 
-  material.customProgramCacheKey = () => "maison-garment-coverage-v3";
+  material.customProgramCacheKey = () => "maison-garment-coverage-v4";
   material.needsUpdate = true;
 
   return () => {
@@ -454,6 +440,19 @@ export function RealisticMannequin3D({
     garment.receiveShadow = true;
     figure.add(garment);
 
+    const collarGeometry = new THREE.TorusGeometry(
+      0.162,
+      0.016,
+      10,
+      40,
+    );
+    const collar = new THREE.Mesh(collarGeometry, shirtMaterial);
+    collar.name = "MAISON_GARMENT_COLLAR";
+    collar.position.set(0, 3.095, 0.01);
+    collar.scale.set(1, 0.64, 1);
+    collar.castShadow = true;
+    figure.add(collar);
+
     const sleeveGeometry = createSleeveGeometry();
 
     const leftSleeve = new THREE.Mesh(sleeveGeometry, shirtMaterial);
@@ -601,6 +600,7 @@ export function RealisticMannequin3D({
       leftSleeve,
       rightSleeve,
       printPlane,
+      collar,
     ];
 
     let dragging = false;
