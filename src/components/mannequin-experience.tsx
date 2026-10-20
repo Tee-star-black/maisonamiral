@@ -1,15 +1,15 @@
 "use client";
 
-import type { CSSProperties } from "react";
 import { useEffect, useId, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatPrice, products } from "@/data/products";
-import { RealisticMannequin3D } from "./mannequin/realistic-mannequin-3d";
+import { RealisticMannequin3D } from "./mannequin/realistic-mannequin-3d-v2";
 import styles from "./mannequin-experience.module.css";
 
 const TRANSITION_MS = 360;
+const showroomProducts = products.filter((product) => Boolean(product.prints?.front));
 type NavigateEvent = { preventDefault: () => void };
 
 export function MannequinExperience() {
@@ -17,11 +17,11 @@ export function MannequinExperience() {
   const id = useId();
   const titleId = `${id}-title`;
   const noteId = `${id}-note`;
-  const [activeIndex, setActiveIndex] = useState(3);
+  const [activeIndex, setActiveIndex] = useState(() => Math.max(0, showroomProducts.findIndex((p) => p.slug === "emblem-tee")));
   const [isTransitioning, setIsTransitioning] = useState(false);
   const timer = useRef<number | null>(null);
   const navigating = useRef(false);
-  const product = products[activeIndex];
+  const product = showroomProducts[activeIndex];
   const href = `/shop/${product.slug}`;
   const photo = product.images[0];
 
@@ -64,25 +64,16 @@ export function MannequinExperience() {
     beginOpen();
   }
 
-  const sceneStyle = {
-    "--shirt-tone": product.tone,
-    "--shirt-ink": product.ink,
-    width: "min(62vw, 720px)",
-    maxWidth: "100%",
-    height: "min(76vh, 760px)",
-    minHeight: "600px",
-    transform: "none",
-  } as CSSProperties;
 
   return (
     <section id="shop-the-look" className={styles.experience} aria-labelledby={titleId}>
       <header className={styles.heading}>
         <div>
-          <p className={styles.eyebrow}>Maison Amiral / 3D wardrobe study</p>
+          <p className={styles.eyebrow}>Maison Amiral / The fitting room</p>
           <h2 id={titleId}>Anatomy of a <em>look.</em></h2>
         </div>
         <p className={styles.intro}>
-          Rotate the figure. Zoom in. Change the piece.<br />Select the garment to enter its product story.
+          The original Edition 001 pieces, styled on a sculptural mannequin.<br />Rotate the look and explore the piece that speaks to you.
         </p>
       </header>
 
@@ -90,7 +81,7 @@ export function MannequinExperience() {
         <div className={styles.sheetHeader}>
           <span>MA / Edition 001</span>
           <span>Figure {String(activeIndex + 1).padStart(2, "0")}</span>
-          <span>Real-time 3D / 360°</span>
+          <span>Atelier garment / 360°</span>
         </div>
 
         <div className={styles.layout}>
@@ -113,36 +104,37 @@ export function MannequinExperience() {
 
               <div className={styles.detailCallout}>
                 <span className={styles.label}>02 / The model</span>
-                <p>Live 3D mannequin.<br />Drag to rotate. Scroll to zoom.</p>
+                <p>Anatomical mannequin.<br />Original collection prints.</p>
               </div>
 
-              <div className={`${styles.figureWrap} ${isTransitioning ? styles.figureFocus : ""}`} style={sceneStyle}>
+              <div className={`${styles.figureWrap} ${isTransitioning ? styles.figureFocus : ""}`}>
                 <RealisticMannequin3D
                   shirtTone={product.tone}
-                  shirtInk={product.ink}
-                  artMark={product.artMark}
                   productName={product.name}
+                  frontArtwork={product.prints?.front}
+                  backArtwork={product.prints?.back}
+                  productImage={photo}
                   onProductOpen={beginOpen}
                 />
               </div>
 
-              <span className={styles.viewCaption}>360° / Live rendered mannequin</span>
+              <span className={styles.viewCaption}>360° / Atelier garment</span>
             </div>
 
             <div className={styles.viewControls}>
               <div className={styles.views} role="group" aria-label="3D interaction instructions">
                 <button type="button" disabled>Drag / rotate</button>
-                <button type="button" disabled>Wheel / zoom</button>
+                <button type="button" disabled>Controls / zoom</button>
               </div>
               <div className={styles.tiltControls} role="group" aria-label="Scene status">
-                <button type="button" disabled>Three.js</button>
-                <button type="button" disabled>Live</button>
+                <button type="button" disabled>Studio light</button>
+                <button type="button" disabled>Edition 001</button>
               </div>
             </div>
           </div>
 
           <aside className={styles.details} aria-label="Choose a collection piece">
-            <p className={styles.label}>The selected piece</p>
+            <p className={styles.label}>Select a piece</p>
             <div aria-live="polite" aria-atomic="true">
               <h3>{product.name}</h3>
               <p className={styles.price}>{formatPrice(product.price)} <span>/ {product.edition}</span></p>
@@ -166,7 +158,7 @@ export function MannequinExperience() {
             </Link>
 
             <div className={styles.selectorList} role="group" aria-label="Collection pieces">
-              {products.map((item, index) => (
+              {showroomProducts.map((item, index) => (
                 <button
                   key={item.slug}
                   type="button"
@@ -175,7 +167,9 @@ export function MannequinExperience() {
                   onClick={() => chooseProduct(index)}
                 >
                   <span>{String(index + 1).padStart(2, "0")}</span>
-                  <span className={styles.swatch} style={{ backgroundColor: item.tone }} aria-hidden="true" />
+                  <span className={styles.selectorThumb} aria-hidden="true">
+                    <Image src={item.images[0]} alt="" fill sizes="42px" />
+                  </span>
                   <strong>{item.name}</strong>
                   <span aria-hidden="true">{activeIndex === index ? "↗" : "+"}</span>
                 </button>
@@ -185,8 +179,8 @@ export function MannequinExperience() {
         </div>
 
         <footer className={styles.sheetFooter}>
-          <p id={noteId}>Interactive 3D styling study. The digital garment communicates silhouette, colour and placement; product photography remains the reference for exact fabric and print detail.</p>
-          <span>Drag to rotate / Scroll to zoom / Tap the shirt to explore</span>
+          <p id={noteId}>A 3D fitting-room interpretation using the collection’s real photographed artwork. Refer to product photographs for exact colours, placement and construction.</p>
+          <span>Drag to rotate / Use zoom controls / Select the garment to explore</span>
         </footer>
       </div>
     </section>

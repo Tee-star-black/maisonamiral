@@ -1,0 +1,19 @@
+.stage { position: relative; width: 100%; height: 100%; min-height: 420px; background: #eeece6; overflow: hidden; }
+.canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.stageCaption { position: absolute; top: 24px; left: 24px; pointer-events: none; color: #6f6a63; font-size: 9px; letter-spacing: .13em; font-weight: 500; }
+.stageCaption span { margin-left: 9px; color: #adaba4; }
+.controls { position: absolute; right: 20px; bottom: 20px; z-index: 2; display: flex; align-items: center; padding: 4px; gap: 2px; background: #f6f3ed; border: 1px solid #c6c1b8; box-shadow: 0 5px 24px #17130d12; }
+.controls button { cursor: pointer; border: none; background: transparent; color: #252420; min-height: 38px; min-width: 36px; padding: 0 8px; font: 500 16px/1 Arial, sans-serif; transition: background-color 130ms ease; }
+.controls button:hover, .controls button:focus-visible { background: #e8e4db; }
+.controls button:focus-visible { outline: 1px solid #252420; outline-offset: -3px; }
+.controls .reset { font: 500 9px Arial, sans-serif; text-transform: uppercase; letter-spacing: .08em; padding: 0 10px; }
+.separator { width: 1px; height: 19px; background: #d2cfc6; margin: 0 3px; }
+.fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #e7e3dc; text-align: center; }
+.fallback p { margin: 0; font: 400 clamp(30px, 7vw, 72px)/.95 Georgia, serif; letter-spacing: -.04em; }
+.fallback p span { display: block; margin-top: 12px; font: 500 12px Arial, sans-serif; letter-spacing: .14em; text-transform: uppercase; }
+.fallbackNotice { position: absolute; bottom: 18px; left: 18px; right: 18px; font: 9px Arial, sans-serif; letter-spacing: .09em; text-transform: uppercase; color: #605b55; background: #eeece6db; padding: 9px; }
+@media (max-width: 640px) { .stage { min-height: 390px; } .stageCaption { top: 14px; left: 14px; font-size: 8px; } .controls { right: 12px; bottom: 12px; } .controls button { min-height: 40px; min-width: 34px; padding: 0 6px; } .controls .reset { padding: 0 7px; } }
+@media (prefers-reduced-motion: reduce) { .controls button { transition: none; } }
+
+.loadStatus { position: absolute; top: 24px; right: 24px; max-width: 42%; color: #79746b; font: 500 9px/1.4 Arial, sans-serif; text-align: right; letter-spacing: .09em; text-transform: uppercase; pointer-events: none; }
+@media (max-width:640px) { .loadStatus { top: 14px; right: 14px; font-size: 8px; } }
