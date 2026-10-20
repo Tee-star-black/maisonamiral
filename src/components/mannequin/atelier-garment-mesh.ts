@@ -4,7 +4,8 @@ import * as THREE from "three";
 export type AtelierGarment = {
   group: THREE.Group;
   hitTargets: THREE.Object3D[];
-  update: (tone: string, ink: string, mark: string) => void;
+  updateTone: (tone: string) => void;
+  setPrints: (front?: THREE.Texture | null, back?: THREE.Texture | null) => void;
   dispose: () => void;
 };
 
@@ -56,7 +57,7 @@ function makePanel(front: boolean, material: THREE.Material, offset = 0) {
       const u = col / PANEL_COLUMNS;
       const p = surface(u, v, front, offset);
       vertices.push(p.x, p.y, p.z);
-      uvs.push(u, v);
+      uvs.push(front ? u : 1 - u, v);
     }
   }
   const stride = PANEL_COLUMNS + 1;
@@ -159,30 +160,7 @@ function createWeaveTexture() {
   return texture;
 }
 
-function createPrint(mark: string, color: string) {
-  const canvas = document.createElement("canvas");
-  canvas.width = canvas.height = 1024;
-  const context = canvas.getContext("2d");
-  if (context) {
-    context.clearRect(0, 0, 1024, 1024);
-    context.fillStyle = color;
-    context.textAlign = "center";
-    context.textBaseline = "middle";
-    context.font = "500 23px Arial, sans-serif";
-    context.fillText("M A I S O N   A M I R A L", 512, 590);
-    context.font = (mark.length > 5 ? "400 69px Georgia, serif" : "400 88px Georgia, serif");
-    context.fillText(mark, 512, 532, 570);
-    context.fillRect(418, 640, 188, 2);
-    context.font = "400 16px Arial, sans-serif";
-    context.fillText("EDITION 001", 512, 678);
-  }
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 8;
-  return texture;
-}
-
-export function createAtelierGarment(tone: string, ink: string, mark: string): AtelierGarment {
+export function createAtelierGarment(tone: string): AtelierGarment {
   const group = new THREE.Group();
   const fabricBump = createWeaveTexture();
   const fabric = new THREE.MeshPhysicalMaterial({
@@ -200,18 +178,25 @@ export function createAtelierGarment(tone: string, ink: string, mark: string): A
     color: tone,
     roughness: 1,
   });
-  const print = new THREE.MeshBasicMaterial({
-    map: createPrint(mark, ink),
+  const photoSurface = (side: THREE.Side) => new THREE.MeshStandardMaterial({
     transparent: true,
     depthWrite: false,
+    alphaTest: 0.015,
+    roughness: 0.97,
+    metalness: 0,
     polygonOffset: true,
     polygonOffsetFactor: -1,
-    side: THREE.FrontSide,
+    side,
   });
+  const frontPrintMaterial = photoSurface(THREE.DoubleSide);
+  const backPrintMaterial = photoSurface(THREE.DoubleSide);
   const front = makePanel(true, fabric);
   const back = makePanel(false, fabric);
-  const artwork = makePanel(true, print, 0.006);
-  group.add(front, back, artwork);
+  const frontArtwork = makePanel(true, frontPrintMaterial, 0.008);
+  const backArtwork = makePanel(false, backPrintMaterial, 0.008);
+  frontArtwork.visible = false;
+  backArtwork.visible = false;
+  group.add(front, back, frontArtwork, backArtwork);
 
   const cuffHits: THREE.Object3D[] = [front, back];
   for (const side of [-1, 1] as const) {
@@ -250,17 +235,23 @@ export function createAtelierGarment(tone: string, ink: string, mark: string): A
     }
   }
 
-  function update(nextTone: string, nextInk: string, nextMark: string) {
+  function updateTone(nextTone: string) {
     fabric.color.set(nextTone);
     fabric.sheenColor.set(nextTone);
     const thread = new THREE.Color(nextTone);
-    thread.offsetHSL(0, 0, nextTone.toLowerCase() === "#111111" || nextTone.toLowerCase() === "#1b1b1b" ? 0.065 : -0.075);
+    thread.offsetHSL(0, 0, nextTone.toLowerCase() === "#111111" || nextTone.toLowerCase() === "#1b1b1b" || nextTone.toLowerCase() === "#161616" ? 0.065 : -0.075);
     stitching.color.copy(thread);
-    print.map?.dispose();
-    print.map = createPrint(nextMark, nextInk);
-    print.needsUpdate = true;
   }
-  update(tone, ink, mark);
+
+  function setPrints(frontTexture: THREE.Texture | null = null, backTexture: THREE.Texture | null = null) {
+    frontPrintMaterial.map = frontTexture;
+    backPrintMaterial.map = backTexture;
+    frontArtwork.visible = Boolean(frontTexture);
+    backArtwork.visible = Boolean(backTexture);
+    frontPrintMaterial.needsUpdate = true;
+    backPrintMaterial.needsUpdate = true;
+  }
+  updateTone(tone);
 
   function dispose() {
     const geometrySet = new Set<THREE.BufferGeometry>();
@@ -270,10 +261,10 @@ export function createAtelierGarment(tone: string, ink: string, mark: string): A
     geometrySet.forEach((geometry) => geometry.dispose());
     fabric.dispose();
     stitching.dispose();
-    print.map?.dispose();
-    print.dispose();
+    frontPrintMaterial.dispose();
+    backPrintMaterial.dispose();
     fabricBump.dispose();
   }
 
-  return { group, hitTargets: cuffHits, update, dispose };
+  return { group, hitTargets: cuffHits, updateTone, setPrints, dispose };
 }
