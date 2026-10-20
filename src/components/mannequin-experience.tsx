@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatPrice, products } from "@/data/products";
-import { RealisticMannequin3D } from "./mannequin/realistic-mannequin-3d";
+import { RealisticMannequin3D } from "./mannequin/realistic-mannequin-3d-v2";
 import styles from "./mannequin-experience.module.css";
 
 const TRANSITION_MS = 360;
@@ -78,7 +78,7 @@ export function MannequinExperience() {
     <section id="shop-the-look" className={styles.experience} aria-labelledby={titleId}>
       <header className={styles.heading}>
         <div>
-          <p className={styles.eyebrow}>Maison Amiral / 3D wardrobe study</p>
+          <p className={styles.eyebrow}>Maison Amiral / 3D atelier</p>
           <h2 id={titleId}>Anatomy of a <em>look.</em></h2>
         </div>
         <p className={styles.intro}>
@@ -90,7 +90,7 @@ export function MannequinExperience() {
         <div className={styles.sheetHeader}>
           <span>MA / Edition 001</span>
           <span>Figure {String(activeIndex + 1).padStart(2, "0")}</span>
-          <span>Real-time 3D / 360°</span>
+          <span>Atelier garment / 360°</span>
         </div>
 
         <div className={styles.layout}>
@@ -113,7 +113,7 @@ export function MannequinExperience() {
 
               <div className={styles.detailCallout}>
                 <span className={styles.label}>02 / The model</span>
-                <p>Live 3D mannequin.<br />Drag to rotate. Scroll to zoom.</p>
+                <p>Digital garment study.<br />Drag to rotate. Use controls to zoom.</p>
               </div>
 
               <div className={`${styles.figureWrap} ${isTransitioning ? styles.figureFocus : ""}`} style={sceneStyle}>
@@ -122,20 +122,21 @@ export function MannequinExperience() {
                   shirtInk={product.ink}
                   artMark={product.artMark}
                   productName={product.name}
+                  productImage={photo}
                   onProductOpen={beginOpen}
                 />
               </div>
 
-              <span className={styles.viewCaption}>360° / Live rendered mannequin</span>
+              <span className={styles.viewCaption}>360° / Atelier garment</span>
             </div>
 
             <div className={styles.viewControls}>
               <div className={styles.views} role="group" aria-label="3D interaction instructions">
                 <button type="button" disabled>Drag / rotate</button>
-                <button type="button" disabled>Wheel / zoom</button>
+                <button type="button" disabled>Controls / zoom</button>
               </div>
               <div className={styles.tiltControls} role="group" aria-label="Scene status">
-                <button type="button" disabled>Three.js</button>
+                <button type="button" disabled>Studio light</button>
                 <button type="button" disabled>Live</button>
               </div>
             </div>
@@ -185,7 +186,7 @@ export function MannequinExperience() {
         </div>
 
         <footer className={styles.sheetFooter}>
-          <p id={noteId}>Interactive 3D styling study. The digital garment communicates silhouette, colour and placement; product photography remains the reference for exact fabric and print detail.</p>
+          <p id={noteId}>Interactive digital garment study. Product photography remains the reference for precise artwork, fabric and construction.</p>
           <span>Drag to rotate / Scroll to zoom / Tap the shirt to explore</span>
         </footer>
       </div>
