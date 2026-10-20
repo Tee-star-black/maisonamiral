@@ -1,16 +1,15 @@
-# Maison Amiral 3D model assets
+# Maison Amiral showroom mannequin
 
-## maison-human-mannequin.glb
+- File: `maison-human-mannequin.glb`
+- Model origin: BoQsc/Godot-3D-Male-Base-Mesh (originally orange-juice-games), `Original/male_base_mesh.glb`
+- License: **CC0 1.0 Universal**, as recorded in the original Maison Amiral showroom branch.
 
-Source: BoQsc/Godot-3D-Male-Base-Mesh (originally orange-juice-games)
-Original asset: Original/male_base_mesh.glb
+The model is loaded with Three.js as a neutral sculptural figure and posed at runtime.
+The photographed Edition 001 artwork is mapped onto Maison Amiral's tailored procedural tee mesh.
 
-License: CC0 1.0 Universal
+## Artwork reference
 
-The source model is a fully rigged, UV-unwrapped male anatomical base mesh.
-Maison Amiral uses it as a sculptural fashion mannequin and applies the relaxed
-showroom pose, mannequin material, lighting and interaction at runtime in Three.js.
-
-The shirt is built as a fitted 3D mesh in the mannequin component so its torso,
-neck opening and sleeves follow the mannequin rather than the shape of a retail
-hanger. The Emblem print samples the supplied product photographs.
+The real product images under `/products` are used to construct digital print previews.
+The preview is not a manufacturing-accurate 3D product scan. Colour, exact
+artwork edges, fabric drape and garment construction should always be checked
+against the original product photographs and final print-master artwork.
