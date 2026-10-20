@@ -14,3 +14,6 @@
 .fallbackNotice { position: absolute; bottom: 18px; left: 18px; right: 18px; font: 9px Arial, sans-serif; letter-spacing: .09em; text-transform: uppercase; color: #605b55; background: #eeece6db; padding: 9px; }
 @media (max-width: 640px) { .stage { min-height: 390px; } .stageCaption { top: 14px; left: 14px; font-size: 8px; } .controls { right: 12px; bottom: 12px; } .controls button { min-height: 40px; min-width: 34px; padding: 0 6px; } .controls .reset { padding: 0 7px; } }
 @media (prefers-reduced-motion: reduce) { .controls button { transition: none; } }
+
+.loadStatus { position: absolute; top: 24px; right: 24px; max-width: 42%; color: #79746b; font: 500 9px/1.4 Arial, sans-serif; text-align: right; letter-spacing: .09em; text-transform: uppercase; pointer-events: none; }
+@media (max-width:640px) { .loadStatus { top: 14px; right: 14px; font-size: 8px; } }
