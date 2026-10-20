@@ -148,3 +148,12 @@
   .figureWrap { transform: translateX(-50%); }
   .garmentHitArea:hover .hotspot, .reverse:hover .figure, .photograph:hover img { transform: none; }
 }
+
+/* Atelier garment v2: allow the studio scene to occupy its full frame. */
+.figureWrap { top: 0; left: 0; right: 0; bottom: 0; width: 100% !important; height: 100% !important; min-height: 0 !important; max-width: none !important; aspect-ratio: auto; transform: none; z-index: 1; }
+.figureFocus { animation: none; }
+.drawing { cursor: default; background: #eeece6; }
+.pieceCallout, .detailCallout { z-index: 4; }
+.leaders, .plateNumber { opacity: .3; }
+.viewCaption { display: none; }
+@media(max-width:640px) { .figureWrap { top: 0; left: 0; width: 100% !important; height: 100% !important; } }
