@@ -87,7 +87,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <figure className={styles.imageFrame} key={image}>
                   <Image
                     src={image}
-                    alt={`${product.name} ${index % 2 === 0 ? "front" : "back"} view`}
+                    alt={`${product.name}, original collection photograph ${index + 1}`}
                     width={1200}
                     height={1500}
                     sizes="(max-width: 900px) 100vw, 62vw"
