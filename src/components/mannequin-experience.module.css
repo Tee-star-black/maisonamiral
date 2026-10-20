@@ -157,3 +157,13 @@
 .leaders, .plateNumber { opacity: .3; }
 .viewCaption { display: none; }
 @media(max-width:640px) { .figureWrap { top: 0; left: 0; width: 100% !important; height: 100% !important; } }
+
+/* Photographic selectors: the piece you select is the piece you actually buy. */
+.selector { grid-template-columns: 19px 42px minmax(0, 1fr) 12px; min-height: 72px; gap: 12px; padding: 8px 0; }
+.selectorThumb { position: relative; display: block; width: 42px; height: 50px; overflow: hidden; background: #dbd7cf; }
+.selectorThumb img { object-fit: cover; object-position: center 25%; }
+.selector[aria-pressed="true"] .selectorThumb { outline: 1px solid currentColor; outline-offset: 2px; }
+@media (max-width: 640px) {
+  .selector { min-height: 72px; }
+  .selectorThumb { width: 42px; height: 50px; }
+}
