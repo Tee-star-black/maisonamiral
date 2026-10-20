@@ -47,8 +47,8 @@ export function RealisticMannequin3D({
         powerPreference: "low-power",
       });
     } catch {
-      setFallback(true);
-      return;
+      const frame = window.requestAnimationFrame(() => setFallback(true));
+      return () => window.cancelAnimationFrame(frame);
     }
 
     let disposed = false;
@@ -64,8 +64,8 @@ export function RealisticMannequin3D({
     const scene = new THREE.Scene();
     scene.background = new THREE.Color("#eeece6");
     const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 50);
-    camera.position.set(0, 2.23, 6.2);
-    camera.lookAt(0, 2.23, 0);
+    camera.position.set(0, 1.85, 6.8);
+    camera.lookAt(0, 1.85, 0);
 
     const figure = new THREE.Group();
     const mannequinRoot = new THREE.Group();
@@ -74,8 +74,8 @@ export function RealisticMannequin3D({
 
     const garment = createAtelierGarment(toneRef.current);
     garment.group.name = "MAISON_PHOTOGRAPHIC_TEE";
-    garment.group.scale.set(0.54, 0.40, 1.33);
-    garment.group.position.set(0, 2.43, 0.05);
+    garment.group.scale.setScalar(1);
+    garment.group.position.set(0, 2.43, 0.015);
     figure.add(garment.group);
     garmentRef.current = garment;
 
@@ -113,7 +113,8 @@ export function RealisticMannequin3D({
     const pointer = new THREE.Vector2();
     let targetYaw = -0.12;
     let targetPitch = 0.01;
-    let targetDistance = 6.2;
+    let fittedDistance = 6.8;
+    let targetDistance = fittedDistance;
     let velocity = 0;
     let pointerId: number | null = null;
     let dragged = false;
@@ -166,6 +167,7 @@ export function RealisticMannequin3D({
       targetPitch = THREE.MathUtils.clamp(targetPitch + dy * 0.0023, -0.12, 0.12);
       velocity = THREE.MathUtils.clamp(dx * 0.001, -0.025, 0.025);
       hasInteracted = true;
+      applyView();
     };
     const onPointerUp = (event: PointerEvent) => {
       if (pointerId !== event.pointerId) return;
@@ -181,11 +183,19 @@ export function RealisticMannequin3D({
     const onWheel = (event: WheelEvent) => {
       if (!event.ctrlKey && !event.metaKey) return;
       event.preventDefault();
-      targetDistance = THREE.MathUtils.clamp(targetDistance + event.deltaY * 0.006, 4.7, 9);
+      targetDistance = THREE.MathUtils.clamp(targetDistance + event.deltaY * 0.006, fittedDistance * 0.72, fittedDistance * 1.35);
       hasInteracted = true;
+      applyView();
     };
 
     const render = () => { mannequin.updateMask(); renderer.render(scene, camera); };
+    // Inputs must render immediately, including while the animation loop is paused.
+    const applyView = () => {
+      figure.rotation.set(targetPitch, targetYaw, 0);
+      camera.position.z = targetDistance;
+      camera.lookAt(0, 1.85, 0);
+      render();
+    };
     const resize = () => {
       if (disposed) return;
       const width = Math.max(1, mount.clientWidth);
@@ -193,6 +203,11 @@ export function RealisticMannequin3D({
       renderer.setSize(width, height, false);
       camera.aspect = width / height;
       camera.fov = width < 560 ? 40 : 34;
+      const zoomRatio = targetDistance / fittedDistance;
+      const halfFov = THREE.MathUtils.degToRad(camera.fov / 2);
+      fittedDistance = Math.max(4.2 / (2 * Math.tan(halfFov)), 2.65 / (2 * Math.tan(halfFov) * camera.aspect));
+      targetDistance = fittedDistance * zoomRatio;
+      camera.position.z = targetDistance;
       camera.updateProjectionMatrix();
       render();
     };
@@ -216,7 +231,7 @@ export function RealisticMannequin3D({
       figure.rotation.y = THREE.MathUtils.lerp(figure.rotation.y, targetYaw, 0.08 * dt);
       figure.rotation.x = THREE.MathUtils.lerp(figure.rotation.x, targetPitch, 0.08 * dt);
       camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetDistance, 0.08 * dt);
-      camera.lookAt(0, 2.23, 0);
+      camera.lookAt(0, 1.85, 0);
       render();
       frame = window.requestAnimationFrame(tick);
     };
@@ -255,17 +270,20 @@ export function RealisticMannequin3D({
         hasInteracted = true;
         targetYaw += direction * (Math.PI / 4);
         velocity = 0;
+        applyView();
       },
       zoom: (direction) => {
         hasInteracted = true;
-        targetDistance = THREE.MathUtils.clamp(targetDistance + direction * 0.6, 4.7, 9);
+        targetDistance = THREE.MathUtils.clamp(targetDistance + direction * 0.6, fittedDistance * 0.72, fittedDistance * 1.35);
+        applyView();
       },
       reset: () => {
         targetYaw = -0.12;
         targetPitch = 0.01;
-        targetDistance = 6.2;
+        targetDistance = fittedDistance;
         velocity = 0;
         hasInteracted = false;
+        applyView();
       },
     };
 

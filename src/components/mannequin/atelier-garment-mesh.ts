@@ -9,72 +9,77 @@ export type AtelierGarment = {
   dispose: () => void;
 };
 
-const PANEL_COLUMNS = 48;
-const PANEL_ROWS = 48;
-const SLEEVE_SEGMENTS = 32;
-const SLEEVE_ROWS = 16;
+// All measurements share the mannequin's world units. The front and back
+// share a T-shaped perimeter; their shoulder/side edges are sewn together.
+const HEM = -0.58;
+const NECK = 0.64;
+const HALF_WIDTH = 0.47;
 
-function smoothstep(from: number, to: number, value: number) {
-  const t = THREE.MathUtils.clamp((value - from) / (to - from), 0, 1);
-  return t * t * (3 - 2 * t);
+function neckline(x: number, front: boolean) {
+  return NECK - (front ? 0.13 : 0.035) * Math.sqrt(Math.max(0, 1 - (x / 0.16) ** 2));
 }
 
-function neckTop(x: number, front: boolean) {
-  const a = Math.abs(x);
-  if (a < 0.365) {
-    const arc = Math.sqrt(Math.max(0, 1 - (a / 0.365) ** 2));
-    return 1.49 - (front ? 0.37 : 0.095) * arc;
+function outline(front: boolean) {
+  const points = [
+    [-0.16, NECK], [-0.42, 0.59], [-0.68, 0.17],
+    [-0.50, 0.05], [-0.39, 0.25], [-0.45, -0.30],
+    [-HALF_WIDTH, HEM], [HALF_WIDTH, HEM], [0.45, -0.30],
+    [0.39, 0.25], [0.50, 0.05], [0.68, 0.17], [0.42, 0.59], [0.16, NECK],
+  ].map(([x, y]) => new THREE.Vector2(x, y));
+  for (let i = 1; i < 24; i++) {
+    const x = 0.16 - (i / 24) * 0.32;
+    points.push(new THREE.Vector2(x, neckline(x, front)));
   }
-  return 1.49 - 0.13 * ((a - 0.365) / (1 - 0.365));
+  return points;
 }
 
-function surface(u: number, v: number, front: boolean, offset = 0) {
-  const t = u * 2 - 1;
-  const hem = -1.48;
-  const y = THREE.MathUtils.lerp(hem, neckTop(t, front), v);
-  const shoulder = smoothstep(0.65, 1, v);
-  const width = 0.87 - 0.075 * Math.sin(v * Math.PI) + 0.075 * shoulder;
-  const edgeDrape = (1 - Math.abs(t) ** 1.75) * 0.012 * Math.sin(11 * v + t * 2.1);
-  const x = t * width + edgeDrape;
-  const roundness = Math.sqrt(Math.max(0, 1 - t * t));
-  const folds =
-    0.022 * Math.sin(t * 16 + v * 12.6) * (1 - smoothstep(0.25, 0.87, v)) +
-    0.028 * Math.exp(-(((t + 0.61) / 0.19) ** 2)) * Math.sin(11 * v + 2.2) +
-    0.023 * Math.exp(-(((t - 0.52) / 0.2) ** 2)) * Math.sin(13 * v - 1.5) +
-    0.010 * Math.sin(26 * v + t * 12) * Math.exp(-(((v - 0.12) / 0.16) ** 2));
-  const baseDepth = (0.015 + 0.24 * roundness) * (0.89 + 0.11 * shoulder);
-  const z = (front ? 1 : -1) * (baseDepth + folds * roundness + offset);
-  return new THREE.Vector3(x, y, z);
+function clothPoint(x: number, y: number, front: boolean, offset = 0) {
+  const bodyRound = Math.max(0, 1 - (x / 0.49) ** 2);
+  const collarBlend = THREE.MathUtils.smoothstep(y, 0.36, 0.64);
+  const bodyDepth = (front ? 0.125 : 0.23) + (front ? 0.12 : 0.055) * bodyRound;
+  const collarDepth = (front ? 0.13 : 0.20) + 0.035 * bodyRound;
+  const depth = THREE.MathUtils.lerp(bodyDepth, collarDepth, collarBlend);
+  const hemFold = (1 - THREE.MathUtils.smoothstep(y, -0.54, 0.24)) *
+    (0.006 * Math.sin(x * 49 + y * 12) + 0.004 * Math.sin(x * 28 - y * 17));
+  return new THREE.Vector3(x, y, (front ? 1 : -1) * (depth + hemFold + offset));
 }
 
 function makePanel(front: boolean, material: THREE.Material, offset = 0) {
-  const vertices: number[] = [];
-  const uvs: number[] = [];
-  const indices: number[] = [];
-  for (let row = 0; row <= PANEL_ROWS; row++) {
-    const v = row / PANEL_ROWS;
-    for (let col = 0; col <= PANEL_COLUMNS; col++) {
-      const u = col / PANEL_COLUMNS;
-      const p = surface(u, v, front, offset);
-      vertices.push(p.x, p.y, p.z);
-      uvs.push(front ? u : 1 - u, v);
+  const points = outline(front);
+  let triangles = THREE.ShapeUtils.triangulateShape(points, []);
+  // Subdivide the actual sewn silhouette, keeping every perimeter edge fixed.
+  for (let level = 0; level < 4; level++) {
+    const midpoints = new Map<string, number>();
+    const midpoint = (a: number, b: number) => {
+      const key = a < b ? `${a}:${b}` : `${b}:${a}`;
+      let index = midpoints.get(key);
+      if (index === undefined) {
+        index = points.length;
+        points.push(points[a].clone().lerp(points[b], 0.5));
+        midpoints.set(key, index);
+      }
+      return index;
+    };
+    const refined: number[][] = [];
+    for (const [a, b, c] of triangles) {
+      const ab = midpoint(a, b), bc = midpoint(b, c), ca = midpoint(c, a);
+      refined.push([a, ab, ca], [ab, b, bc], [ca, bc, c], [ab, bc, ca]);
     }
+    triangles = refined;
   }
-  const stride = PANEL_COLUMNS + 1;
-  for (let row = 0; row < PANEL_ROWS; row++) {
-    for (let col = 0; col < PANEL_COLUMNS; col++) {
-      const a = row * stride + col;
-      const b = a + 1;
-      const c = a + stride;
-      const d = c + 1;
-      if (front) indices.push(a, b, d, a, d, c);
-      else indices.push(a, d, b, a, c, d);
-    }
+  const positions: number[] = [], uvs: number[] = [];
+  for (const { x, y } of points) {
+    const p = clothPoint(x, y, front, offset);
+    positions.push(p.x, p.y, p.z);
+    const u = (x / HALF_WIDTH + 1) * 0.5;
+    // Preserve the catalogue print placement on the torso, excluding sleeves.
+    const top = neckline(THREE.MathUtils.clamp(x, -0.16, 0.16), front);
+    uvs.push(front ? u : 1 - u, (y - HEM) / (top - HEM));
   }
   const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
   geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
-  geometry.setIndex(indices);
+  geometry.setIndex(triangles.flatMap(([a, b, c]) => front ? [a, b, c] : [a, c, b]));
   geometry.computeVertexNormals();
   const mesh = new THREE.Mesh(geometry, material);
   mesh.castShadow = offset === 0;
@@ -82,60 +87,34 @@ function makePanel(front: boolean, material: THREE.Material, offset = 0) {
   return mesh;
 }
 
-function makeSleeve(side: -1 | 1, material: THREE.Material) {
-  const vertices: number[] = [];
-  const indices: number[] = [];
-  const uvs: number[] = [];
-  const point = (t: number, angle: number, extra = 0) => {
-    const centerX = side * (0.805 + t * 0.655);
-    const centerY = 1.255 - 0.50 * t + 0.022 * Math.sin(t * Math.PI);
-    const tangent = new THREE.Vector2(side * 0.74, -0.67);
-    const perpendicular = new THREE.Vector2(-tangent.y, tangent.x);
-    const radius = 0.29 - t * 0.035 + extra;
-    const waviness = 0.009 * Math.sin(angle * 4.0 + t * 5.1) * Math.sin(t * Math.PI);
-    const width = (radius + waviness) * Math.cos(angle);
-    const depth = (0.22 - t * 0.015 + extra) * Math.sin(angle);
-    return new THREE.Vector3(
-      centerX + perpendicular.x * width,
-      centerY + perpendicular.y * width,
-      depth,
-    );
-  };
-  for (let row = 0; row <= SLEEVE_ROWS; row++) {
-    const t = row / SLEEVE_ROWS;
-    for (let col = 0; col <= SLEEVE_SEGMENTS; col++) {
-      const a = (col / SLEEVE_SEGMENTS) * Math.PI * 2;
-      const p = point(t, a);
-      vertices.push(p.x, p.y, p.z);
-      uvs.push(col / SLEEVE_SEGMENTS, t);
-    }
-  }
-  const stride = SLEEVE_SEGMENTS + 1;
-  for (let row = 0; row < SLEEVE_ROWS; row++) {
-    for (let col = 0; col < SLEEVE_SEGMENTS; col++) {
-      const a = row * stride + col;
-      const b = a + 1;
-      const c = a + stride;
-      const d = c + 1;
-      // Double-sided fabric also reveals the inside of the open cuff.
-      indices.push(a, c, b, b, c, d);
+function makeLine(points: THREE.Vector3[], material: THREE.Material, radius = 0.002) {
+  return new THREE.Mesh(new THREE.TubeGeometry(
+    new THREE.CatmullRomCurve3(points), Math.max(24, points.length * 3), radius, 5, false,
+  ), material);
+}
+
+function sewPerimeter(material: THREE.Material) {
+  const front = outline(true), back = outline(false);
+  const positions: number[] = [], indices: number[] = [];
+  // Cuffs (2, 10), hem (6), and neckline (13 onward) stay open.
+  for (const edge of [0, 1, 3, 4, 5, 7, 8, 9, 11, 12]) {
+    for (let step = 0; step < 24; step++) {
+      const a = front[edge].clone().lerp(front[edge + 1], step / 24);
+      const b = front[edge].clone().lerp(front[edge + 1], (step + 1) / 24);
+      const c = back[edge].clone().lerp(back[edge + 1], step / 24);
+      const d = back[edge].clone().lerp(back[edge + 1], (step + 1) / 24);
+      const base = positions.length / 3;
+      for (const p of [clothPoint(a.x, a.y, true), clothPoint(b.x, b.y, true),
+        clothPoint(c.x, c.y, false), clothPoint(d.x, d.y, false)]) positions.push(p.x, p.y, p.z);
+      indices.push(base, base + 2, base + 1, base + 1, base + 2, base + 3);
     }
   }
   const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
-  geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
   geometry.setIndex(indices);
   geometry.computeVertexNormals();
   const mesh = new THREE.Mesh(geometry, material);
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-  return { mesh, point };
-}
-
-function makeLine(points: THREE.Vector3[], material: THREE.Material, radius = 0.007) {
-  const curve = new THREE.CatmullRomCurve3(points);
-  const mesh = new THREE.Mesh(new THREE.TubeGeometry(curve, Math.max(24, points.length * 3), radius, 5, false), material);
-  mesh.castShadow = false;
+  mesh.castShadow = mesh.receiveShadow = true;
   return mesh;
 }
 
@@ -172,7 +151,7 @@ export function createAtelierGarment(tone: string): AtelierGarment {
     sheenRoughness: 0.88,
     side: THREE.DoubleSide,
     bumpMap: fabricBump,
-    bumpScale: 0.006,
+    bumpScale: 0.001,
   });
   const stitching = new THREE.MeshStandardMaterial({
     color: tone,
@@ -188,51 +167,29 @@ export function createAtelierGarment(tone: string): AtelierGarment {
     polygonOffsetFactor: -1,
     side,
   });
-  const frontPrintMaterial = photoSurface(THREE.DoubleSide);
-  const backPrintMaterial = photoSurface(THREE.DoubleSide);
+  const frontPrintMaterial = photoSurface(THREE.FrontSide);
+  const backPrintMaterial = photoSurface(THREE.FrontSide);
   const front = makePanel(true, fabric);
   const back = makePanel(false, fabric);
-  const frontArtwork = makePanel(true, frontPrintMaterial, 0.008);
-  const backArtwork = makePanel(false, backPrintMaterial, 0.008);
+  const frontArtwork = makePanel(true, frontPrintMaterial, 0.0015);
+  const backArtwork = makePanel(false, backPrintMaterial, 0.0015);
   frontArtwork.visible = false;
   backArtwork.visible = false;
   group.add(front, back, frontArtwork, backArtwork);
 
-  const cuffHits: THREE.Object3D[] = [front, back];
-  for (const side of [-1, 1] as const) {
-    const sleeve = makeSleeve(side, fabric);
-    group.add(sleeve.mesh);
-    cuffHits.push(sleeve.mesh);
-    for (const t of [0.96, 1]) {
-      const ring = Array.from({ length: 45 }, (_, i) => sleeve.point(t, (i / 44) * 2 * Math.PI, 0.004));
-      group.add(makeLine(ring, stitching, t === 1 ? 0.009 : 0.0045));
-    }
-    // Shoulder seams run from the neck to the outer sleeve.
-    for (const facing of [true, false]) {
-      const points = Array.from({ length: 15 }, (_, i) => {
-        const x = side * (0.365 + (i / 14) * 0.60);
-        const p = surface((x / 0.955 + 1) * 0.5, 1, facing, 0.006);
-        return p;
-      });
-      group.add(makeLine(points, stitching, 0.004));
-    }
-  }
+  const joinedEdges = sewPerimeter(fabric);
+  group.add(joinedEdges);
+  const cuffHits: THREE.Object3D[] = [front, back, joinedEdges];
 
-  // Layered rib seam around the dipped front and shallow rear neckline.
   for (const facing of [true, false]) {
-    for (const inset of [0, 0.034]) {
-      const neckline = Array.from({ length: 33 }, (_, i) => {
-        const x = -0.365 + (i / 32) * 0.73;
-        const top = surface((x + 1) * 0.5, 1, facing, 0.008);
-        top.y -= inset;
-        return top;
-      });
-      group.add(makeLine(neckline, stitching, inset === 0 ? 0.016 : 0.008));
-    }
-    for (const v of [0.013, 0.032]) {
-      const hem = Array.from({ length: 49 }, (_, i) => surface(i / 48, v, facing, 0.007));
-      group.add(makeLine(hem, stitching, v < 0.02 ? 0.007 : 0.004));
-    }
+    const neck = Array.from({ length: 49 }, (_, i) => {
+      const x = -0.16 + (i / 48) * 0.32;
+      return clothPoint(x, neckline(x, facing), facing, 0.001);
+    });
+    group.add(makeLine(neck, stitching, 0.006));
+    const hem = Array.from({ length: 49 }, (_, i) =>
+      clothPoint(-HALF_WIDTH + (i / 48) * 2 * HALF_WIDTH, HEM + 0.012, facing, 0.001));
+    group.add(makeLine(hem, stitching, 0.0012));
   }
 
   function updateTone(nextTone: string) {

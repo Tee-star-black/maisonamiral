@@ -11,12 +11,12 @@ function poseMannequin(model: THREE.Object3D) {
     if (!(bone instanceof THREE.Bone)) return;
     const parentQuaternion = new THREE.Quaternion();
     bone.parent?.getWorldQuaternion(parentQuaternion);
-    const localAxis = new THREE.Vector3(1, 0, 0).applyQuaternion(parentQuaternion.invert());
+    const localAxis = new THREE.Vector3(0, 0, 1).applyQuaternion(parentQuaternion.invert());
     bone.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(localAxis, angle));
     bone.updateMatrixWorld(true);
   };
-  rotateArm("upper_armL", -0.35);
-  rotateArm("upper_armR", 0.35);
+  rotateArm("upper_armL", -0.15);
+  rotateArm("upper_armR", 0.15);
   model.updateMatrixWorld(true);
 }
 
@@ -65,11 +65,10 @@ export function loadShowroomMannequin(
         "#include <common>\nvarying vec3 vMaisonLocal;")
       .replace("#include <clipping_planes_fragment>",
         "#include <clipping_planes_fragment>\n" +
-        "vec2 neck = vec2(vMaisonLocal.x / 0.205, (vMaisonLocal.y - 3.00) / 0.18);\n" +
-        "bool openNeck = dot(neck, neck) < 1.0;\n" +
-        "if (!openNeck && abs(vMaisonLocal.x) < 0.48 && vMaisonLocal.y > 1.89 && vMaisonLocal.y < 3.035 && abs(vMaisonLocal.z) < 0.39) discard;");
+        "float neckline = vMaisonLocal.z < -0.04 ? 3.04 : 2.94;\n" +
+        "if (abs(vMaisonLocal.x) < 0.48 && vMaisonLocal.y > 1.84 && vMaisonLocal.y < neckline && abs(vMaisonLocal.z) < 0.39) discard;");
   };
-  bodyMaterial.customProgramCacheKey = () => "maison-clothed-mannequin-v3";
+  bodyMaterial.customProgramCacheKey = () => "maison-clothed-mannequin-v4";
 
   let disposed = false;
   let model: THREE.Object3D | null = null;
@@ -81,8 +80,8 @@ export function loadShowroomMannequin(
       return;
     }
     object.name = "MAISON_SHOWROOM_MANNEQUIN";
-    poseMannequin(object);
     object.rotation.y = -Math.PI / 2;
+    poseMannequin(object);
     object.updateMatrixWorld(true);
 
     const originals = new Set<THREE.Material>();

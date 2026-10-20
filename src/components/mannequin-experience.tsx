@@ -179,7 +179,7 @@ export function MannequinExperience() {
         </div>
 
         <footer className={styles.sheetFooter}>
-          <p id={noteId}>A 3D fitting-room interpretation using the collection's real photographed artwork. Refer to product photographs for exact colours, placement and construction.</p>
+          <p id={noteId}>A 3D fitting-room interpretation using the collection’s real photographed artwork. Refer to product photographs for exact colours, placement and construction.</p>
           <span>Drag to rotate / Use zoom controls / Select the garment to explore</span>
         </footer>
       </div>
