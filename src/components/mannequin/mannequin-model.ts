@@ -65,7 +65,9 @@ export function loadShowroomMannequin(
         "#include <common>\nvarying vec3 vMaisonLocal;")
       .replace("#include <clipping_planes_fragment>",
         "#include <clipping_planes_fragment>\n" +
-        "if (abs(vMaisonLocal.x) < 0.48 && vMaisonLocal.y > 1.89 && vMaisonLocal.y < 3.035 && abs(vMaisonLocal.z) < 0.39) discard;");
+        "vec2 neck = vec2(vMaisonLocal.x / 0.205, (vMaisonLocal.y - 3.00) / 0.18);\n" +
+        "bool openNeck = dot(neck, neck) < 1.0;\n" +
+        "if (!openNeck && abs(vMaisonLocal.x) < 0.48 && vMaisonLocal.y > 1.89 && vMaisonLocal.y < 3.035 && abs(vMaisonLocal.z) < 0.39) discard;");
   };
   bodyMaterial.customProgramCacheKey = () => "maison-clothed-mannequin-v3";
 
