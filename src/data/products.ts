@@ -34,7 +34,7 @@ export const products: MaisonProduct[] = [
     artMark: "AUTO",
     shortDescription: "The automobile graphic, finished with a collage of house references.",
     description:
-      "A black everyday tee with a front automobile graphic, a printed back collage and an embroidered-look sleeve motif. The original garment photography shows the design as it is.",
+      "A black everyday tee with a front automobile graphic, a printed back collage and a detailed sleeve patch graphic. The original garment photography shows the design as it is.",
     tone: "#151515",
     ink: "#f4f0e7",
     images: [
@@ -45,7 +45,7 @@ export const products: MaisonProduct[] = [
     imageLabels: ["Front", "Back", "Back detail"],
     artwork: {
       front: { src: asset("automobile", "print-front.png"), width: 0.255, height: 0.16, centerY: 1.25 },
-      back: { src: asset("automobile", "print-back.png"), width: 0.38, height: 0.51, centerY: 1.2 },
+      back: { src: asset("automobile", "print-back.png"), width: 0.33, height: 0.51, centerY: 1.2 },
     },
   },
   {
