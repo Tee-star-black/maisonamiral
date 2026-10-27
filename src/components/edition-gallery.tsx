@@ -3,26 +3,9 @@ import Link from "next/link";
 import styles from "./edition-gallery.module.css";
 
 const images = [
-  {
-    src: "/products/emblem/front-edit.jpeg",
-    alt: "Maison Amiral Emblem Tee front editorial view",
-    className: styles.heroImage,
-  },
-  {
-    src: "/products/emblem/back-editorial.jpeg",
-    alt: "Maison Amiral Emblem Tee back editorial view",
-    className: styles.tallImage,
-  },
-  {
-    src: "/products/emblem/front.jpeg",
-    alt: "Maison Amiral Emblem Tee front product view",
-    className: styles.productImage,
-  },
-  {
-    src: "/products/emblem/back.jpeg",
-    alt: "Maison Amiral Emblem Tee back product view",
-    className: styles.productImage,
-  },
+  { src: "/products/edition-001/emblem/on-model.webp", alt: "Emblem Tee worn in the original editorial portrait", className: styles.heroImage },
+  { src: "/products/edition-001/emblem/front.webp", alt: "Emblem Tee front showing the original artwork", className: styles.tallImage },
+  { src: "/products/edition-001/emblem/back.webp", alt: "Emblem Tee reverse artwork", className: styles.productImage },
 ] as const;
 
 export function EditionGallery() {
