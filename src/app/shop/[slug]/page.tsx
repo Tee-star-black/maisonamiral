@@ -88,13 +88,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <figure className={styles.imageFrame} key={image}>
                   <Image
                     src={image}
-                    alt={`${product.name} ${index % 2 === 0 ? "front" : "back"} view`}
+                    alt={`${product.name} ${product.imageLabels[index]?.toLowerCase() ?? "product"} photograph`}
                     width={1200}
                     height={1500}
                     sizes="(max-width: 900px) 100vw, 62vw"
                     priority={index === 0}
                   />
-                  <figcaption>{String(index + 1).padStart(2, "0")}</figcaption>
+                  <figcaption>{String(index + 1).padStart(2, "0")} / {product.imageLabels[index]}</figcaption>
                 </figure>
               ))}
             </div>
