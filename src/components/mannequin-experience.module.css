@@ -3,15 +3,15 @@
   --ink: #242421;
   --muted: #73736d;
   --line: #ddddd5;
-  background: #fff;
+  background: #e9eae3;
   color: var(--ink);
-  padding: 96px clamp(18px, 4vw, 64px);
+  padding: clamp(80px, 8vw, 140px) clamp(20px, 4.1vw, 76px);
   scroll-margin-top: 24px;
   font-family: var(--font-geist-sans), Arial, sans-serif;
 }
 .heading {
-  text-align: center;
-  max-width: 720px;
+  text-align: left;
+  max-width: 840px;
   margin: 0 auto 48px;
 }
 .eyebrow {
@@ -23,6 +23,7 @@
   margin: 0 0 20px;
 }
 .heading h2 {
+  font-family: var(--font-geist-sans), Arial, sans-serif;
   font-size: clamp(36px, 4.8vw, 64px);
   font-weight: 400;
   letter-spacing: -0.055em;
@@ -37,7 +38,7 @@
 .sheet {
   max-width: 1400px;
   margin: auto;
-  border: 1px solid var(--line);
+  border: 1px solid #c8cbc1;
 }
 .layout {
   display: grid;
@@ -45,7 +46,7 @@
 }
 .study {
   min-width: 0;
-  background: var(--paper);
+  background: #dfe1d8;
 }
 .stageHeader {
   height: 68px;
@@ -192,7 +193,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--ink);
+  background: #262e27;
   color: #fff;
   padding: 18px 20px;
   font-size: 11px;

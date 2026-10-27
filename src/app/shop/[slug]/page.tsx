@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { formatPrice, getProductBySlug, products } from "@/data/products";
 import styles from "./page.module.css";
+import { SiteFooter } from "@/components/site-footer";
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
@@ -141,6 +142,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </p>
         </aside>
       </section>
+      <SiteFooter />
     </main>
   );
 }

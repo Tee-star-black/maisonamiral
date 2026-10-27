@@ -38,8 +38,10 @@ function clothDepth(x: number, y: number) {
   const { top, bottom } = silhouette(x);
   const t = THREE.MathUtils.clamp((y - bottom) / (top - bottom), 0, 1);
   const sleeve = 0.035 + 0.05 * Math.sin(t * Math.PI);
+  const drape = 0.003 * Math.sin(34 * x + 6 * y) * Math.pow(1 - t, 1.5);
+  const sideFold = 0.0045 * Math.sin(19 * y + 28 * a) * THREE.MathUtils.smoothstep(a, 0.17, 0.31);
   const body =
-    0.12 * torso + 0.009 * Math.sin(y * 24 + x * 35) * (Math.abs(x) / 0.3) ** 2;
+    0.12 * torso + 0.007 * Math.sin(y * 24 + x * 35) * (Math.abs(x) / 0.3) ** 2 + drape + sideFold;
   return THREE.MathUtils.lerp(
     body,
     sleeve,
@@ -110,14 +112,14 @@ export function RealisticMannequin3D(props: Props) {
       renderer = new THREE.WebGLRenderer({
         antialias: true,
         alpha: true,
-        powerPreference: "low-power",
+        powerPreference: "high-performance",
       });
     } catch {
       current.current.onUnavailable(true);
       return;
     }
     const canvas = renderer.domElement;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
     renderer.setClearColor(0xf4f3ef, 0);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -159,12 +161,39 @@ export function RealisticMannequin3D(props: Props) {
         metalness: 0.75,
       }),
     );
+    // Repeatable neutral weave adds scale-dependent tactile detail without external assets.
+    // A seeded pattern avoids flicker and the smooth plastic appearance of flat materials.
+    const weaveSize = 128;
+    const weave = new Uint8Array(weaveSize * weaveSize * 4);
+    for (let y = 0; y < weaveSize; y++) {
+      for (let x = 0; x < weaveSize; x++) {
+        const index = (y * weaveSize + x) * 4;
+        const warp = Math.cos(x * Math.PI / 2);
+        const weft = Math.cos(y * Math.PI / 2);
+        const grain = (Math.sin(x * 12.9898 + y * 78.233) * 43758.5453) % 1;
+        const value = Math.round(126 + 21 * warp * weft + 6 * grain);
+        weave[index] = value;
+        weave[index + 1] = value;
+        weave[index + 2] = value;
+        weave[index + 3] = 255;
+      }
+    }
+    const fabricBump = new THREE.DataTexture(weave, weaveSize, weaveSize, THREE.RGBAFormat);
+    fabricBump.wrapS = fabricBump.wrapT = THREE.RepeatWrapping;
+    fabricBump.repeat.set(10, 15);
+    fabricBump.magFilter = THREE.LinearFilter;
+    fabricBump.minFilter = THREE.LinearMipmapLinearFilter;
+    fabricBump.generateMipmaps = true;
+    fabricBump.needsUpdate = true;
+    textures.add(fabricBump);
     const cloth = material(
       new THREE.MeshPhysicalMaterial({
         color: current.current.shirtTone,
-        roughness: 0.95,
-        sheen: 0.2,
-        sheenRoughness: 0.9,
+        roughness: 0.98,
+        sheen: 0.32,
+        sheenRoughness: 0.88,
+        bumpMap: fabricBump,
+        bumpScale: 0.008,
         side: THREE.DoubleSide,
       }),
     );
@@ -193,6 +222,7 @@ export function RealisticMannequin3D(props: Props) {
       [0.068, 1.6],
       [0.065, 1.61],
     ];
+    // A desaturated textile studio is deliberately kept subordinate to the shirt.
     const form = mesh(
       new THREE.LatheGeometry(
         profile.map(([r, y]) => new THREE.Vector2(r, y)),
@@ -214,7 +244,8 @@ export function RealisticMannequin3D(props: Props) {
     stand.position.y = 0.62;
     const foot = mesh(new THREE.CylinderGeometry(0.28, 0.29, 0.025, 64), metal);
     foot.position.y = 0.45;
-    mesh(garmentGeometry(), cloth);
+    const garment = mesh(garmentGeometry(), cloth);
+    garment.receiveShadow = true;
     // The hem and neckline are stitched into the same curved surface.
     const seamMat = material(
       new THREE.MeshStandardMaterial({
@@ -356,10 +387,10 @@ export function RealisticMannequin3D(props: Props) {
     key.shadow.camera.bottom = -2;
     key.shadow.normalBias = 0.015;
     scene.add(key);
-    const fill = new THREE.DirectionalLight(0xe4edff, 1.2);
+    const fill = new THREE.DirectionalLight(0xe8ebe6, 1.1);
     fill.position.set(3, 2, 1);
     scene.add(fill);
-    const rim = new THREE.DirectionalLight(0xffffff, 1.8);
+    const rim = new THREE.DirectionalLight(0xf8f5ec, 1.3);
     rim.position.set(0, 3, -3);
     scene.add(rim);
     let targetAngle = 0,

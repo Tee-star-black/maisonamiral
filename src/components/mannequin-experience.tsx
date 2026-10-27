@@ -66,9 +66,9 @@ export function MannequinExperience() {
       aria-labelledby={titleId}
     >
       <header className={styles.heading}>
-        <p className={styles.eyebrow}>Edition 001 / The fitting studio</p>
-        <h2 id={titleId}>Consider every angle.</h2>
-        <p>Explore the silhouette. Discover the details.</p>
+        <p className={styles.eyebrow}>MA / The garment studio</p>
+        <h2 id={titleId}>The garment studio.</h2>
+        <p>Inspect the shape, surface and fit.</p>
       </header>
       <div className={styles.sheet}>
         <div className={styles.layout}>
@@ -135,8 +135,8 @@ export function MannequinExperience() {
                 {showPhotos
                   ? "Product photography"
                   : hasPhotography
-                    ? "Digital silhouette / Original artwork"
-                    : "Silhouette preview / Artwork pending"}
+                    ? "Digital garment study / Emblem artwork"
+                    : "Shape and colour preview / Artwork not supplied"}
               </span>
             </div>
             {unavailable && (
