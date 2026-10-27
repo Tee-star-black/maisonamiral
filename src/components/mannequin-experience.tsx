@@ -39,14 +39,7 @@ export function MannequinExperience() {
   const product = products[activeIndex];
   const hasPhotography = product.images.length > 0;
   const showPhotos = mode === "photos" || unavailable;
-  const photos = hasPhotography
-    ? [
-        product.images[2],
-        product.images[3],
-        product.images[0],
-        product.images[1],
-      ]
-    : [];
+  const photos = product.images;
 
   function chooseProduct(index: number) {
     setActiveIndex(index);
@@ -106,7 +99,7 @@ export function MannequinExperience() {
                 hasPhotography ? (
                   <Image
                     src={photos[photoIndex]}
-                    alt={`${product.name}, ${["front", "back", "front editorial", "back editorial"][photoIndex]} view`}
+                    alt={`${product.name}, ${product.imageLabels[photoIndex] ?? "product"} view`}
                     fill
                     sizes="(max-width: 900px) 100vw, 65vw"
                     className={styles.productPhoto}
@@ -123,7 +116,7 @@ export function MannequinExperience() {
                 <Mannequin
                   shirtTone={product.tone}
                   productName={product.name}
-                  emblem={product.slug === "emblem-tee"}
+                  artwork={product.artwork}
                   view={view}
                   zoom={zoom}
                   rotating={rotating}
@@ -135,8 +128,10 @@ export function MannequinExperience() {
                 {showPhotos
                   ? "Product photography"
                   : hasPhotography
-                    ? "Digital garment study / Emblem artwork"
-                    : "Shape and colour preview / Artwork not supplied"}
+                    ? product.artwork
+                      ? "Digital garment study / Original printed artwork"
+                      : "Shape and colour preview / Original artwork not supplied"
+                    : "Shape and colour preview / Photography not supplied"}
               </span>
             </div>
             {unavailable && (
@@ -160,12 +155,7 @@ export function MannequinExperience() {
                       onClick={() => setPhotoIndex(index)}
                     >
                       {
-                        [
-                          "Front",
-                          "Back",
-                          "On model · front",
-                          "On model · back",
-                        ][index]
+                        product.imageLabels[index] ?? `View ${index + 1}`
                       }
                     </button>
                   ))}
