@@ -2,11 +2,12 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { products, type GarmentPrint } from "@/data/products";
 
 type Props = {
   shirtTone: string;
   productName: string;
-  emblem: boolean;
+  productSlug: string;
   view: { angle: number; revision: number };
   zoom: number;
   rotating: boolean;
@@ -294,80 +295,56 @@ export function RealisticMannequin3D(props: Props) {
       }
       seam(points, 0.003);
     }
-    const artwork = new THREE.Group();
-    root.add(artwork);
+    // Each decal is cut from the matching user-supplied shirt photograph.
+    // The alpha channel removes the black fabric, leaving only the original ink.
+    const artworkGroups = new Map<string, THREE.Group>();
     let disposed = false;
     const loader = new THREE.TextureLoader();
-    // Crop the original photograph through texture coordinates; no replacement lettering.
-    function print(
-      path: string,
-      crop: [number, number, number, number],
-      width: number,
-      height: number,
-      centerY: number,
-      side: number,
-    ) {
+
+    function print(spec: GarmentPrint, side: 1 | -1, group: THREE.Group) {
+      let decal: THREE.Mesh | undefined;
       const texture = loader.load(
-        path,
-        () => {
-          if (disposed) texture.dispose();
-        },
+        spec.src,
+        () => { if (disposed) texture.dispose(); },
         undefined,
-        () => {
-          if (!disposed) current.current.onUnavailable(true);
-        },
+        // A missing photo must not disable the entire 3D experience.
+        () => { if (decal) decal.visible = false; },
       );
       texture.colorSpace = THREE.SRGBColorSpace;
-      texture.offset.set(crop[0], crop[1]);
-      texture.repeat.set(crop[2], crop[3]);
-      texture.anisotropy = Math.min(
-        8,
-        renderer.capabilities.getMaxAnisotropy(),
-      );
+      texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
       textures.add(texture);
-      const geometry = new THREE.PlaneGeometry(width, height, 40, 40);
-      const positions = geometry.getAttribute("position");
-      for (let i = 0; i < positions.count; i++) {
-        const x = positions.getX(i),
-          y = positions.getY(i) + centerY;
-        positions.setXYZ(i, side * x, y, side * (clothDepth(x, y) + 0.0015));
+
+      const geometry = new THREE.PlaneGeometry(spec.width, spec.height, 40, 40);
+      const position = geometry.getAttribute("position");
+      for (let i = 0; i < position.count; i++) {
+        const x = position.getX(i);
+        const y = position.getY(i) + spec.centerY;
+        position.setXYZ(i, side * x, y, side * (clothDepth(x, y) + 0.0028));
       }
       geometry.computeVertexNormals();
-      // Suppress the dark fabric surrounding the print, preserving original coloured ink.
-      const mat = material(
-        new THREE.MeshStandardMaterial({
-          map: texture,
-          transparent: true,
-          roughness: 0.95,
-          depthWrite: false,
-          polygonOffset: true,
-          polygonOffsetFactor: -1,
-        }),
-      );
-      mat.onBeforeCompile = (shader) => {
-        shader.fragmentShader = shader.fragmentShader.replace(
-          "#include <map_fragment>",
-          `#include <map_fragment>\nfloat ink = max(diffuseColor.r, max(diffuseColor.g, diffuseColor.b));\ndiffuseColor.a *= smoothstep(0.012, 0.075, ink);`,
-        );
-      };
-      mesh(geometry, mat, artwork).castShadow = false;
+      const printMat = material(new THREE.MeshStandardMaterial({
+        map: texture,
+        transparent: true,
+        alphaTest: 0.018,
+        depthWrite: false,
+        roughness: 1,
+        metalness: 0,
+        side: THREE.DoubleSide,
+        polygonOffset: true,
+        polygonOffsetFactor: -1,
+      }));
+      decal = mesh(geometry, printMat, group);
+      decal.castShadow = false;
+      decal.receiveShadow = false;
     }
-    print(
-      "/products/emblem/front.jpeg",
-      [0.33, 0.35, 0.35, 0.35],
-      0.32,
-      0.425,
-      1.2,
-      1,
-    );
-    print(
-      "/products/emblem/back.jpeg",
-      [0.47, 0.665, 0.08, 0.09],
-      0.057,
-      0.085,
-      1.39,
-      -1,
-    );
+
+    for (const item of products) {
+      const group = new THREE.Group();
+      root.add(group);
+      artworkGroups.set(item.slug, group);
+      if (item.artwork?.front) print(item.artwork.front, 1, group);
+      if (item.artwork?.back) print(item.artwork.back, -1, group);
+    }
     const floor = mesh(
       new THREE.PlaneGeometry(200, 200),
       material(new THREE.ShadowMaterial({ opacity: 0.12 })),
@@ -485,7 +462,9 @@ export function RealisticMannequin3D(props: Props) {
         seamMat.color.set(state.shirtTone);
         lastTone = state.shirtTone;
       }
-      artwork.visible = state.emblem;
+      artworkGroups.forEach((group, slug) => {
+        group.visible = slug === state.productSlug;
+      });
       if (state.rotating && !reduced.matches && pointerId === null)
         targetAngle += dt * 0.28;
       const blend = reduced.matches ? 1 : 1 - Math.exp(-dt * 10);
