@@ -1,192 +1,309 @@
 "use client";
 
-import type { CSSProperties } from "react";
-import { useEffect, useId, useRef, useState } from "react";
+import { useId, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { formatPrice, products } from "@/data/products";
-import { RealisticMannequin3D } from "./mannequin/realistic-mannequin-3d";
 import styles from "./mannequin-experience.module.css";
 
-const TRANSITION_MS = 360;
-type NavigateEvent = { preventDefault: () => void };
+const Mannequin = dynamic(
+  () =>
+    import("./mannequin/realistic-mannequin-3d").then(
+      (module) => module.RealisticMannequin3D,
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className={styles.loading} role="status">
+        Preparing the studio…
+      </div>
+    ),
+  },
+);
+const angles = [
+  { label: "Front", angle: 0 },
+  { label: "Side", angle: Math.PI / 2 },
+  { label: "Back", angle: Math.PI },
+];
 
 export function MannequinExperience() {
-  const router = useRouter();
-  const id = useId();
-  const titleId = `${id}-title`;
-  const noteId = `${id}-note`;
+  const titleId = useId();
   const [activeIndex, setActiveIndex] = useState(3);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const timer = useRef<number | null>(null);
-  const navigating = useRef(false);
+  const [mode, setMode] = useState<"model" | "photos">("model");
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const [view, setView] = useState({ angle: 0, revision: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [rotating, setRotating] = useState(false);
+  const [unavailable, setUnavailable] = useState(false);
   const product = products[activeIndex];
-  const href = `/shop/${product.slug}`;
-  const photo = product.images[0];
-
-  useEffect(() => {
-    return () => {
-      if (timer.current !== null) window.clearTimeout(timer.current);
-      document.body.style.cursor = "default";
-    };
-  }, []);
-
-  function cancelTransition() {
-    if (timer.current !== null) window.clearTimeout(timer.current);
-    timer.current = null;
-    navigating.current = false;
-    setIsTransitioning(false);
-  }
+  const hasPhotography = product.images.length > 0;
+  const showPhotos = mode === "photos" || unavailable;
+  const photos = hasPhotography
+    ? [
+        product.images[2],
+        product.images[3],
+        product.images[0],
+        product.images[1],
+      ]
+    : [];
 
   function chooseProduct(index: number) {
-    cancelTransition();
     setActiveIndex(index);
+    setPhotoIndex(0);
+    setMode("model");
   }
 
-  function beginOpen() {
-    if (navigating.current) return;
-    navigating.current = true;
-    setIsTransitioning(true);
-    timer.current = window.setTimeout(() => {
-      timer.current = null;
-      router.push(href);
-    }, TRANSITION_MS);
+  function chooseView(angle: number) {
+    setRotating(false);
+    setView((previous) => ({ angle, revision: previous.revision + 1 }));
   }
-
-  function openProduct(event: NavigateEvent) {
-    if (navigating.current) {
-      event.preventDefault();
-      return;
-    }
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    event.preventDefault();
-    beginOpen();
-  }
-
-  const sceneStyle = {
-    "--shirt-tone": product.tone,
-    "--shirt-ink": product.ink,
-    width: "min(62vw, 720px)",
-    maxWidth: "100%",
-    height: "min(76vh, 760px)",
-    minHeight: "600px",
-    transform: "none",
-  } as CSSProperties;
 
   return (
-    <section id="shop-the-look" className={styles.experience} aria-labelledby={titleId}>
+    <section
+      id="shop-the-look"
+      className={styles.experience}
+      aria-labelledby={titleId}
+    >
       <header className={styles.heading}>
-        <div>
-          <p className={styles.eyebrow}>Maison Amiral / 3D wardrobe study</p>
-          <h2 id={titleId}>Anatomy of a <em>look.</em></h2>
-        </div>
-        <p className={styles.intro}>
-          Rotate the figure. Zoom in. Change the piece.<br />Select the garment to enter its product story.
-        </p>
+        <p className={styles.eyebrow}>Edition 001 / The fitting studio</p>
+        <h2 id={titleId}>Consider every angle.</h2>
+        <p>Explore the silhouette. Discover the details.</p>
       </header>
-
       <div className={styles.sheet}>
-        <div className={styles.sheetHeader}>
-          <span>MA / Edition 001</span>
-          <span>Figure {String(activeIndex + 1).padStart(2, "0")}</span>
-          <span>Real-time 3D / 360°</span>
-        </div>
-
         <div className={styles.layout}>
           <div className={styles.study}>
-            <div className={styles.drawing} role="group" aria-label={`${product.name}, interactive 3D mannequin`} aria-describedby={noteId}>
-              <span className={styles.plateNumber} aria-hidden="true">0{activeIndex + 1}</span>
-
-              <svg className={styles.leaders} viewBox="0 0 1000 780" preserveAspectRatio="none" aria-hidden="true">
-                <path d="M45 269 H225 L365 250" />
-                <path d="M45 470 H225 L356 420" />
-                <circle cx="365" cy="250" r="4" />
-                <circle cx="356" cy="420" r="4" />
-              </svg>
-
-              <Link href={href} onNavigate={openProduct} className={styles.pieceCallout} draggable={false}>
-                <span className={styles.label}>01 / The piece</span>
-                <strong>{product.name}</strong>
-                <span>{formatPrice(product.price)} <span aria-hidden="true">↗</span></span>
-              </Link>
-
-              <div className={styles.detailCallout}>
-                <span className={styles.label}>02 / The model</span>
-                <p>Live 3D mannequin.<br />Drag to rotate. Scroll to zoom.</p>
+            <div className={styles.stageHeader}>
+              <span>
+                MAISON AMIRAL{" "}
+                <span className={styles.studioLabel}>/ STUDIO</span>
+              </span>
+              <div
+                className={styles.modeSwitch}
+                role="group"
+                aria-label="Presentation"
+              >
+                <button
+                  type="button"
+                  aria-pressed={!showPhotos}
+                  disabled={unavailable}
+                  onClick={() => setMode("model")}
+                >
+                  3D view
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={showPhotos}
+                  disabled={!hasPhotography}
+                  onClick={() => setMode("photos")}
+                >
+                  Photographs
+                </button>
               </div>
-
-              <div className={`${styles.figureWrap} ${isTransitioning ? styles.figureFocus : ""}`} style={sceneStyle}>
-                <RealisticMannequin3D
-                  shirtTone={product.tone}
-                  shirtInk={product.ink}
-                  artMark={product.artMark}
-                  productName={product.name}
-                  onProductOpen={beginOpen}
-                />
-              </div>
-
-              <span className={styles.viewCaption}>360° / Live rendered mannequin</span>
             </div>
-
-            <div className={styles.viewControls}>
-              <div className={styles.views} role="group" aria-label="3D interaction instructions">
-                <button type="button" disabled>Drag / rotate</button>
-                <button type="button" disabled>Wheel / zoom</button>
-              </div>
-              <div className={styles.tiltControls} role="group" aria-label="Scene status">
-                <button type="button" disabled>Three.js</button>
-                <button type="button" disabled>Live</button>
-              </div>
+            <div className={styles.stage}>
+              {showPhotos ? (
+                hasPhotography ? (
+                  <Image
+                    src={photos[photoIndex]}
+                    alt={`${product.name}, ${["front", "back", "front editorial", "back editorial"][photoIndex]} view`}
+                    fill
+                    sizes="(max-width: 900px) 100vw, 65vw"
+                    className={styles.productPhoto}
+                  />
+                ) : (
+                  <div className={styles.loading}>
+                    3D is unavailable on this device.{" "}
+                    <Link href={`/shop/${product.slug}`}>
+                      View product details
+                    </Link>
+                  </div>
+                )
+              ) : (
+                <Mannequin
+                  shirtTone={product.tone}
+                  productName={product.name}
+                  emblem={product.slug === "emblem-tee"}
+                  view={view}
+                  zoom={zoom}
+                  rotating={rotating}
+                  onUnavailable={setUnavailable}
+                  onInteract={() => setRotating(false)}
+                />
+              )}
+              <span className={styles.stageNote}>
+                {showPhotos
+                  ? "Product photography"
+                  : hasPhotography
+                    ? "Digital silhouette / Original artwork"
+                    : "Silhouette preview / Artwork pending"}
+              </span>
+            </div>
+            {unavailable && (
+              <p className={styles.fallbackNote} role="status">
+                The 3D view is unavailable. Product photographs remain
+                available.
+              </p>
+            )}
+            <div className={styles.controls}>
+              {showPhotos ? (
+                <div
+                  className={styles.views}
+                  role="group"
+                  aria-label="Product photographs"
+                >
+                  {photos.map((photo, index) => (
+                    <button
+                      key={photo}
+                      type="button"
+                      aria-pressed={photoIndex === index}
+                      onClick={() => setPhotoIndex(index)}
+                    >
+                      {
+                        [
+                          "Front",
+                          "Back",
+                          "On model · front",
+                          "On model · back",
+                        ][index]
+                      }
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <div
+                    className={styles.views}
+                    role="group"
+                    aria-label="Mannequin angle"
+                  >
+                    {angles.map((item) => (
+                      <button
+                        key={item.label}
+                        type="button"
+                        onClick={() => chooseView(item.angle)}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                  <div className={styles.tools}>
+                    <button
+                      type="button"
+                      aria-label="Zoom out"
+                      disabled={zoom <= 1}
+                      onClick={() =>
+                        setZoom((value) => Math.max(1, value - 0.25))
+                      }
+                    >
+                      −
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="Zoom in"
+                      disabled={zoom >= 1.75}
+                      onClick={() =>
+                        setZoom((value) => Math.min(1.75, value + 0.25))
+                      }
+                    >
+                      +
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="Rotate automatically"
+                      aria-pressed={rotating}
+                      onClick={() => setRotating((value) => !value)}
+                    >
+                      {rotating ? "Pause" : "Rotate"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        chooseView(0);
+                        setZoom(1);
+                      }}
+                    >
+                      Reset
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
-
-          <aside className={styles.details} aria-label="Choose a collection piece">
-            <p className={styles.label}>The selected piece</p>
-            <div aria-live="polite" aria-atomic="true">
+          <aside
+            className={styles.details}
+            aria-label="Choose a collection piece"
+          >
+            <div
+              className={styles.productDetails}
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              <p className={styles.eyebrow}>
+                {product.edition} / {String(activeIndex + 1).padStart(2, "0")}
+              </p>
               <h3>{product.name}</h3>
-              <p className={styles.price}>{formatPrice(product.price)} <span>/ {product.edition}</span></p>
+              <p className={styles.price}>{formatPrice(product.price)}</p>
+              <p className={styles.copy}>{product.shortDescription}</p>
             </div>
-
-            {photo ? (
-              <Link href={href} onNavigate={openProduct} className={styles.photograph}>
-                <Image src={photo} alt={`${product.name} editorial photograph`} fill sizes="(max-width: 640px) 85vw, (max-width: 1100px) 40vw, 270px" />
-                <span>Product photograph <span aria-hidden="true">↗</span></span>
-              </Link>
-            ) : (
-              <div className={styles.missingPhoto}>
-                <p>3D material study</p>
-                <span>Product photography has not yet been supplied for this piece.</span>
+            <dl className={styles.specifications}>
+              <div>
+                <dt>Colour</dt>
+                <dd>
+                  {product.slug === "emblem-tee" ||
+                  product.slug === "guerrilla-tee"
+                    ? "Black"
+                    : product.slug === "automobile-tee"
+                      ? "Stone"
+                      : "Ecru"}
+                </dd>
               </div>
-            )}
-
-            <p className={styles.copy}>{product.shortDescription}</p>
-            <Link href={href} onNavigate={openProduct} className={styles.enterButton}>
-              {isTransitioning ? "Opening piece" : "Explore piece"} <span aria-hidden="true">↗</span>
+              <div>
+                <dt>Collection</dt>
+                <dd>Edition 001</dd>
+              </div>
+            </dl>
+            <Link href={`/shop/${product.slug}`} className={styles.enterButton}>
+              View piece <span aria-hidden="true">↗</span>
             </Link>
-
-            <div className={styles.selectorList} role="group" aria-label="Collection pieces">
-              {products.map((item, index) => (
-                <button
-                  key={item.slug}
-                  type="button"
-                  className={styles.selector}
-                  aria-pressed={activeIndex === index}
-                  onClick={() => chooseProduct(index)}
-                >
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  <span className={styles.swatch} style={{ backgroundColor: item.tone }} aria-hidden="true" />
-                  <strong>{item.name}</strong>
-                  <span aria-hidden="true">{activeIndex === index ? "↗" : "+"}</span>
-                </button>
-              ))}
+            <div className={styles.collection}>
+              <p className={styles.eyebrow}>Explore the collection</p>
+              <div role="group" aria-label="Collection pieces">
+                {products.map((item, index) => (
+                  <button
+                    key={item.slug}
+                    type="button"
+                    className={styles.selector}
+                    aria-pressed={activeIndex === index}
+                    onClick={() => chooseProduct(index)}
+                  >
+                    <span
+                      className={styles.swatch}
+                      style={{ backgroundColor: item.tone }}
+                      aria-hidden="true"
+                    />
+                    <span>{item.name}</span>
+                    <span aria-hidden="true">
+                      {activeIndex === index ? "—" : "+"}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
+            <p className={styles.referenceNote}>
+              {hasPhotography
+                ? "Artwork is taken from the original product photographs. Refer to photographs for exact fabric, fit and print detail."
+                : "Colour and silhouette preview. Original artwork and photography are not yet available for this piece."}
+            </p>
           </aside>
         </div>
-
-        <footer className={styles.sheetFooter}>
-          <p id={noteId}>Interactive 3D styling study. The digital garment communicates silhouette, colour and placement; product photography remains the reference for exact fabric and print detail.</p>
-          <span>Drag to rotate / Scroll to zoom / Tap the shirt to explore</span>
+        <footer className={styles.footer}>
+          <span>Johannesburg / Edition 001</span>
+          <span>
+            {showPhotos
+              ? "Select a photograph to explore"
+              : "Drag left or right to turn · Use + to see details"}
+          </span>
         </footer>
       </div>
     </section>

@@ -3,391 +3,499 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
-export type RealisticMannequin3DProps = {
+type Props = {
   shirtTone: string;
-  shirtInk: string;
-  artMark: string;
   productName: string;
-  onProductOpen: () => void;
+  emblem: boolean;
+  view: { angle: number; revision: number };
+  zoom: number;
+  rotating: boolean;
+  onUnavailable: (unavailable: boolean) => void;
+  onInteract: () => void;
 };
 
-export function RealisticMannequin3D({
-  shirtTone,
-  shirtInk,
-  artMark,
-  productName,
-  onProductOpen,
-}: RealisticMannequin3DProps) {
-  const mountRef = useRef<HTMLDivElement>(null);
-  const openProductRef = useRef(onProductOpen);
+// One continuous front and back surface includes the shoulders and sleeves.
+// The sleeve/underarm transitions are part of the garment, not separate cylinders.
+function silhouette(x: number) {
+  const a = Math.abs(x);
+  const top =
+    a < 0.09
+      ? 1.51 - 0.065 * Math.sqrt(1 - (a / 0.09) ** 2)
+      : a < 0.27
+        ? 1.51 - (a - 0.09) * 0.16
+        : 1.4812 - (a - 0.27) * 0.8;
+  const bottom =
+    a <= 0.245
+      ? 0.88 + 0.012 * Math.cos(x * 10)
+      : a < 0.28
+        ? THREE.MathUtils.lerp(0.89, 1.245, (a - 0.245) / 0.035)
+        : 1.245 - (a - 0.28) * 0.47;
+  return { top, bottom };
+}
+function clothDepth(x: number, y: number) {
+  const a = Math.abs(x);
+  const torso = Math.sqrt(Math.max(0.08, 1 - (a / 0.31) ** 2));
+  const { top, bottom } = silhouette(x);
+  const t = THREE.MathUtils.clamp((y - bottom) / (top - bottom), 0, 1);
+  const sleeve = 0.035 + 0.05 * Math.sin(t * Math.PI);
+  const body =
+    0.12 * torso + 0.009 * Math.sin(y * 24 + x * 35) * (Math.abs(x) / 0.3) ** 2;
+  return THREE.MathUtils.lerp(
+    body,
+    sleeve,
+    THREE.MathUtils.smoothstep(a, 0.245, 0.31),
+  );
+}
+function garmentGeometry() {
+  const nx = 120,
+    ny = 60;
+  const positions: number[] = [],
+    uvs: number[] = [],
+    indices: number[] = [];
+  for (const side of [1, -1]) {
+    for (let j = 0; j <= ny; j++)
+      for (let i = 0; i <= nx; i++) {
+        const x = (i / nx - 0.5) * 0.88;
+        const { top, bottom } = silhouette(x);
+        const y = THREE.MathUtils.lerp(bottom, top, j / ny);
+        positions.push(x, y, side * clothDepth(x, y));
+        uvs.push(i / nx, j / ny);
+      }
+  }
+  const panel = (nx + 1) * (ny + 1);
+  for (let side = 0; side < 2; side++)
+    for (let j = 0; j < ny; j++)
+      for (let i = 0; i < nx; i++) {
+        const a = side * panel + j * (nx + 1) + i,
+          b = a + nx + 1;
+        if (side === 0) indices.push(a, a + 1, b, a + 1, b + 1, b);
+        else indices.push(a, b, a + 1, a + 1, b, b + 1);
+      }
+  // Join the front/back at the shoulder; leave the neck, cuffs and hem open.
+  for (let i = 0; i < nx; i++) {
+    const x = (i / nx - 0.5) * 0.88;
+    if (Math.abs(x) < 0.095) continue;
+    const a = ny * (nx + 1) + i;
+    indices.push(a, a + panel, a + 1, a + 1, a + panel, a + panel + 1);
+  }
+  // Close the side seams and underarms, retaining open sleeve cuffs and hem.
+  for (let i = 0; i < nx; i++) {
+    const x = ((i + 0.5) / nx - 0.5) * 0.88;
+    if (Math.abs(x) < 0.245) continue;
+    indices.push(i, i + 1, i + panel, i + 1, i + panel + 1, i + panel);
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute(positions, 3),
+  );
+  geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  return geometry;
+}
 
+export function RealisticMannequin3D(props: Props) {
+  const mountRef = useRef<HTMLDivElement>(null);
+  const current = useRef(props);
   useEffect(() => {
-    openProductRef.current = onProductOpen;
-  }, [onProductOpen]);
+    current.current = props;
+  });
 
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
-
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color("#ece9e2");
-
-    const camera = new THREE.PerspectiveCamera(31, 1, 0.1, 100);
-    camera.position.set(0, 1.35, 8.4);
-    camera.lookAt(0, 0.55, 0);
-
-    const renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: false,
-      powerPreference: "high-performance",
-    });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.6));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true,
+        powerPreference: "low-power",
+      });
+    } catch {
+      current.current.onUnavailable(true);
+      return;
+    }
+    const canvas = renderer.domElement;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0xf4f3ef, 0);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.04;
-    renderer.domElement.style.width = "100%";
-    renderer.domElement.style.height = "100%";
-    renderer.domElement.style.display = "block";
-    renderer.domElement.style.touchAction = "none";
-    mount.appendChild(renderer.domElement);
-
+    renderer.toneMappingExposure = 1.15;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    canvas.style.cssText =
+      "display:block;width:100%;height:100%;touch-action:pan-y;cursor:grab";
+    canvas.tabIndex = 0;
+    canvas.setAttribute("role", "img");
+    canvas.setAttribute(
+      "aria-label",
+      "3D mannequin. Left and right arrow keys rotate the garment. Home resets the view.",
+    );
+    mount.appendChild(canvas);
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 20);
+    camera.position.set(0, 1.37, 5);
+    camera.lookAt(0, 1.03, 0);
     const root = new THREE.Group();
-    root.position.y = -1.92;
     scene.add(root);
-
-    const mannequinMaterial = new THREE.MeshPhysicalMaterial({
-      color: "#c8c1b6",
-      roughness: 0.6,
-      metalness: 0,
-      clearcoat: 0.03,
-    });
-
-    const trouserMaterial = new THREE.MeshStandardMaterial({
-      color: "#2a2927",
-      roughness: 0.82,
-    });
-
-    const shoeMaterial = new THREE.MeshStandardMaterial({
-      color: "#171717",
-      roughness: 0.72,
-    });
-
-    const shirtMaterial = new THREE.MeshPhysicalMaterial({
-      color: shirtTone,
-      roughness: 0.82,
-      metalness: 0,
-      sheen: 0.24,
-      sheenColor: new THREE.Color(shirtTone).offsetHSL(0, 0, 0.1),
-      clearcoat: 0.015,
-    });
-
-    const inkMaterial = new THREE.MeshStandardMaterial({
-      color: shirtInk,
-      roughness: 0.78,
-    });
-
-    const addMesh = (
-      geometry: THREE.BufferGeometry,
-      material: THREE.Material,
-      position: [number, number, number],
-      scale: [number, number, number] = [1, 1, 1],
-      rotation: [number, number, number] = [0, 0, 0],
-      parent: THREE.Object3D = root,
-    ) => {
-      const mesh = new THREE.Mesh(geometry, material);
-      mesh.position.set(...position);
-      mesh.scale.set(...scale);
-      mesh.rotation.set(...rotation);
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      parent.add(mesh);
-      return mesh;
-    };
-
-    // Head and neck
-    addMesh(new THREE.SphereGeometry(0.37, 36, 36), mannequinMaterial, [0, 4.52, 0], [0.94, 1.1, 0.92]);
-    addMesh(new THREE.CylinderGeometry(0.16, 0.2, 0.42, 28), mannequinMaterial, [0, 4.02, 0]);
-
-    // Upper body and hips, kept mostly underneath the garment.
-    addMesh(new THREE.SphereGeometry(0.78, 36, 36), mannequinMaterial, [0, 2.95, 0], [1.02, 1.28, 0.62]);
-    addMesh(new THREE.SphereGeometry(0.58, 30, 30), mannequinMaterial, [0, 1.82, 0], [1.05, 0.72, 0.62]);
-
-    // Arms, slightly relaxed and away from the shirt.
-    const upperArm = new THREE.CapsuleGeometry(0.12, 0.72, 8, 18);
-    const foreArm = new THREE.CapsuleGeometry(0.105, 0.7, 8, 18);
-    addMesh(upperArm, mannequinMaterial, [-0.93, 2.9, 0.02], [1, 1, 1], [0, 0, 0.12]);
-    addMesh(upperArm, mannequinMaterial, [0.93, 2.9, 0.02], [1, 1, 1], [0, 0, -0.12]);
-    addMesh(foreArm, mannequinMaterial, [-1.02, 1.85, 0.03], [1, 1, 1], [0, 0, 0.04]);
-    addMesh(foreArm, mannequinMaterial, [1.02, 1.85, 0.03], [1, 1, 1], [0, 0, -0.04]);
-
-    // Hands.
-    addMesh(new THREE.SphereGeometry(0.13, 22, 22), mannequinMaterial, [-1.05, 1.1, 0.05], [0.72, 1.35, 0.62]);
-    addMesh(new THREE.SphereGeometry(0.13, 22, 22), mannequinMaterial, [1.05, 1.1, 0.05], [0.72, 1.35, 0.62]);
-
-    // Legs and trousers.
-    const thigh = new THREE.CapsuleGeometry(0.19, 1.15, 8, 20);
-    const calf = new THREE.CapsuleGeometry(0.16, 1.12, 8, 20);
-    addMesh(thigh, trouserMaterial, [-0.31, 0.15, 0]);
-    addMesh(thigh, trouserMaterial, [0.31, 0.15, 0]);
-    addMesh(calf, trouserMaterial, [-0.31, -1.38, 0.01]);
-    addMesh(calf, trouserMaterial, [0.31, -1.38, 0.01]);
-
-    // Shoes.
-    addMesh(new THREE.BoxGeometry(0.52, 0.25, 0.9), shoeMaterial, [-0.31, -2.24, 0.18], [1, 1, 1], [0, 0, 0]);
-    addMesh(new THREE.BoxGeometry(0.52, 0.25, 0.9), shoeMaterial, [0.31, -2.24, 0.18], [1, 1, 1], [0, 0, 0]);
-
-    // Garment group. Cylinder geometry gives a soft, fitted torso instead of a cardboard box.
-    const shirt = new THREE.Group();
-    root.add(shirt);
-
-    const shirtBody = addMesh(
-      new THREE.CylinderGeometry(0.78, 0.67, 1.75, 36, 4, false),
-      shirtMaterial,
-      [0, 2.85, 0],
-      [1.08, 1, 0.62],
-      [0, 0, 0],
-      shirt,
-    );
-
-    const sleeveGeometry = new THREE.CylinderGeometry(0.31, 0.25, 0.88, 28, 2, false);
-    const leftSleeve = addMesh(
-      sleeveGeometry,
-      shirtMaterial,
-      [-0.83, 3.23, 0],
-      [1, 1, 0.78],
-      [0, 0, -0.9],
-      shirt,
-    );
-    const rightSleeve = addMesh(
-      sleeveGeometry,
-      shirtMaterial,
-      [0.83, 3.23, 0],
-      [1, 1, 0.78],
-      [0, 0, 0.9],
-      shirt,
-    );
-
-    addMesh(
-      new THREE.TorusGeometry(0.23, 0.035, 16, 42),
-      inkMaterial,
-      [0, 3.69, 0.34],
-      [1, 1, 1],
-      [Math.PI / 2, 0, 0],
-      shirt,
-    );
-
-    // Simple, local print texture so no remote font or asset is required.
-    const printCanvas = document.createElement("canvas");
-    printCanvas.width = 768;
-    printCanvas.height = 320;
-    const ctx = printCanvas.getContext("2d");
-    if (ctx) {
-      ctx.clearRect(0, 0, printCanvas.width, printCanvas.height);
-      ctx.fillStyle = shirtInk;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.font = "700 96px Arial";
-      ctx.fillText(artMark, printCanvas.width / 2, printCanvas.height / 2);
+    const materials = new Set<THREE.Material>();
+    const textures = new Set<THREE.Texture>();
+    function material<T extends THREE.Material>(value: T): T {
+      materials.add(value);
+      return value;
     }
-    const printTexture = new THREE.CanvasTexture(printCanvas);
-    printTexture.colorSpace = THREE.SRGBColorSpace;
-    printTexture.needsUpdate = true;
-    const printMaterial = new THREE.MeshBasicMaterial({ map: printTexture, transparent: true, side: THREE.DoubleSide });
-    const printPlane = addMesh(
-      new THREE.PlaneGeometry(1.15, 0.48),
-      printMaterial,
-      [0, 2.95, 0.505],
-      [1, 1, 1],
-      [0, 0, 0],
-      shirt,
+    const ceramic = material(
+      new THREE.MeshPhysicalMaterial({
+        color: "#b9b5aa",
+        roughness: 0.48,
+        metalness: 0.03,
+      }),
     );
-    printPlane.castShadow = false;
-
-    // Studio floor.
-    const floor = new THREE.Mesh(
-      new THREE.PlaneGeometry(12, 12),
-      new THREE.MeshStandardMaterial({ color: "#e6e2da", roughness: 0.95 }),
+    const metal = material(
+      new THREE.MeshStandardMaterial({
+        color: "#66635c",
+        roughness: 0.4,
+        metalness: 0.75,
+      }),
+    );
+    const cloth = material(
+      new THREE.MeshPhysicalMaterial({
+        color: current.current.shirtTone,
+        roughness: 0.95,
+        sheen: 0.2,
+        sheenRoughness: 0.9,
+        side: THREE.DoubleSide,
+      }),
+    );
+    function mesh(
+      geometry: THREE.BufferGeometry,
+      mat: THREE.Material,
+      parent: THREE.Object3D = root,
+    ) {
+      const object = new THREE.Mesh(geometry, mat);
+      object.castShadow = true;
+      object.receiveShadow = true;
+      parent.add(object);
+      return object;
+    }
+    // A sculpted display bust has one silhouette and one finish throughout.
+    const profile = [
+      [0.16, 0.79],
+      [0.2, 0.81],
+      [0.23, 0.88],
+      [0.235, 1.02],
+      [0.24, 1.23],
+      [0.25, 1.38],
+      [0.23, 1.45],
+      [0.12, 1.49],
+      [0.073, 1.52],
+      [0.068, 1.6],
+      [0.065, 1.61],
+    ];
+    const form = mesh(
+      new THREE.LatheGeometry(
+        profile.map(([r, y]) => new THREE.Vector2(r, y)),
+        64,
+      ),
+      ceramic,
+    );
+    form.scale.z = 0.38;
+    const neckCap = mesh(
+      new THREE.CylinderGeometry(0.065, 0.065, 0.006, 48),
+      ceramic,
+    );
+    neckCap.position.y = 1.61;
+    neckCap.scale.z = 0.38;
+    const stand = mesh(
+      new THREE.CylinderGeometry(0.014, 0.014, 0.36, 24),
+      metal,
+    );
+    stand.position.y = 0.62;
+    const foot = mesh(new THREE.CylinderGeometry(0.28, 0.29, 0.025, 64), metal);
+    foot.position.y = 0.45;
+    mesh(garmentGeometry(), cloth);
+    // The hem and neckline are stitched into the same curved surface.
+    const seamMat = material(
+      new THREE.MeshStandardMaterial({
+        color: current.current.shirtTone,
+        roughness: 1,
+        side: THREE.DoubleSide,
+      }),
+    );
+    function seam(points: THREE.Vector3[], radius: number) {
+      return mesh(
+        new THREE.TubeGeometry(
+          new THREE.CatmullRomCurve3(points),
+          100,
+          radius,
+          6,
+          false,
+        ),
+        seamMat,
+      );
+    }
+    for (const side of [1, -1]) {
+      const hem: THREE.Vector3[] = [];
+      for (let i = 0; i <= 64; i++) {
+        const x = -0.244 + (i / 64) * 0.488;
+        const y = silhouette(x).bottom + 0.008;
+        hem.push(new THREE.Vector3(x, y, side * (clothDepth(x, y) + 0.001)));
+      }
+      seam(hem, 0.002);
+      const collar: THREE.Vector3[] = [];
+      for (let i = 0; i <= 64; i++) {
+        const x = -0.09 + (i / 64) * 0.18;
+        const y = silhouette(x).top;
+        collar.push(new THREE.Vector3(x, y, side * clothDepth(x, y)));
+      }
+      seam(collar, 0.007);
+    }
+    // Sleeve openings have visible fabric thickness, without end caps.
+    for (const side of [-1, 1]) {
+      const x = side * 0.44,
+        { top, bottom } = silhouette(x);
+      const points: THREE.Vector3[] = [];
+      for (let i = 0; i <= 64; i++) {
+        const t = (i / 64) * Math.PI * 2;
+        const y = (top + bottom) / 2 + (Math.cos(t) * (top - bottom)) / 2;
+        points.push(new THREE.Vector3(x, y, Math.sin(t) * clothDepth(x, y)));
+      }
+      seam(points, 0.003);
+    }
+    const artwork = new THREE.Group();
+    root.add(artwork);
+    let disposed = false;
+    const loader = new THREE.TextureLoader();
+    // Crop the original photograph through texture coordinates; no replacement lettering.
+    function print(
+      path: string,
+      crop: [number, number, number, number],
+      width: number,
+      height: number,
+      centerY: number,
+      side: number,
+    ) {
+      const texture = loader.load(
+        path,
+        () => {
+          if (disposed) texture.dispose();
+        },
+        undefined,
+        () => {
+          if (!disposed) current.current.onUnavailable(true);
+        },
+      );
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.offset.set(crop[0], crop[1]);
+      texture.repeat.set(crop[2], crop[3]);
+      texture.anisotropy = Math.min(
+        8,
+        renderer.capabilities.getMaxAnisotropy(),
+      );
+      textures.add(texture);
+      const geometry = new THREE.PlaneGeometry(width, height, 40, 40);
+      const positions = geometry.getAttribute("position");
+      for (let i = 0; i < positions.count; i++) {
+        const x = positions.getX(i),
+          y = positions.getY(i) + centerY;
+        positions.setXYZ(i, side * x, y, side * (clothDepth(x, y) + 0.0015));
+      }
+      geometry.computeVertexNormals();
+      // Suppress the dark fabric surrounding the print, preserving original coloured ink.
+      const mat = material(
+        new THREE.MeshStandardMaterial({
+          map: texture,
+          transparent: true,
+          roughness: 0.95,
+          depthWrite: false,
+          polygonOffset: true,
+          polygonOffsetFactor: -1,
+        }),
+      );
+      mat.onBeforeCompile = (shader) => {
+        shader.fragmentShader = shader.fragmentShader.replace(
+          "#include <map_fragment>",
+          `#include <map_fragment>\nfloat ink = max(diffuseColor.r, max(diffuseColor.g, diffuseColor.b));\ndiffuseColor.a *= smoothstep(0.012, 0.075, ink);`,
+        );
+      };
+      mesh(geometry, mat, artwork).castShadow = false;
+    }
+    print(
+      "/products/emblem/front.jpeg",
+      [0.33, 0.35, 0.35, 0.35],
+      0.32,
+      0.425,
+      1.2,
+      1,
+    );
+    print(
+      "/products/emblem/back.jpeg",
+      [0.47, 0.665, 0.08, 0.09],
+      0.057,
+      0.085,
+      1.39,
+      -1,
+    );
+    const floor = mesh(
+      new THREE.PlaneGeometry(200, 200),
+      material(new THREE.ShadowMaterial({ opacity: 0.12 })),
+      scene,
     );
     floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -4.2;
-    floor.receiveShadow = true;
-    scene.add(floor);
-
-    // Lighting.
-    scene.add(new THREE.HemisphereLight("#fffdf7", "#8f8a82", 2.1));
-
-    const key = new THREE.DirectionalLight("#fffaf1", 3.2);
-    key.position.set(4.5, 7.5, 6.5);
+    floor.position.y = 0.435;
+    floor.castShadow = false;
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xa6a39b, 2.4));
+    const key = new THREE.DirectionalLight(0xfff8ed, 3.1);
+    key.position.set(-3, 5, 4);
     key.castShadow = true;
     key.shadow.mapSize.set(1024, 1024);
+    key.shadow.camera.left = -2;
+    key.shadow.camera.right = 2;
+    key.shadow.camera.top = 3;
+    key.shadow.camera.bottom = -2;
+    key.shadow.normalBias = 0.015;
     scene.add(key);
-
-    const fill = new THREE.DirectionalLight("#d8e2f2", 1.35);
-    fill.position.set(-4.2, 4.2, 4.5);
+    const fill = new THREE.DirectionalLight(0xe4edff, 1.2);
+    fill.position.set(3, 2, 1);
     scene.add(fill);
-
-    const rim = new THREE.PointLight("#ffffff", 12, 16, 2);
-    rim.position.set(0, 4.5, -4.2);
+    const rim = new THREE.DirectionalLight(0xffffff, 1.8);
+    rim.position.set(0, 3, -3);
     scene.add(rim);
-
-    // Interaction.
-    const raycaster = new THREE.Raycaster();
-    const pointer = new THREE.Vector2();
-    const shirtTargets = [shirtBody, leftSleeve, rightSleeve, printPlane];
-    let dragging = false;
-    let moved = false;
-    let pointerId: number | null = null;
-    let previousX = 0;
-    let previousY = 0;
-    let velocity = 0;
-    let targetRotationX = 0;
-    let targetRotationY = -0.14;
-    let cameraDistance = 8.4;
-    let hover = false;
-
-    const updatePointer = (event: PointerEvent) => {
-      const rect = renderer.domElement.getBoundingClientRect();
-      pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-    };
-
-    const hitShirt = (event: PointerEvent) => {
-      updatePointer(event);
-      raycaster.setFromCamera(pointer, camera);
-      return raycaster.intersectObjects(shirtTargets, false).length > 0;
-    };
-
-    const onPointerDown = (event: PointerEvent) => {
-      if (event.button !== 0) return;
-      dragging = true;
-      moved = false;
-      pointerId = event.pointerId;
-      previousX = event.clientX;
-      previousY = event.clientY;
-      renderer.domElement.setPointerCapture(event.pointerId);
-    };
-
-    const onPointerMove = (event: PointerEvent) => {
-      if (!dragging) {
-        const nextHover = hitShirt(event);
-        if (nextHover !== hover) {
-          hover = nextHover;
-          renderer.domElement.style.cursor = hover ? "pointer" : "grab";
-        }
-        return;
-      }
-
-      const dx = event.clientX - previousX;
-      const dy = event.clientY - previousY;
-      if (Math.abs(dx) + Math.abs(dy) > 3) moved = true;
-      previousX = event.clientX;
-      previousY = event.clientY;
-      targetRotationY += dx * 0.0075;
-      targetRotationX = THREE.MathUtils.clamp(targetRotationX + dy * 0.0025, -0.12, 0.12);
-      velocity = dx * 0.0012;
-    };
-
-    const endPointer = (event: PointerEvent) => {
-      if (pointerId !== event.pointerId) return;
-      const shouldOpen = !moved && hitShirt(event);
-      dragging = false;
-      pointerId = null;
-      if (renderer.domElement.hasPointerCapture(event.pointerId)) {
-        renderer.domElement.releasePointerCapture(event.pointerId);
-      }
-      renderer.domElement.style.cursor = hover ? "pointer" : "grab";
-      if (shouldOpen) openProductRef.current();
-    };
-
-    const onWheel = (event: WheelEvent) => {
-      event.preventDefault();
-      cameraDistance = THREE.MathUtils.clamp(cameraDistance + event.deltaY * 0.0045, 7.1, 9.8);
-    };
-
-    renderer.domElement.style.cursor = "grab";
-    renderer.domElement.addEventListener("pointerdown", onPointerDown);
-    renderer.domElement.addEventListener("pointermove", onPointerMove);
-    renderer.domElement.addEventListener("pointerup", endPointer);
-    renderer.domElement.addEventListener("pointercancel", endPointer);
-    renderer.domElement.addEventListener("wheel", onWheel, { passive: false });
-
+    let targetAngle = 0,
+      lastRevision = -1,
+      lastTone = "",
+      visible = true;
+    let pointerId: number | null = null,
+      startX = 0,
+      startY = 0,
+      startAngle = 0;
+    let span = 1;
     const resize = () => {
-      const width = Math.max(1, mount.clientWidth);
-      const height = Math.max(1, mount.clientHeight);
-      renderer.setSize(width, height, false);
-      camera.aspect = width / height;
+      const w = Math.max(1, mount.clientWidth),
+        h = Math.max(1, mount.clientHeight);
+      renderer.setSize(w, h, false);
+      const aspect = w / h;
+      span = Math.max(0.77, 0.52 / aspect);
+      camera.left = -span * aspect;
+      camera.right = span * aspect;
+      camera.top = span;
+      camera.bottom = -span;
       camera.updateProjectionMatrix();
     };
-
     const observer = new ResizeObserver(resize);
     observer.observe(mount);
     resize();
-
-    const clock = new THREE.Clock();
-    let frame = 0;
-    const animate = () => {
-      frame = window.requestAnimationFrame(animate);
-      const elapsed = clock.getElapsedTime();
-      targetRotationY += velocity;
-      velocity *= 0.93;
-      root.rotation.y += (targetRotationY - root.rotation.y) * 0.075;
-      root.rotation.x += (targetRotationX - root.rotation.x) * 0.075;
-      root.position.y = -1.92 + Math.sin(elapsed * 0.7) * 0.008;
-      const targetScale = hover ? 1.012 : 1;
-      const nextScale = THREE.MathUtils.lerp(root.scale.x, targetScale, 0.1);
-      root.scale.setScalar(nextScale);
-      camera.position.z += (cameraDistance - camera.position.z) * 0.1;
-      camera.lookAt(0, 0.55, 0);
+    const intersection = new IntersectionObserver((entries) => {
+      visible = entries[0].isIntersecting;
+    });
+    intersection.observe(mount);
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const down = (event: PointerEvent) => {
+      if (event.button !== 0 || pointerId !== null) return;
+      pointerId = event.pointerId;
+      startX = event.clientX;
+      startY = event.clientY;
+      startAngle = targetAngle;
+      current.current.onInteract();
+      canvas.setPointerCapture(event.pointerId);
+      canvas.style.cursor = "grabbing";
+    };
+    const move = (event: PointerEvent) => {
+      if (event.pointerId !== pointerId) return;
+      if (
+        Math.abs(event.clientY - startY) > Math.abs(event.clientX - startX) &&
+        event.pointerType === "touch"
+      )
+        return;
+      targetAngle = startAngle + (event.clientX - startX) * 0.009;
+    };
+    const end = (event: PointerEvent) => {
+      if (event.pointerId !== pointerId) return;
+      pointerId = null;
+      if (canvas.hasPointerCapture(event.pointerId))
+        canvas.releasePointerCapture(event.pointerId);
+      canvas.style.cursor = "grab";
+    };
+    const keyboard = (event: KeyboardEvent) => {
+      if (!["ArrowLeft", "ArrowRight", "Home"].includes(event.key)) return;
+      event.preventDefault();
+      current.current.onInteract();
+      targetAngle =
+        event.key === "Home"
+          ? 0
+          : targetAngle + (event.key === "ArrowLeft" ? -0.18 : 0.18);
+    };
+    const contextLost = (event: Event) => {
+      event.preventDefault();
+      current.current.onUnavailable(true);
+    };
+    canvas.addEventListener("pointerdown", down);
+    canvas.addEventListener("pointermove", move);
+    canvas.addEventListener("pointerup", end);
+    canvas.addEventListener("pointercancel", end);
+    canvas.addEventListener("lostpointercapture", end);
+    canvas.addEventListener("keydown", keyboard);
+    canvas.addEventListener("webglcontextlost", contextLost);
+    let frame = 0,
+      previous = 0;
+    const animate = (now: number) => {
+      frame = requestAnimationFrame(animate);
+      const dt = Math.min((now - previous) / 1000, 0.05);
+      previous = now;
+      if (!visible || document.hidden) return;
+      const state = current.current;
+      if (state.view.revision !== lastRevision) {
+        targetAngle = state.view.angle;
+        lastRevision = state.view.revision;
+      }
+      if (state.shirtTone !== lastTone) {
+        cloth.color.set(state.shirtTone);
+        seamMat.color.set(state.shirtTone);
+        lastTone = state.shirtTone;
+      }
+      artwork.visible = state.emblem;
+      if (state.rotating && !reduced.matches && pointerId === null)
+        targetAngle += dt * 0.28;
+      const blend = reduced.matches ? 1 : 1 - Math.exp(-dt * 10);
+      root.rotation.y += (targetAngle - root.rotation.y) * blend;
+      camera.zoom += (state.zoom - camera.zoom) * blend;
+      const focusY = 1.03 + ((camera.zoom - 1) / 0.75) * 0.21;
+      camera.position.y = focusY + 0.34;
+      camera.lookAt(0, focusY, 0);
+      camera.updateProjectionMatrix();
       renderer.render(scene, camera);
     };
-    animate();
-
-    const label = document.createElement("div");
-    label.textContent = `${productName} · drag to rotate · click garment to explore`;
-    label.style.position = "absolute";
-    label.style.left = "50%";
-    label.style.bottom = "16px";
-    label.style.transform = "translateX(-50%)";
-    label.style.color = "rgba(20,20,20,.55)";
-    label.style.fontSize = "8px";
-    label.style.letterSpacing = ".11em";
-    label.style.textTransform = "uppercase";
-    label.style.pointerEvents = "none";
-    label.style.whiteSpace = "nowrap";
-    mount.style.position = "relative";
-    mount.appendChild(label);
-
+    frame = requestAnimationFrame(animate);
     return () => {
-      window.cancelAnimationFrame(frame);
+      disposed = true;
+      cancelAnimationFrame(frame);
       observer.disconnect();
-      renderer.domElement.removeEventListener("pointerdown", onPointerDown);
-      renderer.domElement.removeEventListener("pointermove", onPointerMove);
-      renderer.domElement.removeEventListener("pointerup", endPointer);
-      renderer.domElement.removeEventListener("pointercancel", endPointer);
-      renderer.domElement.removeEventListener("wheel", onWheel);
-      if (label.parentNode === mount) mount.removeChild(label);
-      if (renderer.domElement.parentNode === mount) mount.removeChild(renderer.domElement);
+      intersection.disconnect();
+      canvas.removeEventListener("pointerdown", down);
+      canvas.removeEventListener("pointermove", move);
+      canvas.removeEventListener("pointerup", end);
+      canvas.removeEventListener("pointercancel", end);
+      canvas.removeEventListener("lostpointercapture", end);
+      canvas.removeEventListener("keydown", keyboard);
+      canvas.removeEventListener("webglcontextlost", contextLost);
+      const geometries = new Set<THREE.BufferGeometry>();
       scene.traverse((object) => {
-        if (object instanceof THREE.Mesh) object.geometry.dispose();
+        if (object instanceof THREE.Mesh) geometries.add(object.geometry);
       });
-      mannequinMaterial.dispose();
-      trouserMaterial.dispose();
-      shoeMaterial.dispose();
-      shirtMaterial.dispose();
-      inkMaterial.dispose();
-      printMaterial.dispose();
-      printTexture.dispose();
+      geometries.forEach((geometry) => geometry.dispose());
+      materials.forEach((mat) => mat.dispose());
+      textures.forEach((texture) => texture.dispose());
       renderer.dispose();
+      canvas.remove();
     };
-  }, [shirtTone, shirtInk, artMark, productName]);
+  }, []);
 
   return (
     <div
       ref={mountRef}
-      style={{ width: "100%", height: "100%", minHeight: 620 }}
-      aria-label={`Interactive 3D view of ${productName}`}
+      style={{ width: "100%", height: "100%" }}
+      aria-label={`${props.productName} on a studio mannequin`}
     />
   );
 }
