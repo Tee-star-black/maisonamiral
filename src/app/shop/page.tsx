@@ -12,44 +12,27 @@ export const metadata: Metadata = {
 };
 
 function ProductVisual({ slug, name, artMark, image }: { slug: string; name: string; artMark: string; image?: string }) {
-  if (slug === "automobile-tee") {
-    return (
-      <Image
-        src="/graphics/wheel.png"
-        alt={`${name} visual study`}
-        fill
-        sizes="(max-width: 760px) 100vw, 50vw"
-        className={`${styles.image} ${styles.wheelImage}`}
-      />
-    );
+  if (image) {
+    return <Image
+      src={image}
+      alt={`${name}, photographed garment`}
+      fill
+      sizes="(max-width: 760px) 100vw, 50vw"
+      className={styles.image}
+    />;
   }
-
   if (slug === "flag-staple-tee") {
-    return (
-      <video className={styles.video} autoPlay muted loop playsInline aria-label={`${name} moving flag study`}>
+    return <div className={styles.editorialStudy}>
+      <video className={styles.video} autoPlay muted loop playsInline aria-label="Maison Amiral flag editorial film">
         <source src="/video/flag.mp4" type="video/mp4" />
       </video>
-    );
+      <span className={styles.editorialNote}>Editorial reference / Garment photo pending</span>
+    </div>;
   }
-
-  if (image) {
-    return (
-      <Image
-        src={image}
-        alt={`${name} product image`}
-        fill
-        sizes="(max-width: 760px) 100vw, 50vw"
-        className={styles.image}
-      />
-    );
-  }
-
-  return (
-    <div className={styles.art} aria-hidden="true">
-      <span className={styles.artMark}>{artMark}</span>
-      <span className={styles.artSubline}>Johannesburg / Edition 001</span>
-    </div>
-  );
+  return <div className={styles.art} aria-hidden="true">
+    <span className={styles.artMark}>{artMark}</span>
+    <span className={styles.artSubline}>Johannesburg / Edition 001</span>
+  </div>;
 }
 
 export default function ShopPage() {
