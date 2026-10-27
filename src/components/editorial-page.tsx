@@ -1,5 +1,6 @@
 import Link from "next/link";
 import styles from "./editorial-page.module.css";
+import { SiteFooter } from "./site-footer";
 
 type EditorialPageProps = {
   eyebrow: string;
@@ -35,11 +36,7 @@ export function EditorialPage({ eyebrow, title, intro, children }: EditorialPage
 
       {children && <div className={styles.content}>{children}</div>}
 
-      <footer className={styles.footer}>
-        <span>© 2026 Maison Amiral</span>
-        <span>Objects for presence over noise</span>
-        <span>Johannesburg, South Africa</span>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }
