@@ -14,7 +14,7 @@
   justify-content: space-between;
   gap: 24px;
   color: #a7aea4;
-  font: 500 10px/1.5 var(--font-geist-mono), monospace;
+  font: 500 10px/1.5 var(--font-geist-sans), Arial, sans-serif;
   letter-spacing: .075em;
 }
 .overline {
@@ -31,7 +31,7 @@
 .label, .navigation h3 {
   margin: 0 0 32px;
   color: #aab4a6;
-  font: 500 10px/1.5 var(--font-geist-mono), monospace;
+  font: 500 10px/1.5 var(--font-geist-sans), Arial, sans-serif;
   letter-spacing: .11em;
   text-transform: uppercase;
 }
@@ -40,7 +40,13 @@
   font-size: clamp(3.6rem, 7.4vw, 8.4rem);
   line-height: .94;
   letter-spacing: -.075em;
-  font-weight: 480;
+  font-weight: 500;
+}
+.intro h2 em {
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -.055em;
 }
 .cta {
   min-height: 52px;
