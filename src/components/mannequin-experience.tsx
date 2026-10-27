@@ -116,7 +116,7 @@ export function MannequinExperience() {
                 <Mannequin
                   shirtTone={product.tone}
                   productName={product.name}
-                  artwork={product.artwork}
+                  productSlug={product.slug}
                   view={view}
                   zoom={zoom}
                   rotating={rotating}
