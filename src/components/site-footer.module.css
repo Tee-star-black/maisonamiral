@@ -82,8 +82,8 @@
   padding: 22px 0 30px;
   border-top: 1px solid #464b45;
   font-size: clamp(3rem, 11.2vw, 13.9rem);
-  font-weight: 650;
-  letter-spacing: -.095em;
+  font-weight: 400;
+  letter-spacing: -.075em;
   line-height: 1;
   white-space: nowrap;
   text-align: center;
@@ -105,7 +105,7 @@
   .content { padding: 72px 0 88px; gap: 64px; }
   .intro h2 { font-size: clamp(3.5rem, 13vw, 5.5rem); }
   .navigation { gap: 18px; }
-  .wordmark { letter-spacing: -.083em; padding: 24px 0; font-size: 11.2vw; }
+  .wordmark { letter-spacing: -.075em; padding: 24px 0; font-size: 11.2vw; }
   .baseline { align-items: flex-start; flex-direction: column; gap: 8px; padding: 24px 0; }
 }
 @media(prefers-reduced-motion: reduce) {
