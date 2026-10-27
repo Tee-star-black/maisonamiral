@@ -32,7 +32,7 @@ export default function Home() {
       </div>
     </section>
     <div id="fitting-studio"><MannequinExperience /></div>
-    <section className={styles.about} id="about" aria-labelledby="about-heading"><div className={styles.aboutMedia}><Image src="/products/emblem/back-editorial.jpeg" alt="Emblem Tee from behind in Maison Amiral editorial photography" fill sizes="(max-width: 900px) 100vw, 50vw" /></div><div className={styles.aboutText}><p className={styles.kicker}>02 / THE HOUSE</p><h2 id="about-heading">Clothing with<br />a point of view.</h2><p>Maison Amiral is an independent label from Johannesburg. We work with simple forms, graphic details and the belief that the best pieces become part of daily life.</p><Link href="/editorial">Read the house story <span aria-hidden="true">↗</span></Link><span className={styles.aboutIndex}>JOHANNESBURG / SOUTH AFRICA</span></div></section>
+    <section className={styles.about} id="about" aria-labelledby="about-heading"><div className={styles.aboutMedia}><Image src="/products/emblem/back-editorial.jpeg" alt="Emblem Tee from behind in Maison Amiral editorial photography" fill sizes="(max-width: 900px) 100vw, 50vw" /></div><div className={styles.aboutText}><p className={styles.kicker}>02 / THE HOUSE</p><h2 id="about-heading">Clothing with<br /><em>a point of view.</em></h2><p>Maison Amiral is an independent label from Johannesburg. We work with simple forms, graphic details and the belief that the best pieces become part of daily life.</p><Link href="/editorial">Read the house story <span aria-hidden="true">↗</span></Link><span className={styles.aboutIndex}>JOHANNESBURG / SOUTH AFRICA</span></div></section>
     <SiteFooter />
   </main>;
 }
