@@ -35,7 +35,7 @@
 .collectionGrid {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.9fr);gap:clamp(24px,4.5vw,78px);align-items:stretch;}
 .feature {min-width:0;display:flex;flex-direction:column;}
 .featureVisual {position:relative;min-height:570px;flex:1;background:#c4c4bc;overflow:hidden;}
-.featureVisual img {object-fit:cover;object-position:center;transition:transform .6s ease;}
+.featureVisual img {object-fit:contain;object-position:center;background:#f4f3ef;padding:clamp(12px,2vw,28px);transition:transform .6s ease;}
 .feature:hover img {transform:scale(1.025);}
 .featureMeta {display:flex;align-items:end;justify-content:space-between;gap:16px;border-top:1px solid var(--line);padding:19px 0;}
 .featureMeta>span:first-child {display:grid;gap:10px;}
