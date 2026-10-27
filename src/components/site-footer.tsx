@@ -27,7 +27,7 @@ export function SiteFooter() {
         <div className={styles.content}>
           <div className={styles.intro}>
             <p className={styles.label}>A considered wardrobe / 001</p>
-            <h2>Less noise.<br />More presence.</h2>
+            <h2>Less noise.<br /><em>More presence.</em></h2>
             <Link href="/shop" className={styles.cta}>
               Explore the collection <span aria-hidden="true">↗</span>
             </Link>
