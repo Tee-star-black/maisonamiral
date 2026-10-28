@@ -3,7 +3,7 @@
   --edition-muted: #6d726b;
   --edition-line: #c8c9c0;
   padding: clamp(78px, 9vw, 144px) clamp(20px, 4.1vw, 76px);
-  background: #eeeae2;
+  background: #ffffff;
   color: var(--edition-ink);
   scroll-margin-top: 20px;
 }
@@ -77,7 +77,7 @@
   min-height: clamp(490px, 51vw, 740px);
   overflow: hidden;
   isolation: isolate;
-  background: #e4e3dd;
+  background: #ffffff;
 }
 
 .media {
@@ -100,7 +100,7 @@
   object-fit: contain;
   object-position: center;
   padding: clamp(15px, 2vw, 32px);
-  background: #f2f1ec;
+  background: #ffffff;
 }
 
 .film, .film video {
