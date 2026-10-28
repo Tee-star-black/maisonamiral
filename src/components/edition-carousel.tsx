@@ -93,23 +93,14 @@ export function EditionCarousel() {
                   className={styles.media + (active ? " " + styles.mediaActive : "")}
                   aria-hidden="true"
                 >
-                  {product.images[0] ? (
-                    <Image
-                      src={product.images[0]}
-                      alt=""
-                      fill
-                      sizes="(max-width: 760px) 100vw, 55vw"
-                      priority={index === 0}
-                      className={styles.image}
-                    />
-                  ) : (
-                    <div className={styles.film}>
-                      <video muted autoPlay loop playsInline preload="metadata">
-                        <source src="/video/flag.mp4" type="video/mp4" />
-                      </video>
-                      <span>Flag film / Product photograph pending</span>
-                    </div>
-                  )}
+                  <Image
+                    src={product.images[0]}
+                    alt=""
+                    fill
+                    sizes="(max-width: 760px) 100vw, 55vw"
+                    priority={index === 0}
+                    className={styles.image}
+                  />
                 </div>
               );
             })}
