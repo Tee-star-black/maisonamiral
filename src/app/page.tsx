@@ -4,6 +4,7 @@ import { MannequinExperience } from "@/components/mannequin-experience";
 import { SiteFooter } from "@/components/site-footer";
 import { EditionCarousel } from "@/components/edition-carousel";
 import { FieldArchive } from "@/components/field-archive";
+import { MoreToCome } from "@/components/more-to-come";
 import styles from "./home.module.css";
 
 export default function Home() {
@@ -21,6 +22,7 @@ export default function Home() {
     <div id="fitting-studio"><MannequinExperience /></div>
     <FieldArchive />
     <section className={styles.about} id="about" aria-labelledby="about-heading"><div className={styles.aboutMedia}><Image src="/Edit.jpg" alt="Maison Amiral Emblem Tee worn in an editorial portrait" fill sizes="(max-width: 900px) 100vw, 50vw" /></div><div className={styles.aboutText}><p className={styles.kicker}>04 / THE HOUSE</p><h2 id="about-heading">Clothing with<br /><em>a point of view.</em></h2><p>Maison Amiral is an independent label from Johannesburg. We work with simple forms, graphic details and the belief that the best pieces become part of daily life.</p><Link href="/editorial">Read the house story <span aria-hidden="true">↗</span></Link><span className={styles.aboutIndex}>JOHANNESBURG / SOUTH AFRICA</span></div></section>
+    <MoreToCome />
     <SiteFooter />
   </main>;
 }
