@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { PaymentReturn } from "@/components/payment-return";
 import { SiteFooter } from "@/components/site-footer";
-import styles from "../../checkout.module.css";
+import styles from "../checkout.module.css";
 
 export const metadata: Metadata = {
   title: "Order status",
