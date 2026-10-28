@@ -38,9 +38,9 @@ export const products: MaisonProduct[] = [
     tone: "#151515",
     ink: "#f4f0e7",
     images: [
-      asset("automobile", "front.webp"),
-      asset("automobile", "back.webp"),
-      asset("automobile", "back-detail.webp"),
+      "/Automobile front.jpg",
+      "/Automobile 2.jpg",
+      "/Automobile back.jpg",
     ],
     imageLabels: ["Front", "Back", "Back detail"],
     artwork: {
@@ -60,8 +60,8 @@ export const products: MaisonProduct[] = [
     tone: "#171717",
     ink: "#f4f0e7",
     images: [
-      asset("guerrilla", "front.webp"),
-      asset("guerrilla", "on-model.webp"),
+      "/Guerilla.jpg",
+      "/Guerilla 2.jpg",
     ],
     imageLabels: ["Front", "On model"],
     artwork: {
@@ -94,9 +94,9 @@ export const products: MaisonProduct[] = [
     tone: "#131313",
     ink: "#f4f0e7",
     images: [
-      asset("emblem", "front.webp"),
-      asset("emblem", "back.webp"),
-      asset("emblem", "on-model.webp"),
+      "/Emblem front.jpg",
+      "/Emblem back.jpg",
+      "/Edit.jpg",
     ],
     imageLabels: ["Front", "Back", "On model"],
     artwork: {
