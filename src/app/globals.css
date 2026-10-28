@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --paper: #f2eee6;
-  --paper-deep: #e5dfd4;
+  --paper: #ffffff;
+  --paper-deep: #f5f5f5;
   --ink: #0d0d0d;
-  --muted: #716b62;
+  --muted: #656565;
   --line: rgba(13, 13, 13, 0.2);
   --night: #0c0c0c;
-  --chalk: #f4f0e8;
+  --chalk: #ffffff;
 }
 
 * {
