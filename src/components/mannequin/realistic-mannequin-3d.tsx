@@ -302,13 +302,13 @@ export function RealisticMannequin3D(props: Props) {
     const loader = new THREE.TextureLoader();
 
     function print(spec: GarmentPrint, side: 1 | -1, group: THREE.Group) {
-      let decal: THREE.Mesh | undefined;
+      const decalRef: { current?: THREE.Mesh } = {};
       const texture = loader.load(
         spec.src,
         () => { if (disposed) texture.dispose(); },
         undefined,
         // A missing photo must not disable the entire 3D experience.
-        () => { if (decal) decal.visible = false; },
+        () => { if (decalRef.current) decalRef.current.visible = false; },
       );
       texture.colorSpace = THREE.SRGBColorSpace;
       texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
@@ -333,9 +333,9 @@ export function RealisticMannequin3D(props: Props) {
         polygonOffset: true,
         polygonOffsetFactor: -1,
       }));
-      decal = mesh(geometry, printMat, group);
-      decal.castShadow = false;
-      decal.receiveShadow = false;
+      decalRef.current = mesh(geometry, printMat, group);
+      decalRef.current.castShadow = false;
+      decalRef.current.receiveShadow = false;
     }
 
     for (const item of products) {
