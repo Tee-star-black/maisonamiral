@@ -1,8 +1,23 @@
 import type { Metadata } from "next";
-import { EditorialPage } from "@/components/editorial-page";
+import { CartView } from "@/components/cart-view";
+import { SiteFooter } from "@/components/site-footer";
+import styles from "./cart.module.css";
 
-export const metadata: Metadata = { title: "Bag", robots: { index: false, follow: true } };
+export const metadata: Metadata = {
+  title: "Your cart",
+  description: "Review your Maison Amiral pieces and proceed to checkout.",
+  robots: { index: false, follow: true },
+};
 
 export default function CartPage() {
-  return <EditorialPage eyebrow="Bag" title="Your selection." intro="The production checkout flow still depends on the final commerce and payment implementation. This route now resolves cleanly instead of returning a 404 while that integration is completed." />;
+  return (
+    <main className={styles.page}>
+      <div className={styles.container}>
+        <p className={styles.eyebrow}>MAISON AMIRAL / YOUR SELECTION</p>
+        <h1>Your <em>cart.</em></h1>
+        <CartView />
+      </div>
+      <SiteFooter />
+    </main>
+  );
 }
