@@ -40,10 +40,10 @@ export default function ShopPage() {
     <EditorialPage
       eyebrow="Collection / 001"
       title="The first objects."
-      intro="Four studies in movement, machinery, memory and restraint. Designed in Johannesburg and built to hold presence without asking for it."
+      intro="Three studies in movement, machinery, memory and restraint. Designed in Johannesburg and built to hold presence without asking for it."
     >
       <div className={styles.collectionIntro}>
-        <span>Edition 001 / 04 objects</span>
+        <span>Edition 001 / {products.length} objects</span>
         <span>R450 each</span>
       </div>
 
@@ -68,7 +68,7 @@ export default function ShopPage() {
                 image={product.images[0]}
               />
               <span className={styles.mediaLabel}>
-                {String(index + 1).padStart(2, "0")} / 04
+                {String(index + 1).padStart(2, "0")} / {String(products.length).padStart(2, "0")}
               </span>
               <span className={styles.viewLabel}>View object ↗</span>
             </div>
