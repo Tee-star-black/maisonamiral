@@ -21,14 +21,7 @@ function ProductVisual({ slug, name, artMark, image }: { slug: string; name: str
       className={styles.image}
     />;
   }
-  if (slug === "flag-staple-tee") {
-    return <div className={styles.editorialStudy}>
-      <video className={styles.video} autoPlay muted loop playsInline aria-label="Maison Amiral flag editorial film">
-        <source src="/video/flag.mp4" type="video/mp4" />
-      </video>
-      <span className={styles.editorialNote}>Editorial reference / Garment photo pending</span>
-    </div>;
-  }
+
   return <div className={styles.art} aria-hidden="true">
     <span className={styles.artMark}>{artMark}</span>
     <span className={styles.artSubline}>Johannesburg / Edition 001</span>
