@@ -29,7 +29,7 @@ const angles = [
 
 export function MannequinExperience() {
   const titleId = useId();
-  const [activeIndex, setActiveIndex] = useState(3);
+  const [activeIndex, setActiveIndex] = useState(2);
   const [mode, setMode] = useState<"model" | "photos">("model");
   const [photoIndex, setPhotoIndex] = useState(0);
   const [view, setView] = useState({ angle: 0, revision: 0 });
@@ -244,8 +244,8 @@ export function MannequinExperience() {
                   product.slug === "guerrilla-tee"
                     ? "Black"
                     : product.slug === "automobile-tee"
-                      ? "Stone"
-                      : "Ecru"}
+                      ? "Black"
+                      : "Black"}
                 </dd>
               </div>
               <div>
