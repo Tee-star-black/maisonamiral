@@ -7,7 +7,7 @@ Source: user-supplied `Maison (1).zip`. The JPEGs were optimised as WebP without
 - Automobile Tee: `Automobile front.jpg` (front), `Automobile 2.jpg` (back), `Automobile back.jpg` (detail).
 - Guerrilla Tee: `Guerilla.jpg` (front), `Guerilla 2.jpg` (on-body).
 - Emblem Tee: `Emblem front.jpg` (front), `Emblem back.jpg` (reverse), `Edit.jpg` (on-body).
-- Flag Staple Tee: no unambiguous flat-lay product photo. The existing flag editorial film remains until a verified shot is supplied.
+- Only three pieces are for sale: Automobile, Guerrilla, and Emblem. Flag Staple has been removed from the catalogue.
 
 The reference shots showing a white protective suit, the standalone ships, and duplicate variants have not been assigned to any garment.
 
