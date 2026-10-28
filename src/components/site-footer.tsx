@@ -4,8 +4,9 @@ import styles from "./site-footer.module.css";
 const explore = [
   ["Shop", "/shop"],
   ["Collections", "/collections"],
-  ["The studio", "/#fitting-studio"],
+  ["Lookbook", "/lookbook"],
   ["Journal", "/journal"],
+  ["Cart", "/cart"],
 ] as const;
 
 const information = [
