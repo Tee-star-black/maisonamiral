@@ -3,9 +3,9 @@ import Link from "next/link";
 import styles from "./edition-gallery.module.css";
 
 const images = [
-  { src: "/products/edition-001/emblem/on-model.webp", alt: "Emblem Tee worn in the original editorial portrait", className: styles.heroImage },
-  { src: "/products/edition-001/emblem/front.webp", alt: "Emblem Tee front showing the original artwork", className: styles.tallImage },
-  { src: "/products/edition-001/emblem/back.webp", alt: "Emblem Tee reverse artwork", className: styles.productImage },
+  { src: "/Edit.jpg", alt: "Emblem Tee worn in the original editorial portrait", className: styles.heroImage },
+  { src: "/Emblem front.jpg", alt: "Emblem Tee front showing the original artwork", className: styles.tallImage },
+  { src: "/Emblem back.jpg", alt: "Emblem Tee reverse artwork", className: styles.productImage },
 ] as const;
 
 export function EditionGallery() {
