@@ -1,0 +1,6 @@
+.page{background:#fff;min-height:100vh;color:#171a17}
+.container{max-width:1500px;margin:0 auto;padding:clamp(55px,8vw,120px) clamp(20px,4.1vw,76px) 150px}
+.eyebrow{font:600 10px/1.5 var(--font-geist-sans),Arial,sans-serif;letter-spacing:.13em;color:#777}
+.container h1{font:500 clamp(4rem,9vw,9rem)/.9 var(--font-geist-sans),Arial,sans-serif;letter-spacing:-.085em;margin:24px 0 70px}
+.container h1 span{font-family:Georgia,"Times New Roman",serif;font-style:italic}
+@media(max-width:700px){.container{padding:50px 18px 95px}.container h1{margin-bottom:45px;font-size:clamp(3.7rem,16vw,6rem)}}
