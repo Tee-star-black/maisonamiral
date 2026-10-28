@@ -70,20 +70,6 @@ export const products: MaisonProduct[] = [
     },
   },
   {
-    slug: "flag-staple-tee",
-    name: "Flag Staple Tee",
-    price: 450,
-    edition: "Edition 001",
-    artMark: "FLAG",
-    shortDescription: "A staple silhouette with Maison Amiral's flag language.",
-    description:
-      "A foundational Maison Amiral piece. The original garment photograph was not included in the supplied Edition 001 image set; the flag film is shown as an editorial reference.",
-    tone: "#171717",
-    ink: "#f4f0e7",
-    images: [],
-    imageLabels: [],
-  },
-  {
     slug: "emblem-tee",
     name: "Emblem Tee",
     price: 450,
