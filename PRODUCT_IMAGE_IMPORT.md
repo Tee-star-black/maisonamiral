@@ -13,8 +13,8 @@ The reference shots showing a white protective suit, the standalone ships, and d
 
 ## Required binary assets
 
-Thirteen binary assets belong in `public/products/edition-001/{automobile,guerrilla,emblem}/`. The image files are intentionally not in this text-only GitHub commit. Import the companion `Maison_Product_Images_Ready.zip` supplied in the ChatGPT conversation before previewing the feature branch. The archive contains the optimised images and transparent print layers, plus a PowerShell installer.
+Thirteen binary assets belong in `public/products/edition-001/{automobile,guerrilla,emblem}/`. The original JPEG files are now committed directly under `public/` and are wired into the product cards, galleries and homepage. The 3D viewer still requires the five transparent print PNGs from the companion `Maison_Product_Images_Ready.zip` supplied in the ChatGPT conversation to display the authentic graphics on the model. Do not assume JPEG photos provide transparent 3D decals. The archive contains the optimised images and transparent print layers, plus a PowerShell installer.
 
-**Do not merge or release this branch until the images are imported and a build and browser review have passed.**
+**Product photography is now wired to the uploaded JPEGs.** Import the transparent print PNGs for accurate 3D decals, and complete build/browser review before merging or releasing.
 
 The new paths are used by the collection grid, individual product galleries, homepage Emblem photography, photo mode, and 3D mannequin prints.
