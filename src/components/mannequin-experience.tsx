@@ -240,12 +240,7 @@ export function MannequinExperience() {
               <div>
                 <dt>Colour</dt>
                 <dd>
-                  {product.slug === "emblem-tee" ||
-                  product.slug === "guerrilla-tee"
-                    ? "Black"
-                    : product.slug === "automobile-tee"
-                      ? "Black"
-                      : "Black"}
+                  Black
                 </dd>
               </div>
               <div>
