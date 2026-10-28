@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: "Shop the Maison Amiral collection from Johannesburg.",
 };
 
-function ProductVisual({ slug, name, artMark, image }: { slug: string; name: string; artMark: string; image?: string }) {
+function ProductVisual({ name, artMark, image }: { name: string; artMark: string; image?: string }) {
   if (image) {
     return <Image
       src={image}
@@ -55,7 +55,6 @@ export default function ShopPage() {
               } as CSSProperties}
             >
               <ProductVisual
-                slug={product.slug}
                 name={product.name}
                 artMark={product.artMark}
                 image={product.images[0]}
