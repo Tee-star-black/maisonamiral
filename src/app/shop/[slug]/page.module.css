@@ -51,7 +51,7 @@
   position: relative;
   margin: 0;
   min-height: 72vh;
-  background: #dcd7ce;
+  background: #ffffff;
   overflow: hidden;
 }
 
@@ -62,7 +62,7 @@
   min-height: 72vh;
   object-fit: contain;
   padding: clamp(10px, 1vw, 24px);
-  background: #f4f3ef;
+  background: #ffffff;
   transition: transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
