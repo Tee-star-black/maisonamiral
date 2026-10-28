@@ -27,6 +27,8 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Production dependency audit
+        run: npm audit --omit=dev --audit-level=high
       - name: Lint
         run: npm run lint
       - name: Production build
@@ -47,9 +49,3 @@ jobs:
           old_status="$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/shop/flag-staple-tee)"
           test "$old_status" = 404
           curl -sf http://127.0.0.1:3000/api/checkout | grep -q '"enabled":false'
-      - name: Temporary patched Next.js lock export
-        run: |
-          npm install next@16.4.3 eslint-config-next@16.4.3 --package-lock-only --ignore-scripts --no-audit --no-fund
-          echo MAISON_LOCK_BEGIN
-          base64 -w 76 package-lock.json
-          echo MAISON_LOCK_END
