@@ -41,8 +41,9 @@ export const products: MaisonProduct[] = [
       "/Automobile front.jpg",
       "/Automobile 2.jpg",
       "/Automobile back.jpg",
+      "/PHOTO-2026-06-02-15-55-29.jpg",
     ],
-    imageLabels: ["Front", "Back", "Back detail"],
+    imageLabels: ["Front", "Back", "Back detail", "Archive graphic"],
     artwork: {
       front: { src: asset("automobile", "print-front.png"), width: 0.255, height: 0.16, centerY: 1.25 },
       back: { src: asset("automobile", "print-back.png"), width: 0.33, height: 0.51, centerY: 1.2 },
