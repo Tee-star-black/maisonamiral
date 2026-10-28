@@ -25,7 +25,11 @@
 }
 
 .backLink {
-  justify-self: end;
+  display: inline-block;
+  margin-bottom: 35px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid currentColor;
+  font-size: 11px;
   color: var(--muted);
 }
 
@@ -37,14 +41,14 @@
 
 .visualColumn {
   border-right: 1px solid var(--line);
-  background: #111;
+  background: #fff;
 }
 
 .gallery {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1px;
-  background: rgba(255, 255, 255, 0.2);
+  background: #ececec;
 }
 
 .imageFrame {
@@ -183,7 +187,7 @@
 }
 
 .productIndex {
-  margin-bottom: 68px;
+  margin-bottom: 22px;
   color: var(--muted);
   font-size: 8px;
   letter-spacing: 0.12em;
