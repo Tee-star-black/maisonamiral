@@ -52,7 +52,9 @@
 }
 
 .image {
-  object-fit: cover;
+  object-fit: contain;
+  padding: clamp(10px, 1.5vw, 24px);
+  background: #ffffff;
 }
 
 .wheelImage {
@@ -241,3 +243,6 @@
     font-size: clamp(2.8rem, 13vw, 4rem);
   }
 }
+
+.editorialStudy { position: relative; height: 100%; min-height: inherit; }
+.editorialNote { position: absolute; left: 20px; bottom: 20px; z-index: 5; padding: 8px 10px; font-size: 9px; letter-spacing: .09em; text-transform: uppercase; background: #161a16e0; color: white; }

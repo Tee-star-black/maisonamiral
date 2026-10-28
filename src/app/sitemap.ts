@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { products } from "@/data/products";
 
 const baseUrl = "https://www.maisonamiral.co.za";
 
@@ -17,7 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/terms",
   ];
 
-  return routes.map((route) => ({
+  return [...routes, ...products.map((item) => "/shop/" + item.slug)].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
     changeFrequency: route === "" || route === "/shop" ? "weekly" : "monthly",

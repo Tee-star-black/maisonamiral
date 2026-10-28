@@ -12,15 +12,6 @@ type EditorialPageProps = {
 export function EditorialPage({ eyebrow, title, intro, children }: EditorialPageProps) {
   return (
     <main className={styles.page}>
-      <header className={styles.header}>
-        <Link href="/" className={styles.brand}>MAISON AMIRAL</Link>
-        <span className={styles.location}>Johannesburg / Edition 001</span>
-        <nav className={styles.nav} aria-label="Primary navigation">
-          <Link href="/shop">Shop</Link>
-          <Link href="/journal">Journal</Link>
-          <Link href="/contact">Contact</Link>
-        </nav>
-      </header>
 
       <section className={styles.hero}>
         <div className={styles.heroTopline}>

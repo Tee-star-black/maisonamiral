@@ -1,3 +1,10 @@
+export type GarmentPrint = {
+  src: string;
+  width: number;
+  height: number;
+  centerY: number;
+};
+
 export type MaisonProduct = {
   slug: string;
   name: string;
@@ -8,8 +15,15 @@ export type MaisonProduct = {
   description: string;
   tone: string;
   ink: string;
+  /** Real garment photography, ordered front, back, then editorial/detail. */
   images: string[];
+  imageLabels: string[];
+  /** Extracted transparent ink from the original garment photographs. */
+  artwork?: { front?: GarmentPrint; back?: GarmentPrint };
 };
+
+const asset = (product: string, file: string) =>
+  `/products/edition-001/${product}/${file}`;
 
 export const products: MaisonProduct[] = [
   {
@@ -18,12 +32,22 @@ export const products: MaisonProduct[] = [
     price: 450,
     edition: "Edition 001",
     artMark: "AUTO",
-    shortDescription: "A graphic study of machinery, movement and memory.",
+    shortDescription: "The automobile graphic, finished with a collage of house references.",
     description:
-      "A restrained everyday tee built around Maison Amiral's fascination with machinery, motion and the objects that become part of our personal history.",
-    tone: "#d8d3c8",
-    ink: "#151515",
-    images: [],
+      "A black everyday tee with a front automobile graphic, a printed back collage and a detailed sleeve patch graphic. The original garment photography shows the design as it is.",
+    tone: "#151515",
+    ink: "#f4f0e7",
+    images: [
+      "/Automobile front.jpg",
+      "/Automobile 2.jpg",
+      "/Automobile back.jpg",
+      "/PHOTO-2026-06-02-15-55-29.jpg",
+    ],
+    imageLabels: ["Front", "Back", "Back detail", "Archive graphic"],
+    artwork: {
+      front: { src: asset("automobile", "print-front.png"), width: 0.255, height: 0.16, centerY: 1.25 },
+      back: { src: asset("automobile", "print-back.png"), width: 0.33, height: 0.51, centerY: 1.2 },
+    },
   },
   {
     slug: "guerrilla-tee",
@@ -31,25 +55,19 @@ export const products: MaisonProduct[] = [
     price: 450,
     edition: "Edition 001",
     artMark: "G/R",
-    shortDescription: "Quiet rebellion, reduced to a single wearable object.",
+    shortDescription: "An oval graphic framed by precision and streetwear attitude.",
     description:
-      "The Guerrilla Tee treats rebellion as restraint rather than noise: a clean silhouette carrying a sharper graphic attitude.",
-    tone: "#1b1b1b",
-    ink: "#f0ede5",
-    images: [],
-  },
-  {
-    slug: "flag-staple-tee",
-    name: "Flag Staple Tee",
-    price: 450,
-    edition: "Edition 001",
-    artMark: "FLAG",
-    shortDescription: "A staple silhouette with Maison Amiral's flag language.",
-    description:
-      "A foundational Maison Amiral piece: direct, graphic and designed to work as the anchor of a look rather than compete with it.",
-    tone: "#eee9df",
-    ink: "#a41f24",
-    images: [],
+      "A black T-shirt featuring the original Guerrilla front graphic. Browse the garment shot and the editorial image of the tee being worn.",
+    tone: "#171717",
+    ink: "#f4f0e7",
+    images: [
+      "/Guerilla.jpg",
+      "/Guerilla 2.jpg",
+    ],
+    imageLabels: ["Front", "On model"],
+    artwork: {
+      front: { src: asset("guerrilla", "print-front.png"), width: 0.31, height: 0.167, centerY: 1.335 },
+    },
   },
   {
     slug: "emblem-tee",
@@ -57,17 +75,21 @@ export const products: MaisonProduct[] = [
     price: 450,
     edition: "Edition 001",
     artMark: "AMIRAL",
-    shortDescription: "The house emblem, treated as an object rather than a logo.",
+    shortDescription: "The original winged flagship graphic with a small back emblem.",
     description:
-      "The Emblem Tee is the clearest expression of Edition 001: minimal construction, a confident house mark and enough restraint to let the wearer carry the piece.",
-    tone: "#111111",
+      "The Emblem Tee features the bold winged front print and a smaller house emblem on the reverse. Explore the original front, back and on-body photographs.",
+    tone: "#131313",
     ink: "#f4f0e7",
     images: [
-      "/products/emblem/front-edit.jpeg",
-      "/products/emblem/back-editorial.jpeg",
-      "/products/emblem/front.jpeg",
-      "/products/emblem/back.jpeg",
+      "/Emblem front.jpg",
+      "/Emblem back.jpg",
+      "/Edit.jpg",
     ],
+    imageLabels: ["Front", "Back", "On model"],
+    artwork: {
+      front: { src: asset("emblem", "print-front.png"), width: 0.335, height: 0.4, centerY: 1.225 },
+      back: { src: asset("emblem", "print-back.png"), width: 0.1, height: 0.16, centerY: 1.38 },
+    },
   },
 ];
 

@@ -1,4 +1,4 @@
-.page { --paper:#eeeae2; --ink:#202420; --muted:#6d726b; --line:#c8c9c0; background:var(--paper); color:var(--ink); }
+.page { --paper:#ffffff; --ink:#202420; --muted:#6d726b; --line:#c8c9c0; background:var(--paper); color:var(--ink); }
 .hero { min-height: min(980px, 100svh); min-height: 100svh; position:relative; isolation:isolate; display:flex; flex-direction:column; color:#f4f1ea; background:#202420; }
 .heroVisual {position:absolute;inset:0;z-index:-2;overflow:hidden;}
 .heroVisual video {width:100%;height:100%;object-fit:cover;object-position:center;filter:contrast(1.1) saturate(.68);}
@@ -35,7 +35,7 @@
 .collectionGrid {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.9fr);gap:clamp(24px,4.5vw,78px);align-items:stretch;}
 .feature {min-width:0;display:flex;flex-direction:column;}
 .featureVisual {position:relative;min-height:570px;flex:1;background:#c4c4bc;overflow:hidden;}
-.featureVisual img {object-fit:cover;object-position:center;transition:transform .6s ease;}
+.featureVisual img {object-fit:contain;object-position:center;background:#f4f3ef;padding:clamp(12px,2vw,28px);transition:transform .6s ease;}
 .feature:hover img {transform:scale(1.025);}
 .featureMeta {display:flex;align-items:end;justify-content:space-between;gap:16px;border-top:1px solid var(--line);padding:19px 0;}
 .featureMeta>span:first-child {display:grid;gap:10px;}
@@ -54,8 +54,8 @@
 .arrow {font-size:20px;}
 .listFoot {margin-top:auto;border-bottom:1px solid var(--line);}
 .listFoot a {font-weight:700;color:var(--ink);}
-.about {display:grid;grid-template-columns:1fr 1fr;min-height:680px;background:#d9d9d0;}
-.aboutMedia {min-height:620px;position:relative;overflow:hidden;background:#c1c2b8;}
+.about {display:grid;grid-template-columns:1fr 1fr;min-height:680px;background:#ffffff;}
+.aboutMedia {min-height:620px;position:relative;overflow:hidden;background:#ffffff;}
 .aboutMedia img {object-fit:cover;filter:saturate(.85);}
 .aboutText {padding:clamp(44px,6vw,96px);display:flex;flex-direction:column;align-items:flex-start;justify-content:center;}
 .aboutText h2 {font-family:var(--font-geist-sans),Arial,sans-serif;font-size:clamp(3.2rem,5.1vw,6.3rem);line-height:.98;font-weight:500;letter-spacing:-.07em;margin:0 0 32px;}

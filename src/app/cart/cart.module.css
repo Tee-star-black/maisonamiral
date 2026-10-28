@@ -1,0 +1,6 @@
+.page{min-height:100vh;background:#fff;color:#171a17}
+.container{max-width:1580px;margin:0 auto;padding:clamp(60px,7vw,110px) clamp(20px,4.1vw,76px) 150px}
+.eyebrow{font:500 10px/1.5 var(--font-geist-sans),Arial,sans-serif;letter-spacing:.14em;color:#747474}
+.container h1{font:600 clamp(4.2rem,11vw,11rem)/.9 var(--font-geist-sans),Arial,sans-serif;letter-spacing:-.085em;margin:20px 0 clamp(45px,6vw,90px)}
+.container h1 em{font:italic 400 1em/.9 Georgia,"Times New Roman",serif;letter-spacing:-.07em}
+@media(max-width:700px){.container{padding:50px 18px 90px}.container h1{font-size:clamp(3.8rem,17vw,7rem)}}

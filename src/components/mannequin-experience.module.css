@@ -1,9 +1,9 @@
 .experience {
-  --paper: #f4f3ef;
+  --paper: #ffffff;
   --ink: #242421;
   --muted: #73736d;
-  --line: #ddddd5;
-  background: #e9eae3;
+  --line: #dddddd;
+  background: #ffffff;
   color: var(--ink);
   padding: clamp(80px, 8vw, 140px) clamp(20px, 4.1vw, 76px);
   scroll-margin-top: 24px;
@@ -46,7 +46,7 @@
 }
 .study {
   min-width: 0;
-  background: #dfe1d8;
+  background: #ffffff;
 }
 .stageHeader {
   height: 68px;
