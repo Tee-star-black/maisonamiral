@@ -10,11 +10,6 @@ export default function Home() {
   return <main id="top" className={styles.page}>
     <section className={styles.hero} aria-labelledby="hero-heading">
       <div className={styles.heroVisual} aria-hidden="true"><video autoPlay muted loop playsInline preload="metadata" poster="/products/emblem/front-edit.jpeg"><source src="/video/flag.mp4" type="video/mp4" /></video></div>
-      <header className={styles.header}>
-        <Link className={styles.brand} href="/">MAISON AMIRAL<span className={styles.brandMark}> / MA</span></Link>
-        <nav className={styles.nav} aria-label="Primary navigation"><a href="#collection">Collection</a><a href="#fitting-studio">Studio</a><a href="#about">About</a></nav>
-        <Link className={styles.headerShop} href="/shop">Shop Edition 001 <span aria-hidden="true">↗</span></Link>
-      </header>
       <div className={styles.heroContent}>
         <div className={styles.heroMeta}><span>INDEPENDENT CLOTHING / JOHANNESBURG</span><span>EDITION 001 — 2026</span></div>
         <div className={styles.heroTitle}><p>RESTRAINT IN EVERY DETAIL</p><h1 id="hero-heading">Made to<br /><span>be worn.</span></h1></div>
