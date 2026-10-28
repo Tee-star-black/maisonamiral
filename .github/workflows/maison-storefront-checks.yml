@@ -31,3 +31,19 @@ jobs:
         run: npm run lint
       - name: Production build
         run: npm run build
+      - name: Smoke-test store routes and product assets
+        run: |
+          set -euo pipefail
+          npm run start > /tmp/maison-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 35); do
+            if curl -sf http://127.0.0.1:3000/ > /dev/null; then break; fi
+            sleep 1
+          done
+          for route in / /shop /collections /cart /checkout /shop/automobile-tee /shop/guerrilla-tee /shop/emblem-tee /Ship.jpg /Emblem%20front.jpg /Automobile%20front.jpg /Guerilla.jpg; do
+            curl -sf "http://127.0.0.1:3000$route" > /dev/null
+          done
+          old_status="$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/shop/flag-staple-tee)"
+          test "$old_status" = 404
+          curl -sf http://127.0.0.1:3000/api/checkout | grep -q '"enabled":false'
