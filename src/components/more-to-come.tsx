@@ -71,7 +71,7 @@ export function MoreToCome() {
             <label className={styles.consent}>
               <input type="checkbox" checked={consent}
                 onChange={(event) => setConsent(event.target.checked)} required />
-              <span>I agree to receive release announcements and updates by email. No spam, unsubscribe anytime.</span>
+              <span>I agree to receive release announcements and updates by email. You may opt out of future updates.</span>
             </label>
             {status !== "idle" && <p className={status === "success" ? styles.success : styles.error}
               role={status === "error" ? "alert" : "status"}>{feedback}</p>}
