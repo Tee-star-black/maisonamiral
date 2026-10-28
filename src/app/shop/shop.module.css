@@ -54,7 +54,7 @@
 .image {
   object-fit: contain;
   padding: clamp(10px, 1.5vw, 24px);
-  background: #f4f3ef;
+  background: #ffffff;
 }
 
 .wheelImage {
