@@ -1,0 +1,15 @@
+.heading{display:flex;justify-content:space-between;gap:20px;align-items:center;border-top:1px solid #222;border-bottom:1px solid #ccc;padding:20px 0;margin-bottom:42px;font:600 10px/1.5 var(--font-geist-sans),Arial,sans-serif;letter-spacing:.09em}
+.heading a{border-bottom:1px solid #444;padding:7px 0}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.card{min-width:0}
+.image{position:relative;aspect-ratio:3/4;background:#fff;overflow:hidden;border:1px solid #ededed}
+.image img{object-fit:contain;padding:20px;transition:transform .5s ease}
+.card:hover .image img{transform:scale(1.035)}
+.image span{position:absolute;top:16px;left:16px;font:600 10px/1 var(--font-geist-sans),Arial,sans-serif;background:#fff;padding:9px}
+.caption{display:flex;justify-content:space-between;align-items:baseline;gap:15px;border-top:1px solid #333;padding-top:17px;margin-top:17px}
+.caption h2{font:italic 400 clamp(27px,3vw,43px)/1.05 Georgia,"Times New Roman",serif;letter-spacing:-.04em;margin:0}
+.caption span{font-size:12px}
+.card>p{max-width:370px;color:#666;font-size:12px;line-height:1.7}
+@media(max-width:800px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:540px){.grid{grid-template-columns:1fr;gap:42px}.heading{font-size:9px}.image{aspect-ratio:4/5}}
+@media(prefers-reduced-motion:reduce){.image img{transition:none}}
