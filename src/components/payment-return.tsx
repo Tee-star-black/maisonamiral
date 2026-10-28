@@ -20,6 +20,7 @@ export function PaymentReturn({
   useEffect(() => {
     if (!orderId) return;
     let closed = false;
+    let done = false;
     let attempts = 0;
     const check = async () => {
       try {
@@ -28,6 +29,7 @@ export function PaymentReturn({
         const result = await response.json() as { status: string };
         if (closed) return;
         if (result.status === "paid") {
+          done = true;
           setState("paid");
           clearCart();
           return;
@@ -43,7 +45,7 @@ export function PaymentReturn({
     };
     void check();
     const timer = window.setInterval(() => {
-      if (++attempts > 30 || closed) {
+      if (++attempts > 30 || closed || done) {
         window.clearInterval(timer);
         return;
       }
