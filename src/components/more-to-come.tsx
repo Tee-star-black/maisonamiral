@@ -43,7 +43,7 @@ export function MoreToCome() {
   return (
     <section className={styles.section} aria-labelledby="more-to-come-title">
       <div className={styles.overline}>
-        <span>MAISON AMIRAL / WHAT'S NEXT</span>
+        <span>MAISON AMIRAL / WHAT&apos;S NEXT</span>
         <span>EDITION 002 AND BEYOND</span>
       </div>
       <div className={styles.layout}>
