@@ -73,7 +73,7 @@ export function EditionCarousel() {
           <h2 id="edition-heading">Edition 001.</h2>
         </div>
         <div className={styles.intro}>
-          <p>Four objects. One point of view.<br />Designed in Johannesburg.</p>
+          <p>Three objects. One point of view.<br />Designed in Johannesburg.</p>
           <Link href="/shop">View all pieces <span aria-hidden="true">↗</span></Link>
         </div>
       </div>
