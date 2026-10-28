@@ -1,4 +1,4 @@
-.section{background:#e3e2d8;color:#222821;padding:clamp(76px,9vw,150px) clamp(20px,4.1vw,76px);border-top:1px solid #c8cac2}
+.section{background:#ffffff;color:#222821;padding:clamp(76px,9vw,150px) clamp(20px,4.1vw,76px);border-top:1px solid #c8cac2}
 .header{display:flex;justify-content:space-between;align-items:end;gap:36px;margin-bottom:clamp(32px,4vw,64px)}
 .heading{min-width:0}
 .eyebrow,.fieldMeta,.fieldBottom,.objectHead,.objectFoot>span,.detailCopy>span,.detailArrow{font:500 10px/1.5 var(--font-geist-sans),Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase}
@@ -19,7 +19,7 @@
 .poseForeground{left:19%;bottom:1%;width:44%;height:87%;z-index:5}
 .objects{display:grid;grid-template-rows:1fr 1fr;gap:12px;min-width:0}
 .insignia,.vessel{position:relative;min-height:340px;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:24px;isolation:isolate}
-.insignia{background:#d7d9d0}.vessel{background:#c5cac1}
+.insignia{background:#f7f7f7}.vessel{background:#f3f3f3}
 .objectHead,.objectFoot{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;position:relative;z-index:2}
 .objectHead{color:#586257}.objectFoot{align-items:flex-end}
 .objectFoot strong{font:italic 400 clamp(1.5rem,2.3vw,2.5rem)/1.1 Georgia,"Times New Roman",serif;letter-spacing:-.04em}
