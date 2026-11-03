@@ -3,7 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { cartSubtotal, useCart } from "@/lib/cart";
+import { cartSubtotal, clearCart, useCart } from "@/lib/cart";
 import { formatPrice, getProductBySlug } from "@/data/products";
 import { provinces, type Buyer } from "@/lib/commerce";
 import styles from "./checkout-form.module.css";
@@ -68,8 +68,10 @@ export function CheckoutForm() {
         notificationStatus:payload.notificationStatus ?? "needs_attention",
         message:payload.message ?? "Your order has been recorded." });
       window.sessionStorage.removeItem("maison-eft-checkout-id");
+      clearCart();
+      setSubmitting(false);
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "Unable to start payment.");
+      setError(reason instanceof Error ? reason.message : "Unable to place your order.");
       setSubmitting(false);
     }
   }
