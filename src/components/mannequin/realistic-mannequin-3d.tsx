@@ -35,14 +35,17 @@ function silhouette(x: number) {
 }
 function clothDepth(x: number, y: number) {
   const a = Math.abs(x);
-  const torso = Math.sqrt(Math.max(0.08, 1 - (a / 0.31) ** 2));
+  // Rounded chest taper, not a flattened sheet. Keep decals on this same surface.
+  const torso = Math.sqrt(Math.max(0.12, 1 - (a / 0.35) ** 2));
   const { top, bottom } = silhouette(x);
   const t = THREE.MathUtils.clamp((y - bottom) / (top - bottom), 0, 1);
-  const sleeve = 0.035 + 0.05 * Math.sin(t * Math.PI);
+  const sleeve = 0.065 + 0.036 * Math.sin(t * Math.PI);
   const drape = 0.003 * Math.sin(34 * x + 6 * y) * Math.pow(1 - t, 1.5);
   const sideFold = 0.0045 * Math.sin(19 * y + 28 * a) * THREE.MathUtils.smoothstep(a, 0.17, 0.31);
   const body =
-    0.12 * torso + 0.007 * Math.sin(y * 24 + x * 35) * (Math.abs(x) / 0.3) ** 2 + drape + sideFold;
+    (0.142 + 0.008 * THREE.MathUtils.smoothstep(y, 1.05, 1.4)) * torso +
+    0.003 * Math.sin(y * 19 + x * 21) * (Math.abs(x) / 0.3) ** 2 +
+    drape + sideFold;
   return THREE.MathUtils.lerp(
     body,
     sleeve,
@@ -138,8 +141,8 @@ export function RealisticMannequin3D(props: Props) {
     mount.appendChild(canvas);
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 20);
-    camera.position.set(0, 1.37, 5);
-    camera.lookAt(0, 1.03, 0);
+    camera.position.set(0, 1.53, 5);
+    camera.lookAt(0, 1.18, 0);
     const root = new THREE.Group();
     scene.add(root);
     const materials = new Set<THREE.Material>();
@@ -238,6 +241,36 @@ export function RealisticMannequin3D(props: Props) {
       formPositions.setZ(i, formPositions.getZ(i) * THREE.MathUtils.lerp(0.38, 0.78, neck));
     }
     form.geometry.computeVertexNormals();
+    // Anatomical shop mannequin: head, neck and relaxed arms are real 3D volumes.
+    // The exposed parts remain matte ceramic; the T-shirt hides the shoulder joints.
+    const head = mesh(new THREE.SphereGeometry(1, 48, 36), ceramic);
+    head.position.set(0, 1.785, 0.002);
+    head.scale.set(0.105, 0.143, 0.092);
+    const jaw = mesh(new THREE.SphereGeometry(1, 36, 24), ceramic);
+    jaw.position.set(0, 1.716, 0.026);
+    jaw.scale.set(0.078, 0.072, 0.080);
+    // Deliberately blank face, as on a professional retail display form.
+    const neck = mesh(new THREE.CylinderGeometry(0.066, 0.078, 0.19, 40), ceramic);
+    neck.position.set(0, 1.613, 0.0);
+    neck.scale.z = 0.82;
+    for (const side of [-1, 1]) {
+      const armGroup = new THREE.Group();
+      armGroup.position.set(side * 0.375, 1.275, 0.0);
+      armGroup.rotation.z = side * 0.08;
+      root.add(armGroup);
+      const upperArm = mesh(new THREE.CylinderGeometry(0.063, 0.053, 0.255, 32), ceramic, armGroup);
+      upperArm.position.y = -0.13;
+      upperArm.scale.z = 0.82;
+      const elbow = mesh(new THREE.SphereGeometry(0.054, 24, 16), ceramic, armGroup);
+      elbow.position.y = -0.257;
+      elbow.scale.z = 0.84;
+      const forearm = mesh(new THREE.CylinderGeometry(0.052, 0.032, 0.24, 32), ceramic, armGroup);
+      forearm.position.set(side * 0.006, -0.375, 0.009);
+      forearm.scale.z = 0.86;
+      const hand = mesh(new THREE.SphereGeometry(1, 24, 20), ceramic, armGroup);
+      hand.position.set(side * 0.012, -0.545, 0.014);
+      hand.scale.set(0.035, 0.094, 0.030);
+    }
     const neckCap = mesh(
       new THREE.CylinderGeometry(0.065, 0.065, 0.006, 48),
       ceramic,
@@ -392,7 +425,7 @@ export function RealisticMannequin3D(props: Props) {
         h = Math.max(1, mount.clientHeight);
       renderer.setSize(w, h, false);
       const aspect = w / h;
-      span = Math.max(0.77, 0.52 / aspect);
+      span = Math.max(0.96, 0.63 / aspect);
       camera.left = -span * aspect;
       camera.right = span * aspect;
       camera.top = span;
@@ -483,8 +516,8 @@ export function RealisticMannequin3D(props: Props) {
       const blend = reduced.matches ? 1 : 1 - Math.exp(-dt * 10);
       root.rotation.y += (targetAngle - root.rotation.y) * blend;
       camera.zoom += (THREE.MathUtils.clamp(state.zoom, 1, 1.75) - camera.zoom) * blend;
-      const focusY = 1.03 + ((camera.zoom - 1) / 0.75) * 0.21;
-      camera.position.y = focusY + 0.34;
+      const focusY = 1.18 + ((camera.zoom - 1) / 0.75) * 0.11;
+      camera.position.y = focusY + 0.35;
       camera.lookAt(0, focusY, 0);
       camera.updateProjectionMatrix();
       renderer.render(scene, camera);
