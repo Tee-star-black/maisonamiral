@@ -13,7 +13,7 @@ const emptyBuyer: Buyer = {
   address: "", suburb: "", city: "", province: "", postalCode: "",
 };
 
-type CheckoutConfig = { enabled: boolean; deliveryCents: number | null; currency: "ZAR" };
+type CheckoutConfig = { enabled: boolean; deliveryCents: number | null; currency: "ZAR"; paymentMethod: "eft" };
 const money = (cents: number) => "R" + (cents / 100).toFixed(2);
 
 export function CheckoutForm() {
@@ -23,6 +23,7 @@ export function CheckoutForm() {
   const [config, setConfig] = useState<CheckoutConfig | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [confirmed, setConfirmed] = useState<{ reference:string; notificationStatus:string; message:string } | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -32,7 +33,7 @@ export function CheckoutForm() {
         return r.json() as Promise<CheckoutConfig>;
       })
       .then((data) => { if (active) setConfig(data); })
-      .catch(() => { if (active) setConfig({ enabled: false, deliveryCents: null, currency: "ZAR" }); });
+      .catch(() => { if (active) setConfig({ enabled: false, deliveryCents: null, currency: "ZAR", paymentMethod: "eft" }); });
     return () => { active = false; };
   }, []);
 
@@ -47,18 +48,26 @@ export function CheckoutForm() {
     setSubmitting(true);
     setError("");
     try {
+      let checkoutId = window.sessionStorage.getItem("maison-eft-checkout-id");
+      if (!checkoutId || !/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(checkoutId)) {
+        checkoutId = window.crypto.randomUUID();
+        window.sessionStorage.setItem("maison-eft-checkout-id", checkoutId);
+      }
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ customer: buyer, items }),
+        body: JSON.stringify({ customer: buyer, items, checkoutId }),
       });
-      const payload = await response.json() as { redirectUrl?: string; error?: string };
-      if (!response.ok || !payload.redirectUrl) throw new Error(payload.error ?? "Unable to start payment.");
-      const target = new URL(payload.redirectUrl);
-      if (target.protocol !== "https:" ||
-          (target.hostname !== "yoco.com" && !target.hostname.endsWith(".yoco.com")))
-        throw new Error("Unexpected payment page");
-      window.location.assign(target.href);
+      const payload = await response.json() as {
+        orderId?: string; reference?: string; notificationStatus?: string;
+        message?: string; error?: string;
+      };
+      if (!response.ok || !payload.orderId || !payload.reference)
+        throw new Error(payload.error ?? "Unable to place your order.");
+      setConfirmed({ reference:payload.reference,
+        notificationStatus:payload.notificationStatus ?? "needs_attention",
+        message:payload.message ?? "Your order has been recorded." });
+      window.sessionStorage.removeItem("maison-eft-checkout-id");
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Unable to start payment.");
       setSubmitting(false);
@@ -67,7 +76,16 @@ export function CheckoutForm() {
 
   return (
     <div className={styles.layout}>
-      <form id="ma-checkout-form" className={styles.form} onSubmit={submit}>
+      {confirmed && <section role="status" style={{gridColumn:"1 / -1",padding:"28px",border:"1px solid #202420",background:"#f7f7f7"}}>
+        <p style={{fontSize:11,letterSpacing:".12em"}}>MAISON AMIRAL / ORDER RECORDED</p>
+        <h2 style={{fontFamily:"Georgia,serif",fontSize:"clamp(32px,5vw,58px)",fontWeight:400,margin:"18px 0"}}>Awaiting EFT payment.</h2>
+        <p>Your reference: <strong>{confirmed.reference}</strong></p>
+        <p>{confirmed.message}</p>
+        {confirmed.notificationStatus !== "sent" && <p role="alert">Email delivery needs attention. Keep your order reference and contact Maison Amiral before making payment.</p>}
+        <p>Use the invoice reference for your transfer. Your order is only marked paid once the funds are verified.</p>
+        <Link href="/shop" style={{display:"inline-block",borderBottom:"1px solid",marginTop:16}}>Return to shop ↗</Link>
+      </section>}
+      {!confirmed && <form id="ma-checkout-form" className={styles.form} onSubmit={submit}>
         <h2>Your details.</h2>
         <p className={styles.formIntro}>We&apos;ll use these details to prepare and deliver your order.</p>
         <div className={styles.fields}>
@@ -95,9 +113,9 @@ export function CheckoutForm() {
             value={buyer.postalCode} onChange={(e) => setField("postalCode", e.target.value)} /></label>
         </div>
         <Link className={styles.returnLink} href="/cart">← Return to cart</Link>
-      </form>
+      </form>}
 
-      <aside className={styles.summary}>
+      {!confirmed && <aside className={styles.summary}>
         <div className={styles.summaryTop}><span>ORDER SUMMARY</span><span>EDITION 001</span></div>
         {items.length ? items.map((item) => {
           const product = getProductBySlug(item.slug);
@@ -123,17 +141,17 @@ export function CheckoutForm() {
         </strong></div>
         {config && !config.enabled && (
           <p className={styles.notice} role="status">
-            Secure payments are being connected. Your cart is saved, but payment cannot begin until the store&apos;s payment, delivery and order-record settings are activated.
+            EFT ordering is not available until our invoice email, banking and delivery settings are configured.
           </p>
         )}
         {error && <p className={styles.error} role="alert">{error}</p>}
         <button type="submit" form="ma-checkout-form" className={styles.pay}
           disabled={!items.length || !config?.enabled || submitting}>
-          {submitting ? "CONNECTING TO YOCO..." : "CONTINUE TO SECURE PAYMENT"}
+          {submitting ? "PLACING ORDER..." : "PLACE ORDER & RECEIVE EFT INVOICE"}
           <span aria-hidden="true">↗</span>
         </button>
-        <p className={styles.security}>Payments are completed on Yoco&apos;s secure hosted checkout. We never receive your card details.</p>
-      </aside>
+        <p className={styles.security}>No card payment is taken. After placing your order, an invoice with EFT banking details is emailed to you. We dispatch only after verifying payment.</p>
+      </aside>}
     </div>
   );
 }
