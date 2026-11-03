@@ -1,91 +1,71 @@
-# Maison Amiral: shop, cart, checkout and release updates
+# Maison Amiral | EFT checkout and Resend order notifications
 
-This branch implements a three-product online storefront for:
-- Automobile Tee
-- Guerrilla Tee
-- Emblem Tee
+The storefront supports three products: Automobile Tee, Guerrilla Tee and Emblem Tee.
+The original product gallery, cart, size selection, homepage wheel/Philosophy and
+More To Come newsletter remain in place.
 
-Each item is R450 based on the existing Maison product catalogue. Flag Staple is removed.
-The original JPEGs in /public are used in the shop, catalogue and slideshow.
+## How checkout works
 
-## What works without external configuration
+1. Customer chooses size/quantity and reviews the local cart.
+2. Checkout collects the delivery address and shows the server-configured delivery charge.
+3. POST /api/checkout validates products/prices and address; the server never trusts prices submitted by the browser.
+4. A UUID order is written to the dedicated Supabase maison_orders table as `awaiting_payment`.
+5. Two independent Resend messages are sent: a customer-facing EFT invoice and an internal order alert.
+6. The page shows the reference and email delivery status. No EFT can be verified automatically by these messages.
+7. Staff verify the payment in the bank account before marking an order paid and fulfilling it.
 
-- Shared navigation on all pages, ship insignia in the middle of the header.
-- /shop, /collections, /lookbook, /journal and /contact are separate routes.
-- Reactive Cart (number of items) in the nav.
-- Product-size selection (S, M, L, XL), quantity, add/remove, persisted cart.
-- /cart subtotals and /checkout customer and South African delivery address form.
-- Synchronized auto-advancing Edition 001 slideshow.
-- Pure-white page background; no cream sections.
-- More To Come: accessible email form and explicit marketing consent.
-- The existing field archive and ship artwork remain in the homepage.
+Customer and store-owner emails contain an HTML invoice with product line items,
+ZAR total, payment reference, and configured bank details. This is not a PDF attachment.
+Do not announce a PDF download until one is implemented.
 
-## Activate order and email storage
+## Setup (required before accepting any real orders)
 
-Create a *separate Maison Amiral* Supabase project or dedicated schema as appropriate.
-Do not borrow a database from TeleDoctorSA or another product.
+- Use a separate Maison Supabase project/schema, not any healthcare data store.
+- Apply both SQL files, in order:
+  - `supabase/migrations/20261028_maison_store.sql`
+  - `supabase/migrations/20261103_maison_eft_orders.sql`
+- Copy `.env.example` to `.env.local`. Set the Supabase server URL and service-role key.
+- Verify the actual merchant bank details and enter all `MAISON_BANK_*` values on the server.
+- Configure the delivery fee in cents with explicit business approval. Zero means free delivery.
+- Verify the Maison sending domain in Resend; configure server-only `RESEND_API_KEY`,
+  `MAISON_RESEND_FROM`, and `MAISON_ORDER_EMAIL`.
+- Deploy the environment variables through hosting secrets; never commit values.
+- Check `GET /api/checkout` responds with `enabled:true` before attempting a test order.
+- Place a test order using a safe test email address and inspect BOTH received emails,
+  the order in Supabase, correct totals, statuses and branded reference.
 
-Run \`supabase/migrations/20261028_maison_store.sql\` in its SQL editor.
-This creates two private RLS-enabled tables: \`maison_orders\` and
-\`maison_subscribers\`. The app uses only the server-side service role.
-Never expose the service-role key in frontend code or NEXT_PUBLIC variables.
+Checkout stays disabled if any critical banking, Resend, database, or delivery
+setting is missing. No Yoco key is required for EFT checkout. The old Yoco webhook
+is left unused for backward compatibility with historical payment records.
 
-Copy \`.env.example\` to \`.env.local\`. Set:
-- \`MAISON_SUPABASE_URL\`: the Maison Supabase project URL.
-- \`MAISON_SUPABASE_SERVICE_ROLE_KEY\`: server-only service-role key.
-- \`MAISON_DELIVERY_FEE_CENTS\`: a business-approved delivery fee, in ZAR cents.
-  0 is only appropriate if the business explicitly authorizes free delivery.
-- \`MAISON_SITE_URL\`: the origin serving the store. Use https for live hosting.
+## Important production limitations
 
-The "Notify Me" form writes consented email addresses to
-\`maison_subscribers\`. A separate mailing platform/campaign workflow will
-be required to *send* future campaign emails. The form does not pretend
-to send releases by itself.
+- Emails are sent immediately via Resend. If either fails, the order remains saved
+  with `notification_status=needs_attention` and server logs identify the order.
+  A staff email-reconciliation workflow and retry queue are not yet implemented.
+- Payment reconciliation and order status changes require a protected staff interface
+  or server-side operations. There is no public 'mark paid' endpoint by design.
+- The API uses browser session idempotency to prevent duplicate submissions
+  during retries; production rate limiting and abuse monitoring must still be deployed.
+- Stock checks, fulfilment dashboard, tax invoice/VAT details (if applicable),
+  POPIA policies, backups, and email-delivery observability require business signoff.
+- Never treat an EFT proof image or email acknowledgement as actual bank settlement.
+- Existing order-status read route uses UUIDs; ensure no sensitive customer data
+  is exposed through public responses.
 
-## Activate online payments
+## Run checks
 
-Maison Amiral is designed for Yoco's hosted Checkout API.
-1. Verify the production domain in the Yoco business account.
-2. Enable the Checkout API and get **test** secret key (not the client/public key).
-3. Register an HTTPS webhook pointing to
-   \`https://www.maisonamiral.co.za/api/yoco/webhook\`.
-4. Save the webhook signing secret from registration.
-5. Configure server-only \`YOCO_SECRET_KEY\` and \`YOCO_WEBHOOK_SECRET\`.
-6. Verify the configured delivery charge, then enable payment for testing.
-7. Complete end-to-end sandbox tests, including duplicate webhook events,
-   failed/cancelled payments, valid signature, wrong signature, amounts,
-   and order persistence. Move to live keys only after the business approves.
-
-The checkout recalculates trusted prices from the server product catalogue.
-Orders are saved with pending status before redirecting to the Yoco-hosted page.
-Only the HMAC-validated \`payment.succeeded\` webhook may mark an order paid.
-The return page polls stored order status and never treats a redirect as proof
-of payment. Payment returns do not leak contact or delivery details.
-
-**Do not deploy or accept real customer payments until the credentials,
-confirmed delivery fee, webhook, test runs and fulfilment process have all
-been verified.** A functioning cart UI alone does not mean a live store is ready.
-
-## Operations remaining before taking live orders
-
-- Confirm sizing, stock levels and policies for the three items.
-- Confirm delivery provider, prices, courier integration and dispatch SLAs.
-- Add internal order management/fulfilment operations, packing, tracking
-  notifications and customer receipts.
-- Confirm stock reservation to avoid overselling.
-- Confirm POPIA privacy text and newsletter unsubscribe mechanism.
-- Add production rate limiting, monitoring, error alerts and backups.
-- Sign off payment, refund, tax and shipping compliance with the merchant.
-
-## Local work
-
-\`\`\`powershell
-git switch feat/maison-authentic-product-imagery-20261027
-git pull origin feat/maison-authentic-product-imagery-20261027
+```powershell
+git fetch origin
+git switch feat/eft-resend-checkout-20261103
 npm ci
+npm run lint
+npm run build
 npm run dev
-\`\`\`
+```
 
-Inspect \`/shop\`, \`/shop/automobile-tee\`, \`/cart\`, \`/checkout\`, \`/collections\`,
-and the homepage. Run \`npm run lint\` and \`npm run build\` before merging.
-No production deployment is part of this change.
+Test mobile checkout, empty cart, quantity changes, server price validation,
+missing settings, Resend failures, repeat submission, and confirmation display.
+
+**Do not merge/deploy for real sales until migration, credentials, bank details,
+delivery amount, email templates and operational reconciliation are verified.**
