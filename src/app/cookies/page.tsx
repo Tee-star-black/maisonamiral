@@ -1,0 +1,10 @@
+import type { Metadata } from "next";
+import { PolicyPage } from "@/components/policy-page";
+export const metadata:Metadata={title:"Cookie Policy",description:"Cookies and browser storage used on the Maison Amiral website."};
+export default function CookiesPage(){return <PolicyPage eyebrow="LEGAL / 003" title="Cookie policy." intro="A straightforward description of the browser storage we use to keep your shopping experience working.">
+<section><h2>01 / Cookies and local storage</h2><p>Cookies are small files that websites may store on your device. Local storage is a related browser feature. Maison Amiral uses local storage to remember selected garments, quantities and sizes between pages and visits. The checkout also uses session storage for a temporary checkout-attempt reference to reduce accidental duplicate orders.</p></section>
+<section><h2>02 / Essential operation</h2><p>The shopping bag and checkout-attempt data support features you request when using our store. Browser storage is not used as evidence that an EFT payment has succeeded. Order records and payment status are maintained separately on the server.</p></section>
+<section><h2>03 / Analytics and advertising</h2><p>We do not currently describe optional analytics, advertising or behavioural-tracking cookies as active features. If these services are added, this notice and any necessary consent controls must be updated before activation. Third-party hosting or security services may use their own essential technologies.</p></section>
+<section><h2>04 / Your controls</h2><p>You can clear cookies, local storage and session data using your browser settings. Clearing site data may empty your shopping cart or reset an incomplete checkout. Most browsers also offer controls to block cookies, although certain site features may be affected.</p></section>
+<section><h2>05 / Contact</h2><p>For questions about the data stored in your browser, email <a href="mailto:support@maisonamiral.co.za">support@maisonamiral.co.za</a>. For personal information rights, read our <a href="/privacy">Privacy Policy</a>.</p></section>
+</PolicyPage>}
