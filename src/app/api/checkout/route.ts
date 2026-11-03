@@ -1,125 +1,92 @@
 import { randomUUID } from "node:crypto";
-import { getCommerceReady, getDeliveryFee, validateBuyer, validateItems } from "@/lib/commerce";
+import { getDeliveryFee, getEftSettings, validateBuyer, validateItems } from "@/lib/commerce";
+import { referenceFor, sendOrderEmail } from "@/lib/eft-invoice";
 import { storeDb } from "@/lib/maison-store-db";
 
 export const runtime = "nodejs";
-
-function result(body: unknown, status = 200) {
-  return Response.json(body, {
-    status,
-    headers: { "Cache-Control": "no-store" },
-  });
+type Order = { id:string; email:string; total_cents:number; notification_status:string; status:string };
+function json(body: unknown, status = 200) {
+  return Response.json(body, { status, headers: { "Cache-Control":"no-store" } });
 }
-
 export async function GET() {
-  return result({
-    enabled: getCommerceReady(),
-    deliveryCents: getDeliveryFee(),
-    currency: "ZAR",
-  });
+  return json({ enabled: getEftSettings().enabled, deliveryCents: getDeliveryFee(), currency: "ZAR", paymentMethod: "eft" });
 }
-
 export async function POST(request: Request) {
-  if (!getCommerceReady()) {
-    return result({ error: "Secure checkout is not yet configured for this store." }, 503);
-  }
-
-  const length = Number(request.headers.get("content-length") ?? "0");
-  if (length > 16000) return result({ error: "Invalid checkout request." }, 413);
-  let input: unknown;
-  try {
-    input = await request.json();
-  } catch {
-    return result({ error: "Invalid checkout request." }, 400);
-  }
-  if (!input || typeof input !== "object")
-    return result({ error: "Invalid checkout details." }, 400);
-  const body = input as Record<string, unknown>;
+  const settings = getEftSettings();
+  if (!settings.enabled) return json({ error:"EFT checkout is not configured yet. Please contact the store." }, 503);
+  if (Number(request.headers.get("content-length") ?? 0) > 16000)
+    return json({ error:"Checkout request too large." }, 413);
+  let raw: unknown;
+  try { raw = await request.json(); } catch { return json({ error:"Invalid checkout request." }, 400); }
+  if (!raw || typeof raw !== "object") return json({ error:"Invalid checkout details." },400);
+  const body = raw as Record<string,unknown>;
   const buyer = validateBuyer(body.customer);
   const items = validateItems(body.items);
-  if (!buyer || !items) return result({
-    error: "Check the delivery details, sizes and quantities, then try again.",
-  }, 400);
+  if (!buyer || !items) return json({ error:"Please check your details, items, sizes and quantities." },400);
+  const fee = getDeliveryFee();
+  if (fee === null) return json({ error:"Delivery pricing is unavailable." },503);
+  const subtotal = items.reduce((sum,item)=>sum+item.unit_price_cents*item.quantity,0);
+  const total = subtotal + fee;
+  if (!Number.isSafeInteger(total) || total <= 0 || total > 5000000)
+    return json({ error:"Order total is outside the accepted limits." },400);
 
-  const deliveryCents = getDeliveryFee();
-  if (deliveryCents === null) return result({ error: "Delivery pricing is unavailable." }, 503);
-  const subtotalCents = items.reduce((sum, item) => sum + item.unit_price_cents * item.quantity, 0);
-  const totalCents = subtotalCents + deliveryCents;
-  if (!Number.isSafeInteger(totalCents) || totalCents <= 0 || totalCents > 5000000)
-    return result({ error: "Order total is outside accepted limits." }, 400);
+  // A per-checkout UUID is retained in sessionStorage across retries. No duplicates on refresh.
+  const id = typeof body.checkoutId === "string" ? body.checkoutId : "";
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id))
+    return json({ error:"Invalid checkout attempt. Please refresh and try again." },400);
 
-  const orderId = randomUUID();
-  const site = process.env.MAISON_SITE_URL;
-  if (!site) return result({ error: "Checkout is not configured." }, 503);
-  let siteUrl: URL;
+  let isNew = false;
   try {
-    siteUrl = new URL(site);
-    if (siteUrl.protocol !== "https:" && siteUrl.hostname !== "localhost")
-      throw new Error("Invalid origin");
+    const existing = await storeDb<Order[]>("maison_orders","GET", {
+      query: { select:"id,email,total_cents,notification_status,status",id:"eq."+id,limit:"1" },
+    });
+    if (existing.length) {
+      if (existing[0].email !== buyer.email || existing[0].total_cents !== total)
+        return json({ error:"This checkout reference belongs to another order. Reload checkout to try again." },409);
+      return json({ orderId:id,reference:referenceFor(id),notificationStatus:existing[0].notification_status,
+        message:"Your order was already created. Do not submit another bank transfer for this reference." });
+    }
+    // Treat unique-key conflict on concurrent inserts as an existing order on retry.
+    await storeDb("maison_orders","POST", {
+      body: { id, first_name:buyer.firstName,last_name:buyer.lastName,email:buyer.email,
+        phone:buyer.phone,address:buyer.address,suburb:buyer.suburb,city:buyer.city,
+        province:buyer.province,postal_code:buyer.postalCode,items,
+        subtotal_cents:subtotal,delivery_cents:fee,total_cents:total,
+        status:"awaiting_payment",notification_status:"pending" },
+      prefer:"return=minimal",
+    });
+    isNew = true;
   } catch {
-    return result({ error: "Checkout origin is invalid." }, 503);
+    const existing = await storeDb<Order[]>("maison_orders","GET",{
+      query:{select:"id,email,total_cents,notification_status,status",id:"eq."+id,limit:"1"},
+    }).catch(()=>[]);
+    if (existing.length && existing[0].email===buyer.email && existing[0].total_cents===total)
+      return json({orderId:id,reference:referenceFor(id),notificationStatus:existing[0].notification_status});
+    return json({error:"We couldn't save your order. No payment is required yet."},503);
   }
+  if (!isNew) return json({error:"Unable to create order."},503);
 
+  const invoice = { id,buyer,items,subtotalCents:subtotal,deliveryCents:fee,totalCents:total,bank:settings.bank };
+  const sent = await Promise.allSettled([
+    sendOrderEmail(buyer.email,invoice,settings.key,settings.sender,false),
+    sendOrderEmail(settings.admin,invoice,settings.key,settings.sender,true),
+  ]);
+  const customerSent = sent[0].status==="fulfilled";
+  const ownerSent = sent[1].status==="fulfilled";
+  const notificationStatus = customerSent && ownerSent ? "sent" : "needs_attention";
   try {
-    await storeDb("maison_orders", "POST", {
-      body: {
-        id: orderId,
-        first_name: buyer.firstName,
-        last_name: buyer.lastName,
-        email: buyer.email,
-        phone: buyer.phone,
-        address: buyer.address,
-        suburb: buyer.suburb,
-        city: buyer.city,
-        province: buyer.province,
-        postal_code: buyer.postalCode,
-        items,
-        subtotal_cents: subtotalCents,
-        delivery_cents: deliveryCents,
-        total_cents: totalCents,
-        status: "pending",
-      },
-      prefer: "return=minimal",
+    await storeDb("maison_orders","PATCH",{
+      query:{id:"eq."+id,status:"eq.awaiting_payment"},
+      body:{notification_status:notificationStatus,updated_at:new Date().toISOString()},
+      prefer:"return=minimal",
     });
   } catch {
-    return result({ error: "Could not securely save the order. No payment was started." }, 503);
+    // Order still exists; operations must reconcile notification status before fulfilment.
   }
-
-  try {
-    const response = await fetch("https://payments.yoco.com/api/checkouts", {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + process.env.YOCO_SECRET_KEY,
-        "Content-Type": "application/json",
-        "Idempotency-Key": orderId,
-      },
-      body: JSON.stringify({
-        amount: totalCents,
-        currency: "ZAR",
-        clientReferenceId: orderId,
-        metadata: { orderId },
-        successUrl: new URL("/checkout/return?order=" + orderId, siteUrl).toString(),
-        cancelUrl: new URL("/checkout/return?order=" + orderId + "&cancelled=1", siteUrl).toString(),
-        failureUrl: new URL("/checkout/return?order=" + orderId + "&failed=1", siteUrl).toString(),
-      }),
-      cache: "no-store",
-      signal: AbortSignal.timeout(15000),
-    });
-    if (!response.ok) throw new Error("Gateway rejected checkout");
-    const payload = await response.json() as { id?: string; redirectUrl?: string };
-    if (!payload.id || !payload.redirectUrl) throw new Error("Gateway response invalid");
-    const redirect = new URL(payload.redirectUrl);
-    if (redirect.protocol !== "https:" ||
-        (redirect.hostname !== "yoco.com" && !redirect.hostname.endsWith(".yoco.com")))
-      throw new Error("Unexpected gateway redirect");
-
-    await storeDb("maison_orders", "PATCH", {
-      query: { id: "eq." + orderId },
-      body: { yoco_checkout_id: payload.id, updated_at: new Date().toISOString() },
-      prefer: "return=minimal",
-    });
-    return result({ redirectUrl: redirect.toString(), orderId });
-  } catch {
-    return result({ error: "Payment could not be started. Please try again; no payment was taken." }, 502);
-  }
+  if (!customerSent || !ownerSent)
+    console.error("Maison order emails require reconciliation", {orderId:id,customerSent,ownerSent});
+  return json({orderId:id,reference:referenceFor(id),notificationStatus,
+    message:customerSent
+      ? "Your order has been recorded. Check your email for the EFT invoice."
+      : "Your order was recorded, but your invoice email could not be confirmed. Contact Maison Amiral with the reference."},201);
 }
