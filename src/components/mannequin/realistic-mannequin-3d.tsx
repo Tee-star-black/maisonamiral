@@ -15,90 +15,76 @@ type Props = {
   onInteract: () => void;
 };
 
-// One continuous front and back surface includes the shoulders and sleeves.
-// The sleeve/underarm transitions are part of the garment, not separate cylinders.
-function silhouette(x: number) {
-  const a = Math.abs(x);
-  const top =
-    a < 0.09
-      ? 1.51 - 0.065 * Math.sqrt(1 - (a / 0.09) ** 2)
-      : a < 0.27
-        ? 1.51 - (a - 0.09) * 0.16
-        : 1.4812 - (a - 0.27) * 0.8;
-  const bottom =
-    a <= 0.245
-      ? 0.88 + 0.012 * Math.cos(x * 10)
-      : a < 0.28
-        ? THREE.MathUtils.lerp(0.89, 1.245, THREE.MathUtils.smoothstep(a, 0.245, 0.28))
-        : 1.245 - (a - 0.28) * 0.47;
-  return { top, bottom };
+// Continuous anatomical torso surface, with actual rounded volume and a neck opening.
+// The previous front/back sheet stretched and flattened during rotation.
+function shirtRadius(y: number) {
+  const sections = [
+    { y: 0.88, x: 0.242, z: 0.130 },
+    { y: 0.97, x: 0.242, z: 0.130 },
+    { y: 1.10, x: 0.235, z: 0.138 },
+    { y: 1.25, x: 0.248, z: 0.153 },
+    { y: 1.37, x: 0.245, z: 0.145 },
+    { y: 1.435, x: 0.192, z: 0.107 },
+    { y: 1.48, x: 0.088, z: 0.073 },
+  ];
+  for (let i = 1; i < sections.length; i++) {
+    if (y <= sections[i].y) {
+      const p = sections[i - 1], n = sections[i];
+      const t = THREE.MathUtils.smoothstep(y, p.y, n.y);
+      return { x: THREE.MathUtils.lerp(p.x, n.x, t),
+        z: THREE.MathUtils.lerp(p.z, n.z, t) };
+    }
+  }
+  return { x: 0.088, z: 0.073 };
 }
 function clothDepth(x: number, y: number) {
-  const a = Math.abs(x);
-  // Rounded chest taper, not a flattened sheet. Keep decals on this same surface.
-  const torso = Math.sqrt(Math.max(0.12, 1 - (a / 0.35) ** 2));
-  const { top, bottom } = silhouette(x);
-  const t = THREE.MathUtils.clamp((y - bottom) / (top - bottom), 0, 1);
-  const sleeve = 0.065 + 0.036 * Math.sin(t * Math.PI);
-  const drape = 0.003 * Math.sin(34 * x + 6 * y) * Math.pow(1 - t, 1.5);
-  const sideFold = 0.0045 * Math.sin(19 * y + 28 * a) * THREE.MathUtils.smoothstep(a, 0.17, 0.31);
-  const body =
-    (0.142 + 0.008 * THREE.MathUtils.smoothstep(y, 1.05, 1.4)) * torso +
-    0.003 * Math.sin(y * 19 + x * 21) * (Math.abs(x) / 0.3) ** 2 +
-    drape + sideFold;
-  return THREE.MathUtils.lerp(
-    body,
-    sleeve,
-    THREE.MathUtils.smoothstep(a, 0.245, 0.31),
-  );
+  const shape = shirtRadius(THREE.MathUtils.clamp(y, 0.88, 1.48));
+  const ratio = THREE.MathUtils.clamp(x / shape.x, -0.99, 0.99);
+  return shape.z * Math.sqrt(1 - ratio * ratio) +
+    0.0015 * Math.sin(x * 35 + y * 27) * THREE.MathUtils.smoothstep(y, 0.88, 1.05);
 }
 function garmentGeometry() {
-  const nx = 120,
-    ny = 60;
-  const positions: number[] = [],
-    uvs: number[] = [],
-    indices: number[] = [];
-  for (const side of [1, -1]) {
-    for (let j = 0; j <= ny; j++)
-      for (let i = 0; i <= nx; i++) {
-        const x = (i / nx - 0.5) * 0.88;
-        const { top, bottom } = silhouette(x);
-        const y = THREE.MathUtils.lerp(bottom, top, j / ny);
-        positions.push(x, y, side * clothDepth(x, y));
-        uvs.push(i / nx, j / ny);
-      }
+  const segments = 96, rings = 72;
+  const positions: number[] = [], uvs: number[] = [], indices: number[] = [];
+  for (let j = 0; j <= rings; j++) {
+    const y = THREE.MathUtils.lerp(0.88, 1.48, j / rings);
+    const radius = shirtRadius(y);
+    for (let i = 0; i <= segments; i++) {
+      const theta = (i / segments) * Math.PI * 2;
+      const x = Math.sin(theta) * radius.x;
+      const z = Math.cos(theta) * radius.z;
+      const drape = 0.002 * Math.sin(y * 24 + theta * 5) * (1 - j / rings);
+      positions.push(x + drape, y, z);
+      uvs.push(i / segments, j / rings);
+    }
   }
-  const panel = (nx + 1) * (ny + 1);
-  for (let side = 0; side < 2; side++)
-    for (let j = 0; j < ny; j++)
-      for (let i = 0; i < nx; i++) {
-        const a = side * panel + j * (nx + 1) + i,
-          b = a + nx + 1;
-        if (side === 0) indices.push(a, a + 1, b, a + 1, b + 1, b);
-        else indices.push(a, b, a + 1, a + 1, b, b + 1);
-      }
-  // Join the front/back at the shoulder; leave the neck, cuffs and hem open.
-  for (let i = 0; i < nx; i++) {
-    const x = (i / nx - 0.5) * 0.88;
-    if (Math.abs(x) < 0.095) continue;
-    const a = ny * (nx + 1) + i;
-    indices.push(a, a + panel, a + 1, a + 1, a + panel, a + panel + 1);
+  for (let j = 0; j < rings; j++) {
+    for (let i = 0; i < segments; i++) {
+      const a = j * (segments + 1) + i;
+      const b = a + segments + 1;
+      indices.push(a, a + 1, b, a + 1, b + 1, b);
+    }
   }
-  // Close the side seams and underarms, retaining open sleeve cuffs and hem.
-  for (let i = 0; i < nx; i++) {
-    const x = ((i + 0.5) / nx - 0.5) * 0.88;
-    if (Math.abs(x) < 0.245) continue;
-    indices.push(i, i + 1, i + panel, i + 1, i + panel + 1, i + panel);
-  }
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute(
-    "position",
-    new THREE.Float32BufferAttribute(positions, 3),
-  );
-  geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
-  geometry.setIndex(indices);
-  geometry.computeVertexNormals();
-  return geometry;
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  g.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+  g.setIndex(indices);
+  g.computeVertexNormals();
+  return g;
+}
+function sleeveGeometry(side: number) {
+  // A true tapered tube runs from shoulder into the sleeve opening,
+  // avoiding the disconnected flat-sleeve silhouette of the old model.
+  const start = new THREE.Vector3(side * 0.207, 1.425, 0);
+  const end = new THREE.Vector3(side * 0.410, 1.265, 0);
+  const axis = end.clone().sub(start);
+  const g = new THREE.CylinderGeometry(0.093, 0.078, axis.length(), 48, 10, true);
+  // Cylinder top is the smaller shoulder end; local y+ points toward shoulder.
+  const q = new THREE.Quaternion().setFromUnitVectors(
+    new THREE.Vector3(0, 1, 0), start.clone().sub(end).normalize());
+  g.applyQuaternion(q);
+  g.translate((start.x + end.x) / 2, (start.y + end.y) / 2, 0);
+  return g;
 }
 
 export function RealisticMannequin3D(props: Props) {
@@ -286,53 +272,24 @@ export function RealisticMannequin3D(props: Props) {
     foot.position.y = 0.45;
     const garment = mesh(garmentGeometry(), cloth);
     garment.receiveShadow = true;
-    // The hem and neckline are stitched into the same curved surface.
-    const seamMat = material(
-      new THREE.MeshStandardMaterial({
-        color: current.current.shirtTone,
-        roughness: 1,
-        side: THREE.DoubleSide,
-      }),
-    );
-    function seam(points: THREE.Vector3[], radius: number) {
-      return mesh(
-        new THREE.TubeGeometry(
-          new THREE.CatmullRomCurve3(points),
-          100,
-          radius,
-          6,
-          false,
-        ),
-        seamMat,
-      );
-    }
-    for (const side of [1, -1]) {
-      const hem: THREE.Vector3[] = [];
-      for (let i = 0; i <= 64; i++) {
-        const x = -0.244 + (i / 64) * 0.488;
-        const y = silhouette(x).bottom + 0.008;
-        hem.push(new THREE.Vector3(x, y, side * (clothDepth(x, y) + 0.001)));
-      }
-      seam(hem, 0.002);
-      const collar: THREE.Vector3[] = [];
-      for (let i = 0; i <= 64; i++) {
-        const x = -0.09 + (i / 64) * 0.18;
-        const y = silhouette(x).top;
-        collar.push(new THREE.Vector3(x, y, side * clothDepth(x, y)));
-      }
-      seam(collar, 0.0045);
-    }
-    // Sleeve openings have visible fabric thickness, without end caps.
+    for (const side of [-1, 1]) mesh(sleeveGeometry(side), cloth);
+    // Open hems and crew collar with real circumference, not flattened strips.
+    const hem = mesh(new THREE.TorusGeometry(1, 0.004, 8, 96), seamMat);
+    hem.rotation.x = Math.PI / 2;
+    hem.scale.set(0.242, 0.13, 1);
+    hem.position.y = 0.883;
+    const neckline = mesh(new THREE.TorusGeometry(1, 0.009, 10, 96), seamMat);
+    neckline.rotation.x = Math.PI / 2;
+    neckline.scale.set(0.089, 0.074, 1);
+    neckline.position.y = 1.485;
+    // Ribbed neckline highlights the collar rather than hiding the mannequin neck.
     for (const side of [-1, 1]) {
-      const x = side * 0.44,
-        { top, bottom } = silhouette(x);
-      const points: THREE.Vector3[] = [];
-      for (let i = 0; i <= 64; i++) {
-        const t = (i / 64) * Math.PI * 2;
-        const y = (top + bottom) / 2 + (Math.cos(t) * (top - bottom)) / 2;
-        points.push(new THREE.Vector3(x, y, (i <= 32 ? 1 : -1) * clothDepth(x, y)));
-      }
-      seam(points, 0.003);
+      const sleeveEdge = mesh(new THREE.TorusGeometry(0.080, 0.003, 6, 48), seamMat);
+      const start = new THREE.Vector3(side * 0.207, 1.425, 0);
+      const end = new THREE.Vector3(side * 0.410, 1.265, 0);
+      sleeveEdge.quaternion.setFromUnitVectors(
+        new THREE.Vector3(0, 0, 1), end.clone().sub(start).normalize());
+      sleeveEdge.position.copy(end);
     }
     // Each decal is cut from the matching user-supplied shirt photograph.
     // The alpha channel removes the black fabric, leaving only the original ink.
