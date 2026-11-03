@@ -152,6 +152,7 @@ export function CheckoutForm() {
           {submitting ? "PLACING ORDER..." : "PLACE ORDER & RECEIVE EFT INVOICE"}
           <span aria-hidden="true">↗</span>
         </button>
+        <p className={styles.security}>By placing an order you acknowledge our <Link href="/privacy" style={{textDecoration:"underline"}}>Privacy Policy</Link>, <Link href="/returns" style={{textDecoration:"underline"}}>Returns Policy</Link> and <Link href="/terms" style={{textDecoration:"underline"}}>Terms</Link>.</p>
         <p className={styles.security}>No card payment is taken. After placing your order, an invoice with EFT banking details is emailed to you. We dispatch only after verifying payment.</p>
       </aside>}
     </div>
