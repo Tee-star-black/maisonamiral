@@ -29,7 +29,7 @@ function silhouette(x: number) {
     a <= 0.245
       ? 0.88 + 0.012 * Math.cos(x * 10)
       : a < 0.28
-        ? THREE.MathUtils.lerp(0.89, 1.245, (a - 0.245) / 0.035)
+        ? THREE.MathUtils.lerp(0.89, 1.245, THREE.MathUtils.smoothstep(a, 0.245, 0.28))
         : 1.245 - (a - 0.28) * 0.47;
   return { top, bottom };
 }
@@ -150,8 +150,8 @@ export function RealisticMannequin3D(props: Props) {
     }
     const ceramic = material(
       new THREE.MeshPhysicalMaterial({
-        color: "#b9b5aa",
-        roughness: 0.48,
+        color: "#c4c4c1",
+        roughness: 0.72,
         metalness: 0.03,
       }),
     );
@@ -191,10 +191,10 @@ export function RealisticMannequin3D(props: Props) {
       new THREE.MeshPhysicalMaterial({
         color: current.current.shirtTone,
         roughness: 0.98,
-        sheen: 0.32,
+        sheen: 0.18,
         sheenRoughness: 0.88,
         bumpMap: fabricBump,
-        bumpScale: 0.008,
+        bumpScale: 0.0018,
         side: THREE.DoubleSide,
       }),
     );
@@ -231,13 +231,19 @@ export function RealisticMannequin3D(props: Props) {
       ),
       ceramic,
     );
-    form.scale.z = 0.38;
+    // Keep the torso inside the garment while giving the exposed neck an oval profile.
+    const formPositions = form.geometry.getAttribute("position");
+    for (let i = 0; i < formPositions.count; i++) {
+      const neck = THREE.MathUtils.smoothstep(formPositions.getY(i), 1.48, 1.54);
+      formPositions.setZ(i, formPositions.getZ(i) * THREE.MathUtils.lerp(0.38, 0.78, neck));
+    }
+    form.geometry.computeVertexNormals();
     const neckCap = mesh(
       new THREE.CylinderGeometry(0.065, 0.065, 0.006, 48),
       ceramic,
     );
     neckCap.position.y = 1.61;
-    neckCap.scale.z = 0.38;
+    neckCap.scale.z = 0.78;
     const stand = mesh(
       new THREE.CylinderGeometry(0.014, 0.014, 0.36, 24),
       metal,
@@ -281,7 +287,7 @@ export function RealisticMannequin3D(props: Props) {
         const y = silhouette(x).top;
         collar.push(new THREE.Vector3(x, y, side * clothDepth(x, y)));
       }
-      seam(collar, 0.007);
+      seam(collar, 0.0045);
     }
     // Sleeve openings have visible fabric thickness, without end caps.
     for (const side of [-1, 1]) {
@@ -291,7 +297,7 @@ export function RealisticMannequin3D(props: Props) {
       for (let i = 0; i <= 64; i++) {
         const t = (i / 64) * Math.PI * 2;
         const y = (top + bottom) / 2 + (Math.cos(t) * (top - bottom)) / 2;
-        points.push(new THREE.Vector3(x, y, Math.sin(t) * clothDepth(x, y)));
+        points.push(new THREE.Vector3(x, y, (i <= 32 ? 1 : -1) * clothDepth(x, y)));
       }
       seam(points, 0.003);
     }
@@ -353,8 +359,8 @@ export function RealisticMannequin3D(props: Props) {
     floor.rotation.x = -Math.PI / 2;
     floor.position.y = 0.435;
     floor.castShadow = false;
-    scene.add(new THREE.HemisphereLight(0xffffff, 0xa6a39b, 2.4));
-    const key = new THREE.DirectionalLight(0xfff8ed, 3.1);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x92949a, 1.8));
+    const key = new THREE.DirectionalLight(0xffffff, 3.1);
     key.position.set(-3, 5, 4);
     key.castShadow = true;
     key.shadow.mapSize.set(1024, 1024);
@@ -362,12 +368,14 @@ export function RealisticMannequin3D(props: Props) {
     key.shadow.camera.right = 2;
     key.shadow.camera.top = 3;
     key.shadow.camera.bottom = -2;
-    key.shadow.normalBias = 0.015;
+    key.shadow.normalBias = 0.003;
+    key.shadow.bias = -0.0001;
+    key.shadow.radius = 3;
     scene.add(key);
-    const fill = new THREE.DirectionalLight(0xe8ebe6, 1.1);
+    const fill = new THREE.DirectionalLight(0xeef2ff, 1.2);
     fill.position.set(3, 2, 1);
     scene.add(fill);
-    const rim = new THREE.DirectionalLight(0xf8f5ec, 1.3);
+    const rim = new THREE.DirectionalLight(0xffffff, 1.8);
     rim.position.set(0, 3, -3);
     scene.add(rim);
     let targetAngle = 0,
@@ -416,7 +424,7 @@ export function RealisticMannequin3D(props: Props) {
         event.pointerType === "touch"
       )
         return;
-      targetAngle = startAngle + (event.clientX - startX) * 0.009;
+      targetAngle = startAngle + ((event.clientX - startX) / Math.max(320, mount.clientWidth)) * Math.PI * 2;
     };
     const end = (event: PointerEvent) => {
       if (event.pointerId !== pointerId) return;
@@ -454,7 +462,12 @@ export function RealisticMannequin3D(props: Props) {
       if (!visible || document.hidden) return;
       const state = current.current;
       if (state.view.revision !== lastRevision) {
-        targetAngle = state.view.angle;
+        // A preset should never unwind several turns accumulated during dragging.
+        const delta = Math.atan2(
+          Math.sin(state.view.angle - root.rotation.y),
+          Math.cos(state.view.angle - root.rotation.y),
+        );
+        targetAngle = root.rotation.y + delta;
         lastRevision = state.view.revision;
       }
       if (state.shirtTone !== lastTone) {
@@ -469,7 +482,7 @@ export function RealisticMannequin3D(props: Props) {
         targetAngle += dt * 0.28;
       const blend = reduced.matches ? 1 : 1 - Math.exp(-dt * 10);
       root.rotation.y += (targetAngle - root.rotation.y) * blend;
-      camera.zoom += (state.zoom - camera.zoom) * blend;
+      camera.zoom += (THREE.MathUtils.clamp(state.zoom, 1, 1.75) - camera.zoom) * blend;
       const focusY = 1.03 + ((camera.zoom - 1) / 0.75) * 0.21;
       camera.position.y = focusY + 0.34;
       camera.lookAt(0, focusY, 0);
