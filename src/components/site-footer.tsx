@@ -14,6 +14,7 @@ const information = [
   ["Shipping", "/shipping"],
   ["Returns", "/returns"],
   ["Privacy", "/privacy"],
+  ["Cookies", "/cookies"],
   ["Terms", "/terms"],
 ] as const;
 
