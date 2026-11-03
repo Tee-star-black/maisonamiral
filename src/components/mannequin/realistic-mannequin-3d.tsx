@@ -272,6 +272,11 @@ export function RealisticMannequin3D(props: Props) {
     foot.position.y = 0.45;
     const garment = mesh(garmentGeometry(), cloth);
     garment.receiveShadow = true;
+    const seamMat = material(new THREE.MeshStandardMaterial({
+      color: current.current.shirtTone,
+      roughness: 0.92,
+      side: THREE.DoubleSide,
+    }));
     for (const side of [-1, 1]) mesh(sleeveGeometry(side), cloth);
     // Open hems and crew collar with real circumference, not flattened strips.
     const hem = mesh(new THREE.TorusGeometry(1, 0.004, 8, 96), seamMat);
