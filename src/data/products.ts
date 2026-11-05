@@ -1,3 +1,5 @@
+export const DELIVERY_FEE_CENTS = 4000;
+
 export type GarmentPrint = {
   src: string;
   width: number;
