@@ -16,7 +16,7 @@ export default function CollectionsPage() {
     <EditorialPage
       eyebrow="Collections / 001"
       title="Edition 001."
-      intro="Four pieces. One collection. Explore the original Maison Amiral garment photographs and discover the fit, details and stories behind each shirt."
+      intro="Four pieces. One collection. Explore original Maison Amiral garments and accessories, with photography and details for every piece."
     >
       <div className={styles.heading}>
         <span>FOUR PIECES / JOHANNESBURG</span>
