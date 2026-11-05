@@ -62,8 +62,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <p className={styles.price}>{formatPrice(product.price)}</p>
           <p className={styles.description}>{product.description}</p>
 
-          <div className={styles.detailBlock}><span>Cut</span><strong>Relaxed unisex tee</strong></div>
-          <div className={styles.detailBlock}><span>Sizes</span><strong>S / M / L / XL</strong></div>
+          {product.category === "accessory" ? (
+            <><div className={styles.detailBlock}><span>Type</span><strong>Floating lapel accessory</strong></div><div className={styles.detailBlock}><span>Dimensions</span><strong>29 mm × 30 mm</strong></div></>
+          ) : (
+            <><div className={styles.detailBlock}><span>Cut</span><strong>Relaxed unisex tee</strong></div><div className={styles.detailBlock}><span>Sizes</span><strong>S / M / L / XL</strong></div></>
+          )}
           <div className={styles.detailBlock}><span>Origin</span><strong>Johannesburg, South Africa</strong></div>
 
           <ProductBuyPanel slug={product.slug} />
