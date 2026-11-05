@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
@@ -7,8 +8,20 @@ import { MoreToCome } from "@/components/more-to-come";
 import { HousePhilosophy } from "@/components/house-philosophy";
 import styles from "./home.module.css";
 
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+  openGraph: { url: "/" },
+};
+
 export default function Home() {
+  const schema = {
+    "@context": "https://schema.org", "@graph": [
+      { "@type": "Organization", "@id": "https://www.maisonamiral.co.za/#organization", name: "Maison Amiral", url: "https://www.maisonamiral.co.za/", logo: "https://www.maisonamiral.co.za/icon.svg", email: "support@maisonamiral.co.za", address: { "@type": "PostalAddress", addressLocality: "Johannesburg", addressCountry: "ZA" } },
+      { "@type": "WebSite", "@id": "https://www.maisonamiral.co.za/#website", name: "Maison Amiral", url: "https://www.maisonamiral.co.za/", publisher: { "@id": "https://www.maisonamiral.co.za/#organization" }, inLanguage: "en-ZA" }
+    ]
+  };
   return <main id="top" className={styles.page}>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }} />
     <section className={styles.hero} aria-labelledby="hero-heading">
       <div className={styles.heroVisual} aria-hidden="true"><video autoPlay muted loop playsInline preload="metadata" poster="/products/emblem/front-edit.jpeg"><source src="/video/flag.mp4" type="video/mp4" /></video></div>
       <div className={styles.heroContent}>
