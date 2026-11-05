@@ -805,3 +805,13 @@ main {
     gap: 8px;
   }
 }
+
+
+/* Touch, safe-area and overflow safeguards */
+html { -webkit-text-size-adjust: 100%; }
+body { min-width: 0; overflow-x: clip; }
+img, video, svg { max-width: 100%; }
+button, input, textarea, select { font: inherit; }
+@media (max-width: 600px) {
+  .section-pad { padding: 64px 18px; }
+}
