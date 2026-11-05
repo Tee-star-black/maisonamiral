@@ -28,3 +28,20 @@
 @media (max-width: 760px) { .catalogHeader { padding-top: 35px; } .kicker { margin-bottom: 30px; font-size: 9px; } .headingRow h1 { font-size: clamp(2.5rem, 8vw, 3.6rem); } .count { display: none; } .catalog { padding-bottom: 62px; } .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px 12px; } .toolbar { margin-bottom: 16px; } .quickView { display: none; } .image { padding: 8px; } .meta { flex-direction: column; gap: 3px; padding-top: 10px; } .meta h2 { font-size: 13px; margin-top: 5px; } .category { font-size: 8px; } .price { margin: 0; font-size: 13px; } }
 @media (max-width: 380px) { .headingRow h1 { font-size: 2.3rem; } .toolbar { font-size: 9px; } .toolbar span:last-child { display: none; } .grid { gap: 26px 10px; } }
 @media (prefers-reduced-motion: reduce) { .image, .quickView { transition: none; } }
+
+
+/* Keep catalogue comfortably readable and tappable on narrow phones. */
+@media (max-width: 760px) {
+  .card { min-width: 0; }
+  .visual { aspect-ratio: 4 / 5; }
+  .meta h2 { font-size: 14px; }
+  .category { font-size: 10px; line-height: 1.35; }
+  .price { font-size: 14px; }
+}
+@media (max-width: 360px) {
+  .catalogHeader { padding-left: 14px; padding-right: 14px; }
+  .catalog { padding-left: 14px; padding-right: 14px; }
+  .grid { gap: 25px 9px; }
+  .meta h2 { font-size: 13px; }
+  .category { font-size: 9px; }
+}
