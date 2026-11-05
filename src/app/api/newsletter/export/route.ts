@@ -11,7 +11,7 @@ function authenticated(header: string | null, secret: string) {
   const expected = Buffer.from(secret);
   return supplied.length === expected.length && timingSafeEqual(supplied, expected);
 }
-const csvCell = (value: string) => '"' + value.replace(/"/g, '""') + '"';
+const csvCell = (value: string) => '"' + (/^[=+\-@]/.test(value) ? "'" + value : value).replace(/"/g, '""') + '"';
 export async function GET(request: Request) {
   const key = process.env.MAISON_NEWSLETTER_ADMIN_TOKEN ?? "";
   if (!authenticated(request.headers.get("authorization"), key))
