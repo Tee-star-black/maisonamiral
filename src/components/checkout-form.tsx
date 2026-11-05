@@ -7,6 +7,7 @@ import { cartSubtotal, clearCart, useCart } from "@/lib/cart";
 import { formatPrice, getProductBySlug } from "@/data/products";
 import { provinces, type Buyer } from "@/lib/commerce";
 import styles from "./checkout-form.module.css";
+import { WheelLoader } from "./wheel-loader";
 
 const emptyBuyer: Buyer = {
   firstName: "", lastName: "", email: "", phone: "",
@@ -149,7 +150,7 @@ export function CheckoutForm() {
         {error && <p className={styles.error} role="alert">{error}</p>}
         <button type="submit" form="ma-checkout-form" className={styles.pay}
           disabled={!items.length || !config?.enabled || submitting}>
-          {submitting ? "PLACING ORDER..." : "PLACE ORDER & RECEIVE EFT INVOICE"}
+          {submitting ? <><WheelLoader label="Placing order" compact /> PLACING ORDER...</> : "PLACE ORDER & RECEIVE EFT INVOICE"}
           <span aria-hidden="true">↗</span>
         </button>
         <p className={styles.security}>By placing an order you acknowledge our <Link href="/privacy" style={{textDecoration:"underline"}}>Privacy Policy</Link>, <Link href="/returns" style={{textDecoration:"underline"}}>Returns Policy</Link> and <Link href="/terms" style={{textDecoration:"underline"}}>Terms</Link>.</p>
