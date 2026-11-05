@@ -4,3 +4,9 @@
 .container h1{font:500 clamp(4rem,9vw,9rem)/.9 var(--font-geist-sans),Arial,sans-serif;letter-spacing:-.085em;margin:24px 0 70px}
 .container h1 span{font-family:Georgia,"Times New Roman",serif;font-style:italic}
 @media(max-width:700px){.container{padding:50px 18px 95px}.container h1{margin-bottom:45px;font-size:clamp(3.7rem,16vw,6rem)}}
+
+
+@media (max-width: 700px) {
+  .container { padding: 34px 18px 80px; }
+  .container h1 { font-size: clamp(2.8rem, 13vw, 4.3rem); margin: 15px 0 32px; }
+}
