@@ -5,7 +5,7 @@
 - Distinct route titles and descriptions.
 - Page-specific canonical URLs (preferred host: https://www.maisonamiral.co.za).
 - Home page Organization + WebSite JSON-LD and individual Product + Offer JSON-LD for each item with real ZAR prices.
-- Brand wheel favicon SVG, Next.js app icon metadata, web app manifest and a 1200x630 branded Open Graph image.
+- Brand wheel favicon (SVG + 32x32 ICO), 180x180 Apple touch PNG, Next.js app icon metadata, web app manifest and a 1200x630 branded Open Graph image.
 - Open Graph and X/Twitter site previews.
 - Generated /sitemap.xml with the shop, products and published information pages.
 - /robots.txt with sitemap and crawl exclusions for private cart, checkout and API paths.
@@ -25,7 +25,7 @@
 8. **Core Web Vitals**: test mobile LCP, CLS, INP and image loading with PageSpeed Insights, real-user data when possible, on the deployed domain. The unused Garment Studio was removed from the homepage to reduce client-side 3D work.
 9. **Social sharing**: test Facebook Sharing Debugger and LinkedIn Post Inspector after the deployment, especially cached old social images.
 10. **Performance and accessibility**: run `npm ci && npm run lint && npm run build`, then inspect mobile widths 320, 360, 390, 430, 768 and 1024 pixels, keyboard navigation and email signup.
-11. **Apple home-screen icon**: the SVG wheel supports browsers; optionally export a square PNG 180x180 from the approved brand icon for the best iOS home-screen experience.
+11. **Apple home-screen icon**: a wheel PNG at 180x180 is included; inspect on a physical iPhone to confirm home-screen appearance.
 12. **Store listings**: ensure pricing, availability and product photos are consistent with the actual checkout and inventory. If using Google Merchant Center, configure product feeds separately.
 
 ## Useful production checks
