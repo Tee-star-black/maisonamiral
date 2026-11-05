@@ -395,3 +395,14 @@
     margin-top: 24px;
   }
 }
+
+
+@media (max-width: 560px) {
+  .experience { padding: 55px 16px; }
+  .stage { height: auto; aspect-ratio: 4 / 5; min-height: 310px; max-height: 510px; }
+  .controls { justify-content: space-between; }
+  .controls button { min-width: 44px; min-height: 44px; }
+  .details { padding: 24px 16px; }
+  .productDetails h3 { font-size: 27px; }
+  .enterButton { min-height: 52px; }
+}
