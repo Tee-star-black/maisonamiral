@@ -378,3 +378,23 @@
     transform: none;
   }
 }
+
+
+@media (max-width: 600px) {
+  .section { padding: 66px 18px; }
+  .heading { gap: 18px; margin-bottom: 26px; }
+  .heading h2 { font-size: clamp(3rem, 12vw, 4.5rem); }
+  .grid { gap: 24px; }
+  .stage { min-height: 0; height: auto; aspect-ratio: 4 / 5; }
+  .image { padding: 10px; }
+  .caption { min-height: 75px; padding: 12px 0; gap: 10px; }
+  .captionTitle { gap: 5px; }
+  .captionTitle strong { font-size: clamp(22px, 7vw, 30px); }
+  .captionPrice { font-size: 13px; }
+  .indexItem { min-height: 64px; padding: 13px 4px; }
+  .itemCopy strong { font-size: clamp(20px, 6vw, 26px); }
+  .itemCopy small { margin-top: 5px; }
+  .controls { padding-top: 16px; }
+  .navigation button { width: 48px; height: 48px; }
+  .playButton { min-height: 48px; }
+}
