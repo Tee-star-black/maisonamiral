@@ -85,3 +85,20 @@
 }
 @media(max-width:400px){.heroTitle h1{font-size:15.7vw}.heroMeta{font-size:8px}.productName{font-size:23px}.productPrice{font-size:12px}.productRow{gap:7px}.productName small{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.page a,.featureVisual img{transition:none;}}
+
+
+/* Keep home-page hero typography and CTA in the phone viewport. */
+@media (max-width: 600px) {
+  .hero { min-height: 100svh; }
+  .heroTitle h1 { font-size: clamp(3.4rem, 13.2vw, 5.3rem); overflow-wrap: anywhere; }
+  .heroContent { padding-left: 18px; padding-right: 18px; }
+  .heroBottom { gap: 22px; }
+  .heroBottom p { font-size: clamp(16px, 4.8vw, 21px); }
+  .heroButton { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; }
+  .aboutMedia { min-height: 340px; }
+  .aboutText { min-height: 0; padding: 48px 20px; }
+}
+@media (max-width: 380px) {
+  .heroTitle h1 { font-size: 13vw; }
+  .heroContent { padding-left: 14px; padding-right: 14px; }
+}
