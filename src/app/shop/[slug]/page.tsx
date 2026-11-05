@@ -20,9 +20,10 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const product = getProductBySlug(slug);
   if (!product) return { title: "Product not found" };
   return {
-    title: product.name,
+    title: product.name + " | Shop South Africa",
+    alternates: { canonical: "/shop/" + product.slug },
     description: product.shortDescription,
-    openGraph: { images: product.images[0] ? [product.images[0]] : [] },
+    openGraph: { title: product.name + " | Maison Amiral", url: "/shop/" + product.slug, type: "website", images: product.images[0] ? [product.images[0]] : [] },
   };
 }
 
@@ -31,8 +32,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const product = getProductBySlug(slug);
   if (!product) notFound();
 
+  const structuredProduct = {
+    "@context": "https://schema.org", "@type": "Product",
+    name: product.name, description: product.description, image: product.images.map((image) => "https://www.maisonamiral.co.za" + image),
+    brand: { "@type": "Brand", name: "Maison Amiral" },
+    offers: { "@type": "Offer", url: "https://www.maisonamiral.co.za/shop/" + product.slug, priceCurrency: "ZAR", price: product.price.toFixed(2), seller: { "@type": "Organization", name: "Maison Amiral" } }
+  };
   return (
     <main className={styles.page}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredProduct).replace(/</g, "\\u003c") }} />
       <section className={styles.productHero}>
         <div className={styles.visualColumn}>
           <div className={styles.gallery}>
