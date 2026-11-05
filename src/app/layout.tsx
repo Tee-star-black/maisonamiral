@@ -34,11 +34,11 @@ export const metadata: Metadata = {
     title: "Maison Amiral | Clothing & Accessories from Johannesburg",
     description:
       "Discover independently designed Maison Amiral clothing and accessories from Johannesburg, South Africa.",
-    images: [{ url: "/Edit.jpg", width: 1200, height: 630, alt: "Maison Amiral original clothing collection" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Maison Amiral original clothing collection" }],
   },
   twitter: {
     card: "summary_large_image",
-    images: ["/Edit.jpg"],
+    images: ["/opengraph-image"],
     title: "Maison Amiral | Johannesburg",
     description:
       "Clothing for movement, memory and the quiet confidence of things made with intent.",
