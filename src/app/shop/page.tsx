@@ -1,81 +1,60 @@
 import type { Metadata } from "next";
-import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { EditorialPage } from "@/components/editorial-page";
+import { SiteFooter } from "@/components/site-footer";
 import { formatPrice, products } from "@/data/products";
 import styles from "./shop.module.css";
 
 export const metadata: Metadata = {
   title: "Shop",
-  description: "Shop the Maison Amiral collection from Johannesburg.",
+  description: "Discover clothing and accessories from Maison Amiral, Johannesburg.",
 };
-
-function ProductVisual({ name, artMark, image }: { name: string; artMark: string; image?: string }) {
-  if (image) {
-    return <Image
-      src={image}
-      alt={`${name}, photographed garment`}
-      fill
-      sizes="(max-width: 760px) 100vw, 50vw"
-      className={styles.image}
-    />;
-  }
-
-  return <div className={styles.art} aria-hidden="true">
-    <span className={styles.artMark}>{artMark}</span>
-    <span className={styles.artSubline}>Johannesburg / Edition 001</span>
-  </div>;
-}
 
 export default function ShopPage() {
   return (
-    <EditorialPage
-      eyebrow="Collection / 001"
-      title="The first objects."
-      intro="Clothing and accessories shaped by movement, machinery, memory and restraint. Designed in Johannesburg and built to hold presence without asking for it."
-    >
-      <div className={styles.collectionIntro}>
-        <span>Edition 001 / {products.length} objects</span>
-        <span>Clothing & accessories / from R60</span>
-      </div>
+    <main className={styles.page}>
+      <header className={styles.catalogHeader}>
+        <div className={styles.kicker}><span>MAISON AMIRAL / SHOP</span><span>JOHANNESBURG · 2026</span></div>
+        <div className={styles.headingRow}>
+          <div>
+            <h1>Shop the collection<span>.</span></h1>
+            <p>Considered pieces for everyday wear. Discover the full Maison Amiral collection.</p>
+          </div>
+          <span className={styles.count}>{String(products.length).padStart(2, "0")} PIECES</span>
+        </div>
+      </header>
 
-      <div className={styles.grid}>
-        {products.map((product, index) => (
-          <Link
-            href={`/shop/${product.slug}`}
-            key={product.slug}
-            className={`${styles.card} ${index % 2 === 1 ? styles.offsetCard : ""}`}
-          >
-            <div
-              className={styles.visual}
-              style={{
-                "--product-tone": product.tone,
-                "--product-ink": product.ink,
-              } as CSSProperties}
-            >
-              <ProductVisual
-                name={product.name}
-                artMark={product.artMark}
-                image={product.images[0]}
-              />
-              <span className={styles.mediaLabel}>
-                {String(index + 1).padStart(2, "0")} / {String(products.length).padStart(2, "0")}
-              </span>
-              <span className={styles.viewLabel}>View object ↗</span>
-            </div>
-
-            <article className={styles.meta}>
-              <div>
-                <p className={styles.edition}>{product.edition}</p>
-                <h2>{product.name}</h2>
-                <p className={styles.description}>{product.shortDescription}</p>
+      <section className={styles.catalog} aria-label="Maison Amiral products">
+        <div className={styles.toolbar}>
+          <span>ALL PRODUCTS <span className={styles.toolbarCount}>({products.length})</span></span>
+          <span>CLOTHING &amp; ACCESSORIES</span>
+        </div>
+        <div className={styles.grid}>
+          {products.map((product) => (
+            <Link href={`/shop/${product.slug}`} key={product.slug} className={styles.card}>
+              <div className={styles.visual}>
+                <Image
+                  src={product.images[0]}
+                  alt={`${product.name} product photograph`}
+                  fill
+                  sizes="(max-width: 520px) 50vw, (max-width: 960px) 33vw, 25vw"
+                  className={styles.image}
+                />
+                <span className={styles.quickView}>VIEW PRODUCT ↗</span>
               </div>
-              <p className={styles.price}>{formatPrice(product.price)}</p>
-            </article>
-          </Link>
-        ))}
-      </div>
-    </EditorialPage>
+              <div className={styles.meta}>
+                <div className={styles.info}>
+                  <span className={styles.category}>{product.category === "accessory" ? "ACCESSORIES" : "CLOTHING"} / {product.edition}</span>
+                  <h2>{product.name}</h2>
+                </div>
+                <span className={styles.price}>{formatPrice(product.price)}</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+        <p className={styles.delivery}>Delivery: R40 flat rate per order · Prices in ZAR</p>
+      </section>
+      <SiteFooter />
+    </main>
   );
 }
