@@ -4,7 +4,7 @@
  */
 export async function storeDb<T = unknown>(
   table: "maison_orders" | "maison_subscribers",
-  method: "GET" | "POST" | "PATCH",
+  method: "GET" | "POST" | "PATCH" | "DELETE",
   options: { query?: Record<string, string>; body?: unknown; prefer?: string } = {},
 ): Promise<T> {
   const rawUrl = process.env.MAISON_SUPABASE_URL;
