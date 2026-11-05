@@ -30,20 +30,6 @@ const asset = (product: string, file: string) =>
 
 export const products: MaisonProduct[] = [
   {
-    slug: "boat-floating-wheel",
-    name: "Boat Floating Wheel",
-    price: 60,
-    category: "accessory",
-    edition: "Accessories / 001",
-    artMark: "WHEEL",
-    shortDescription: "A subtle statement piece designed to elevate whatever you wear it on.",
-    description: "A boat wheel-inspired floating lapel accessory designed to subtly stand out and elevate any item it is worn on. Finished in black with red detailing. Dimensions: 29 mm × 30 mm.",
-    tone: "#ffffff",
-    ink: "#161616",
-    images: ["/products/boat-floating-wheel.svg"],
-    imageLabels: ["Detail"],
-  },
-  {
     slug: "automobile-tee",
     name: "Automobile Tee",
     price: 450,
@@ -108,6 +94,21 @@ export const products: MaisonProduct[] = [
       back: { src: asset("emblem", "print-back.png"), width: 0.1, height: 0.16, centerY: 1.38 },
     },
   },
+  {
+    slug: "boat-floating-wheel",
+    name: "Boat Floating Wheel",
+    price: 60,
+    category: "accessory",
+    edition: "Accessories / 001",
+    artMark: "WHEEL",
+    shortDescription: "A subtle statement piece designed to elevate whatever you wear it on.",
+    description: "A boat wheel-inspired floating lapel accessory designed to subtly stand out and elevate any item it is worn on. Finished in black with red detailing. Dimensions: 29 mm × 30 mm.",
+    tone: "#ffffff",
+    ink: "#161616",
+    images: ["/products/boat-floating-wheel.svg"],
+    imageLabels: ["Illustration"],
+  },
+
 ];
 
 export function getProductBySlug(slug: string) {
