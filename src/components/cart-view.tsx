@@ -3,14 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { cartCount, cartSubtotal, changeQuantity, removeFromCart, useCart } from "@/lib/cart";
-import { getDeliveryFee } from "@/lib/commerce";
-import { formatPrice, getProductBySlug } from "@/data/products";
+import { DELIVERY_FEE_CENTS, formatPrice, getProductBySlug } from "@/data/products";
 import styles from "./cart-view.module.css";
 
 export function CartView() {
   const items = useCart();
   const subtotal = cartSubtotal(items);
-  const delivery = getDeliveryFee() / 100;
+  const delivery = DELIVERY_FEE_CENTS / 100;
 
   if (!items.length) {
     return (
