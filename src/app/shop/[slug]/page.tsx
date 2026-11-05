@@ -49,6 +49,22 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <figcaption>{String(index + 1).padStart(2, "0")} / {product.imageLabels[index]}</figcaption>
               </figure>
             ))}
+            {product.slug === "boat-floating-wheel" && (
+              <figure className={styles.imageFrame}>
+                <video
+                  controls
+                  playsInline
+                  preload="metadata"
+                  poster="/products/boat-floating-wheel/boat-front.jpeg"
+                  aria-label="Boat Floating Wheel product video"
+                  style={{ width: "100%", height: "100%", minHeight: "72vh", display: "block", objectFit: "contain", background: "#fff" }}
+                >
+                  <source src="/products/boat-floating-wheel/boat-video.mp4" type="video/mp4" />
+                  Your browser does not support video playback.
+                </video>
+                <figcaption>04 / Product in motion</figcaption>
+              </figure>
+            )}
           </div>
         </div>
 
