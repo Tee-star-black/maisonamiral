@@ -8,7 +8,7 @@ import styles from "./shop.module.css";
 export const metadata: Metadata = {
   title: "Shop Graphic Tees & Accessories in South Africa",
   alternates: { canonical: "/shop" },
-  openGraph: { url: "/shop", images: ["/Edit.jpg"] },
+  openGraph: { url: "/shop", images: ["/opengraph-image"] },
   description: "Shop Maison Amiral graphic T-shirts and original accessories designed in Johannesburg. Explore Edition 001 and the Boat Floating Wheel.",
 };
 
