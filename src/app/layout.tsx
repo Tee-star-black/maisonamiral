@@ -16,28 +16,34 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.maisonamiral.co.za"),
   title: {
-    default: "Maison Amiral | Johannesburg",
+    default: "Maison Amiral | Independent Clothing & Accessories Johannesburg",
     template: "%s | Maison Amiral",
   },
   description:
-    "Maison Amiral is a Johannesburg fashion label shaped by movement, memory, machinery and restraint.",
+    "Discover Maison Amiral clothing and accessories, designed in Johannesburg, South Africa. Shop considered graphic tees and original accessories.",
+  keywords: ["Maison Amiral", "Maison Amiral South Africa", "Johannesburg clothing brand", "South African streetwear", "graphic T-shirts", "fashion accessories"],
+  category: "shopping",
+  icons: { icon: [{ url: "/icon.svg", type: "image/svg+xml" }, { url: "/favicon.ico", sizes: "any" }], shortcut: "/icon.svg", apple: "/icon.svg" },
+  manifest: "/manifest.webmanifest",
   applicationName: "Maison Amiral",
-  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "en_ZA",
     url: "/",
     siteName: "Maison Amiral",
-    title: "Maison Amiral | Johannesburg",
+    title: "Maison Amiral | Clothing & Accessories from Johannesburg",
     description:
-      "Clothing for movement, memory and the quiet confidence of things made with intent.",
+      "Discover independently designed Maison Amiral clothing and accessories from Johannesburg, South Africa.",
+    images: [{ url: "/Edit.jpg", width: 1200, height: 630, alt: "Maison Amiral original clothing collection" }],
   },
   twitter: {
     card: "summary_large_image",
+    images: ["/Edit.jpg"],
     title: "Maison Amiral | Johannesburg",
     description:
       "Clothing for movement, memory and the quiet confidence of things made with intent.",
   },
+  verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined },
   robots: {
     index: true,
     follow: true,
