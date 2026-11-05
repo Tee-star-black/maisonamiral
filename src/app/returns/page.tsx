@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { PolicyPage } from "@/components/policy-page";
-export const metadata:Metadata={title:"Returns & Refunds",description:"Maison Amiral returns, refunds, cancellations and consumer rights in South Africa."};
+export const metadata:Metadata={
+  alternates: { canonical: "/returns" },
+  openGraph: { url: "/returns", type: "website", images: ["/Edit.jpg"] },title:"Returns & Refunds",description:"Maison Amiral returns, refunds, cancellations and consumer rights in South Africa."};
 export default function ReturnsPage(){return <PolicyPage eyebrow="CUSTOMER CARE / 002" title="Returns & refunds." intro="A clear guide to cooling-off cancellations, incorrect or defective garments, and refunds for manual EFT orders.">
 <section><h2>01 / Seven-day online cooling-off period</h2><p>For qualifying online purchases, you may cancel without giving a reason within seven days after receiving your goods under section 44 of South Africa&apos;s Electronic Communications and Transactions Act. You may be responsible only for the direct cost of returning the goods. If you already paid, the applicable refund must be made within 30 days after cancellation. Statutory exceptions can apply, including certain personalised or made-to-order goods.</p></section>
 <section><h2>02 / Faulty, unsafe or incorrect items</h2><p>Our policy does not limit your rights under the Consumer Protection Act. Where the six-month implied warranty applies to defective goods, you may be entitled to return the goods at our risk and expense and choose a repair, replacement or refund as provided by law. If you received the wrong garment or size, please contact us promptly so we can arrange an appropriate remedy.</p></section>
