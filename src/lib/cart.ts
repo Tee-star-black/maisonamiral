@@ -3,7 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { getProductBySlug } from "@/data/products";
 
-export const SIZES = ["S", "M", "L", "XL"] as const;
+export const SIZES = ["S", "M", "L", "XL", "ONE SIZE"] as const;
 export type GarmentSize = (typeof SIZES)[number];
 
 export type CartLine = {
@@ -29,7 +29,8 @@ function sanitise(value: unknown): CartLine[] {
     if (!entry || typeof entry !== "object") continue;
     const raw = entry as Partial<CartLine>;
     if (typeof raw.slug !== "string" || !getProductBySlug(raw.slug)) continue;
-    if (!SIZES.includes(raw.size as GarmentSize)) continue;
+    const product = getProductBySlug(raw.slug);
+    if (!SIZES.includes(raw.size as GarmentSize) || (product?.category === "accessory" ? raw.size !== "ONE SIZE" : raw.size === "ONE SIZE")) continue;
     const quantity = Number(raw.quantity);
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 10) continue;
     const key = raw.slug + ":" + raw.size;
@@ -94,7 +95,8 @@ function update(next: CartLine[]) {
 }
 
 export function addToCart(slug: string, size: GarmentSize, quantity = 1) {
-  if (!getProductBySlug(slug) || !SIZES.includes(size)) return;
+  const product = getProductBySlug(slug);
+  if (!product || !SIZES.includes(size) || (product.category === "accessory" ? size !== "ONE SIZE" : size === "ONE SIZE")) return;
   start();
   const increment = Math.min(10, Math.max(1, Math.trunc(quantity)));
   const existing = lines.find((line) => line.slug === slug && line.size === size);
