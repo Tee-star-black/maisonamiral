@@ -105,8 +105,12 @@ export const products: MaisonProduct[] = [
     description: "A boat wheel-inspired floating lapel accessory designed to subtly stand out and elevate any item it is worn on. Finished in black with red detailing. Dimensions: 29 mm × 30 mm.",
     tone: "#ffffff",
     ink: "#161616",
-    images: ["/products/boat-floating-wheel.svg"],
-    imageLabels: ["Illustration"],
+    images: [
+      "/products/boat-floating-wheel/boat-front.jpeg",
+      "/products/boat-floating-wheel/boat-detail.jpeg",
+      "/products/boat-floating-wheel/boat-lifestyle.jpeg",
+    ],
+    imageLabels: ["Front", "Detail", "Lifestyle"],
   },
 
 ];
