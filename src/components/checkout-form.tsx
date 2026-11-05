@@ -126,7 +126,7 @@ export function CheckoutForm() {
             <div className={styles.item} key={item.slug + ":" + item.size}>
               <div className={styles.photo}><Image src={product.images[0]} alt={product.name} width={90} height={110}/></div>
               <div className={styles.itemDescription}>
-                <strong>{product.name}</strong><span>Size {item.size} / Qty {item.quantity}</span>
+                <strong>{product.name}</strong><span>{item.size === "ONE SIZE" ? "One size" : `Size ${item.size}`} / Qty {item.quantity}</span>
               </div>
               <span>{formatPrice(product.price * item.quantity)}</span>
             </div>
