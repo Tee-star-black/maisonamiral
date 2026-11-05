@@ -10,7 +10,7 @@ export type Buyer = {
   address: string; suburb: string; city: string; province: string; postalCode: string;
 };
 export type OrderItem = {
-  slug: string; size: "S" | "M" | "L" | "XL";
+  slug: string; size: "S" | "M" | "L" | "XL" | "ONE SIZE";
   quantity: number; unit_price_cents: number; name: string;
 };
 export function validateBuyer(value: unknown): Buyer | null {
@@ -43,7 +43,7 @@ export function validateItems(raw: unknown): OrderItem[] | null {
     const product = typeof row.slug === "string" ? getProductBySlug(row.slug) : null;
     const size = row.size;
     const quantity = row.quantity;
-    if (!product || !["S","M","L","XL"].includes(String(size)) ||
+    if (!product || !(product.category === "accessory" ? size === "ONE SIZE" : ["S","M","L","XL"].includes(String(size))) ||
         !Number.isInteger(quantity) || (quantity as number) < 1 ||
         (quantity as number) > 10) return null;
     const key = product.slug + ":" + size;
@@ -56,11 +56,10 @@ export function validateItems(raw: unknown): OrderItem[] | null {
   if (items.reduce((sum, row) => sum + row.quantity, 0) > 20) return null;
   return items;
 }
+export const DELIVERY_FEE_CENTS = 4000;
+
 export function getDeliveryFee() {
-  const raw = process.env.MAISON_DELIVERY_FEE_CENTS;
-  if (!raw || !/^\d+$/.test(raw)) return null;
-  const value = Number(raw);
-  return Number.isSafeInteger(value) && value >= 0 && value <= 100000 ? value : null;
+  return DELIVERY_FEE_CENTS;
 }
 export function getEftSettings() {
   const env = process.env;
