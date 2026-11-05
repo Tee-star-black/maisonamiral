@@ -22,3 +22,14 @@
 @media(max-width:900px){.layout{grid-template-columns:1fr;gap:45px}.content{padding-top:0;max-width:660px}}
 @media(max-width:500px){.overline span:last-child{display:none}.layout h2{font-size:clamp(4.3rem,16vw,7rem)}.content>p{font-size:14px;margin-bottom:32px}.inputRow button{gap:9px;padding:0 12px;font-size:10px}.inputRow input{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.inputRow button{transition:none}}
+
+
+@media (max-width: 500px) {
+  .section { padding: 65px 18px; }
+  .layout { padding-top: 35px; gap: 30px; }
+  .layout h2 { font-size: clamp(3.1rem, 13vw, 4.7rem); overflow-wrap: anywhere; }
+  .content h3 { font-size: 28px; }
+  .inputRow { grid-template-columns: minmax(0,1fr); border: 0; gap: 10px; }
+  .inputRow input { border-bottom: 1px solid #222; min-height: 50px; font-size: 16px; }
+  .inputRow button { justify-content: space-between; min-height: 50px; padding: 0 16px; }
+}
