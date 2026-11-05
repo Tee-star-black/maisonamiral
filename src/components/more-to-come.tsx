@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { WheelLoader } from "./wheel-loader";
 import styles from "./more-to-come.module.css";
 
 export function MoreToCome() {
@@ -31,7 +32,7 @@ export function MoreToCome() {
       setEmail("");
       setConsent(false);
       setStatus("success");
-      setFeedback("You're on the list. We'll be in touch when the next release is ready.");
+      setFeedback("Check your inbox and confirm your email to join the next-drop list.");
     } catch (error) {
       setStatus("error");
       setFeedback(error instanceof Error ? error.message : "Unable to subscribe right now.");
@@ -61,7 +62,7 @@ export function MoreToCome() {
                 autoComplete="email" maxLength={254}
                 placeholder="YOUR EMAIL ADDRESS"
                 value={email} onChange={(event) => setEmail(event.target.value)} />
-              <button type="submit" disabled={pending}>{pending ? "ADDING..." : "NOTIFY ME"} <span aria-hidden="true">↗</span></button>
+              <button type="submit" disabled={pending}>{pending ? <><WheelLoader label="Submitting" compact /> SENDING...</> : "NOTIFY ME"} <span aria-hidden="true">↗</span></button>
             </div>
             <div className={styles.honeypot} aria-hidden="true">
               <label htmlFor="ma-release-website">Website</label>
@@ -71,7 +72,7 @@ export function MoreToCome() {
             <label className={styles.consent}>
               <input type="checkbox" checked={consent}
                 onChange={(event) => setConsent(event.target.checked)} required />
-              <span>I agree to receive release announcements and updates by email. You may opt out of future updates.</span>
+              <span>I agree to receive release announcements and updates by email. Please confirm via the email we send. Every drop email includes an unsubscribe link.</span>
             </label>
             {status !== "idle" && <p className={status === "success" ? styles.success : styles.error}
               role={status === "error" ? "alert" : "status"}>{feedback}</p>}
