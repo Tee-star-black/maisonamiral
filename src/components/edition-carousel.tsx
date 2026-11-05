@@ -73,7 +73,7 @@ export function EditionCarousel() {
           <h2 id="edition-heading">Edition 001.</h2>
         </div>
         <div className={styles.intro}>
-          <p>Three objects. One point of view.<br />Designed in Johannesburg.</p>
+          <p>Four objects. One point of view.<br />Designed in Johannesburg.</p>
           <Link href="/shop">View all pieces <span aria-hidden="true">↗</span></Link>
         </div>
       </div>
@@ -125,7 +125,7 @@ export function EditionCarousel() {
             <span>{pad(activeIndex)} / {String(products.length).padStart(2, "0")}</span>
           </div>
 
-          <div className={styles.indexItems} role="group" aria-label="Choose a T-shirt to preview">
+          <div className={styles.indexItems} role="group" aria-label="Choose a product to preview">
             {products.map((product, index) => {
               const active = index === activeIndex;
               return (
@@ -149,10 +149,10 @@ export function EditionCarousel() {
 
           <div className={styles.controls}>
             <div className={styles.navigation} role="group" aria-label="Slideshow controls">
-              <button type="button" onClick={() => choose(activeIndex - 1)} aria-label="Previous T-shirt">
+              <button type="button" onClick={() => choose(activeIndex - 1)} aria-label="Previous product">
                 <span aria-hidden="true">←</span>
               </button>
-              <button type="button" onClick={() => choose(activeIndex + 1)} aria-label="Next T-shirt">
+              <button type="button" onClick={() => choose(activeIndex + 1)} aria-label="Next product">
                 <span aria-hidden="true">→</span>
               </button>
             </div>
