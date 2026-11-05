@@ -45,3 +45,12 @@
   .meta h2 { font-size: 13px; }
   .category { font-size: 9px; }
 }
+
+/* Two-across product catalogue on phones, including 3-column tablet breakpoints. */
+@media (max-width: 900px) {
+  .grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+@media (max-width: 520px) {
+  .grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .visual { width: 100%; aspect-ratio: 4/5; }
+}
