@@ -1,4 +1,4 @@
-import { getProductBySlug } from "@/data/products";
+import { DELIVERY_FEE_CENTS, getProductBySlug } from "@/data/products";
 
 export const provinces = [
   "Eastern Cape", "Free State", "Gauteng", "KwaZulu-Natal", "Limpopo",
@@ -56,8 +56,6 @@ export function validateItems(raw: unknown): OrderItem[] | null {
   if (items.reduce((sum, row) => sum + row.quantity, 0) > 20) return null;
   return items;
 }
-export const DELIVERY_FEE_CENTS = 4000;
-
 export function getDeliveryFee() {
   return DELIVERY_FEE_CENTS;
 }
