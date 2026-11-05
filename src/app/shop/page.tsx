@@ -33,11 +33,11 @@ export default function ShopPage() {
     <EditorialPage
       eyebrow="Collection / 001"
       title="The first objects."
-      intro="Three studies in movement, machinery, memory and restraint. Designed in Johannesburg and built to hold presence without asking for it."
+      intro="Clothing and accessories shaped by movement, machinery, memory and restraint. Designed in Johannesburg and built to hold presence without asking for it."
     >
       <div className={styles.collectionIntro}>
         <span>Edition 001 / {products.length} objects</span>
-        <span>R450 each</span>
+        <span>Clothing & accessories / from R60</span>
       </div>
 
       <div className={styles.grid}>
