@@ -20,7 +20,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [...routes, ...products.map((item) => "/shop/" + item.slug)].map((route) => ({
     url: `${baseUrl}${route}`,
-    lastModified: new Date(),
     changeFrequency: route === "" || route === "/shop" ? "weekly" : "monthly",
     priority: route === "" ? 1 : route === "/shop" ? 0.9 : 0.6,
   }));
