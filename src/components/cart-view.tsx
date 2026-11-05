@@ -3,12 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { cartCount, cartSubtotal, changeQuantity, removeFromCart, useCart } from "@/lib/cart";
+import { getDeliveryFee } from "@/lib/commerce";
 import { formatPrice, getProductBySlug } from "@/data/products";
 import styles from "./cart-view.module.css";
 
 export function CartView() {
   const items = useCart();
   const subtotal = cartSubtotal(items);
+  const delivery = getDeliveryFee() / 100;
 
   if (!items.length) {
     return (
@@ -34,7 +36,7 @@ export function CartView() {
                 <Image src={product.images[0]} alt={product.name} width={240} height={300} sizes="120px" />
               </Link>
               <div className={styles.details}>
-                <p className={styles.edition}>EDITION 001 / {item.size}</p>
+                <p className={styles.edition}>{product.edition} / {item.size === "ONE SIZE" ? "One size" : item.size}</p>
                 <Link href={"/shop/" + product.slug} className={styles.name}>{product.name}</Link>
                 <p className={styles.unit}>{formatPrice(product.price)} each</p>
                 <div className={styles.actions}>
@@ -60,9 +62,9 @@ export function CartView() {
       <aside className={styles.summary} aria-label="Order summary">
         <h2>Order summary.</h2>
         <div className={styles.summaryLine}><span>Subtotal</span><strong>{formatPrice(subtotal)}</strong></div>
-        <div className={styles.summaryLine}><span>Delivery</span><span>Calculated at checkout</span></div>
-        <div className={styles.grandTotal}><span>Subtotal</span><strong>{formatPrice(subtotal)}</strong></div>
-        <p>Final delivery charge and order total are shown before payment.</p>
+        <div className={styles.summaryLine}><span>Delivery</span><strong>{formatPrice(delivery)}</strong></div>
+        <div className={styles.grandTotal}><span>Total</span><strong>{formatPrice(subtotal + delivery)}</strong></div>
+        <p>Flat delivery fee of R40 per order, including mixed carts.</p>
         <Link href="/checkout" className={styles.checkout}>PROCEED TO CHECKOUT <span>↗</span></Link>
       </aside>
     </div>
