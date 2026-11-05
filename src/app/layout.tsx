@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     "Discover Maison Amiral clothing and accessories, designed in Johannesburg, South Africa. Shop considered graphic tees and original accessories.",
   keywords: ["Maison Amiral", "Maison Amiral South Africa", "Johannesburg clothing brand", "South African streetwear", "graphic T-shirts", "fashion accessories"],
   category: "shopping",
-  icons: { icon: [{ url: "/icon.svg", type: "image/svg+xml" }, { url: "/favicon.ico", sizes: "any" }], shortcut: "/icon.svg", apple: "/icon.svg" },
+  icons: { icon: [{ url: "/icon.svg", type: "image/svg+xml" }], shortcut: "/icon.svg", apple: "/icon.svg" },
   manifest: "/manifest.webmanifest",
   applicationName: "Maison Amiral",
   openGraph: {
