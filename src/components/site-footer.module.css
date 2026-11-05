@@ -111,3 +111,12 @@
 @media(prefers-reduced-motion: reduce) {
   .footer a { transition: none; }
 }
+
+@media (max-width: 580px) {
+  .inner { padding-left: 18px; padding-right: 18px; }
+  .content { padding: 55px 0 58px; gap: 38px; }
+  .intro h2 { font-size: clamp(2.7rem, 11vw, 4.3rem); overflow-wrap: anywhere; }
+  .navigation { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 18px; }
+  .navigation a { display: inline-flex; align-items: center; min-height: 44px; }
+  .wordmark { white-space: normal; overflow-wrap: anywhere; font-size: clamp(2.3rem, 10vw, 4rem); }
+}
