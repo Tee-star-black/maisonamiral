@@ -33,3 +33,20 @@
 .layout a:focus-visible,.layout button:focus-visible,.layout input:focus-visible,.layout select:focus-visible{outline:2px solid #436747;outline-offset:3px}
 @media(max-width:920px){.layout{grid-template-columns:1fr;gap:55px}}
 @media(max-width:580px){.fields{grid-template-columns:1fr;gap:20px}.wide{grid-column:span 1}.formIntro{margin-bottom:26px}.summaryTop{font-size:9px}}
+
+
+@media (max-width: 600px) {
+  .layout { gap: 36px; }
+  .form h2 { font-size: 2.15rem; }
+  .formIntro { margin-bottom: 24px; }
+  .fields { grid-template-columns: minmax(0,1fr); gap: 16px; }
+  .wide { grid-column: 1; }
+  .fields input, .fields select { min-height: 48px; font-size: 16px; }
+  .returnLink { display: inline-flex; align-items: center; min-height: 44px; margin-top: 18px; }
+  .summary { padding-top: 20px; }
+  .item { grid-template-columns: 56px minmax(0,1fr) auto; gap: 9px; }
+  .photo { width: 56px; height: 70px; }
+  .itemDescription strong { font-size: 16px; }
+  .item > span { font-size: 11px; white-space: nowrap; }
+  .pay { min-height: 56px; }
+}
