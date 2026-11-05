@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { PolicyPage } from "@/components/policy-page";
-export const metadata:Metadata={title:"Privacy Policy",description:"How Maison Amiral handles customer and newsletter information."};
+export const metadata:Metadata={
+  alternates: { canonical: "/privacy" },
+  openGraph: { url: "/privacy", type: "website", images: ["/Edit.jpg"] },title:"Privacy Policy",description:"How Maison Amiral handles customer and newsletter information."};
 export default function PrivacyPage(){return <PolicyPage eyebrow="LEGAL / 001" title="Privacy policy." intro="How we collect, use and protect information when you visit Maison Amiral, purchase clothing or request release updates.">
 <section><h2>01 / Who we are</h2><p>Maison Amiral is a clothing label operating in South Africa. For privacy requests or questions about how your data is handled, contact <a href="mailto:support@maisonamiral.co.za">support@maisonamiral.co.za</a>. This policy applies to our online storefront at maisonamiral.co.za and www.maisonamiral.co.za.</p></section>
 <section><h2>02 / Information we collect</h2><p>When you place an order, we collect your name, email address, telephone number, delivery address, selected garments, sizes, quantities, order totals and payment status. We keep the order reference and information needed for delivery and customer support. When you opt into release announcements, we collect your email address and record your consent. Basic technical and security information may be processed by our hosting provider when you visit the site.</p></section>
