@@ -30,3 +30,24 @@
 .layout button:focus-visible,.layout a:focus-visible,.empty a:focus-visible{outline:2px solid #436747;outline-offset:4px}
 @media(max-width:850px){.layout{grid-template-columns:1fr}.summary{max-width:none}}
 @media(max-width:480px){.line{grid-template-columns:90px minmax(0,1fr) auto;gap:12px}.photo{width:90px;height:115px}.name{font-size:24px}.total{font-size:12px}.actions{gap:8px}.quantity{grid-template-columns:29px 29px 29px}.summary h2{font-size:30px}}
+
+
+/* Compact cart rows, accessible quantity buttons and single-column checkout prompt */
+@media (max-width: 600px) {
+  .layout { gap: 35px; }
+  .line { grid-template-columns: 88px minmax(0,1fr); column-gap: 13px; row-gap: 9px; padding: 17px 0; }
+  .photo { width: 88px; height: 110px; grid-row: span 2; }
+  .details { grid-column: 2; }
+  .edition { font-size: 8px; margin-bottom: 6px; }
+  .name { font-size: clamp(20px, 6vw, 26px); overflow-wrap: anywhere; }
+  .unit { margin: 7px 0; font-size: 12px; }
+  .actions { gap: 12px; margin-top: 10px; }
+  .quantity { grid-template-columns: 42px 32px 42px; }
+  .quantity button, .quantity output { min-height: 44px; }
+  .remove { min-height: 44px; }
+  .total { grid-column: 2; justify-self: end; font-size: 13px; }
+  .summary { padding-top: 20px; }
+  .summary h2 { margin-bottom: 23px; }
+  .checkout { min-height: 54px; }
+  .back { min-height: 44px; display: inline-flex; align-items: center; }
+}
