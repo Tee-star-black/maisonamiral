@@ -1,4 +1,4 @@
-import { verifyNewsletterToken } from "@/lib/newsletter-tokens";
+import { createNewsletterToken, verifyNewsletterToken } from "@/lib/newsletter-tokens";
 import { storeDb } from "@/lib/maison-store-db";
 
 export const runtime = "nodejs";
@@ -13,6 +13,8 @@ export async function POST(request: Request) {
       body: { email, consent_at: new Date().toISOString() },
       prefer: "resolution=merge-duplicates,return=minimal",
     });
-    return Response.redirect(new URL("/newsletter/confirmed", request.url), 303);
+    const destination = new URL("/newsletter/confirmed", request.url);
+    destination.searchParams.set("manage", createNewsletterToken(email, "unsubscribe"));
+    return Response.redirect(destination, 303);
   } catch { return new Response("Subscription could not be completed. Please try again.", { status: 503 }); }
 }

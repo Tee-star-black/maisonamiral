@@ -1,3 +1,4 @@
+import { MobileNavigation } from "./mobile-navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { CartIndicator } from "./store-cart-indicator";
@@ -21,14 +22,7 @@ export function StoreHeader() {
         <nav className={styles.desktopNav} aria-label="Shop and explore">
           {mainLinks.map(([label, href]) => <Link href={href} key={href}>{label}</Link>)}
         </nav>
-        <details className={styles.mobileMenu}>
-          <summary aria-label="Open navigation menu">Menu <span aria-hidden="true">☰</span></summary>
-          <nav aria-label="Mobile navigation">
-            {[...mainLinks, ...secondaryLinks].map(([label, href]) => (
-              <Link href={href} key={href}>{label}</Link>
-            ))}
-          </nav>
-        </details>
+        <MobileNavigation links={[...mainLinks, ...secondaryLinks]} />
       </div>
 
       <Link href="/" className={styles.logo} aria-label="Maison Amiral home">

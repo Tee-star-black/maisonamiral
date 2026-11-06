@@ -47,7 +47,7 @@ export function renderInvoice(invoice: Invoice, ownerCopy = false, testMode = fa
 }
 export async function sendOrderEmail(to: string, invoice: Invoice, apiKey: string,
   from: string, ownerCopy: boolean, testMode = false) {
-  const response = await fetch("https://api.resend.com/emails", {
+  const send = () => fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: "Bearer " + apiKey, "Content-Type": "application/json",
       "Idempotency-Key": invoice.id + (ownerCopy ? "-store-" : "-customer-") + createHash("sha256").update(to.toLowerCase()).digest("hex").slice(0, 16) },
@@ -56,6 +56,13 @@ export async function sendOrderEmail(to: string, invoice: Invoice, apiKey: strin
       html: renderInvoice(invoice, ownerCopy, testMode) }),
     signal: AbortSignal.timeout(12000), cache: "no-store",
   });
+  let response = await send();
+  for (let retry = 0; response.status === 429 && retry < 2; retry++) {
+    const seconds = Number(response.headers.get("retry-after"));
+    const delay = Number.isFinite(seconds) && seconds > 0 ? Math.min(seconds * 1000, 4000) : 1000 * (retry + 1);
+    await new Promise(resolve => setTimeout(resolve, delay));
+    response = await send();
+  }
   if (!response.ok) {
     const details = await response.json().catch(() => ({})) as { message?: string };
     throw new Error("Resend rejected order notification (" + response.status + "): " + (details.message ?? "Unknown error").slice(0, 300));

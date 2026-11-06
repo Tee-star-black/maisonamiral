@@ -19,7 +19,8 @@ export function ProductBuyPanel({ slug }: { slug: string }) {
       setError("Choose a size before adding this piece to your cart.");
       return;
     }
-    addToCart(slug, accessory ? "ONE SIZE" : size!, quantity);
+    const problem = addToCart(slug, accessory ? "ONE SIZE" : size!, quantity);
+    if (problem) { setAdded(false); setError(problem); return; }
     setAdded(true);
     setError("");
   }

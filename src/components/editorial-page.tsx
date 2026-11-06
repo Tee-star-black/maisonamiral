@@ -1,4 +1,3 @@
-import Link from "next/link";
 import styles from "./editorial-page.module.css";
 import { SiteFooter } from "./site-footer";
 

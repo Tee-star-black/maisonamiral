@@ -59,3 +59,5 @@
   .mobileMenu summary { font-size: 10px; gap: 5px; }
   .cart { font-size: 10px; }
 }
+
+@media(max-width:900px){.mobileMenu nav{max-height:calc(100dvh - 100px);overflow-y:auto;overscroll-behavior:contain}}

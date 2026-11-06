@@ -37,7 +37,11 @@ function sanitise(value: unknown): CartLine[] {
     valid.set(key, { slug: raw.slug, size: raw.size as GarmentSize, quantity });
     if (valid.size >= 12) break;
   }
-  return [...valid.values()];
+  return [...valid.values()].reduce<CartLine[]>((result, line) => {
+    const remaining = 20 - cartCount(result);
+    if (remaining > 0) result.push({...line, quantity:Math.min(line.quantity,remaining)});
+    return result;
+  }, []);
 }
 
 function parse(raw: string | null): CartLine[] {
@@ -96,10 +100,13 @@ function update(next: CartLine[]) {
 
 export function addToCart(slug: string, size: GarmentSize, quantity = 1) {
   const product = getProductBySlug(slug);
-  if (!product || !SIZES.includes(size) || (product.category === "accessory" ? size !== "ONE SIZE" : size === "ONE SIZE")) return;
+  if (!product || !SIZES.includes(size) || (product.category === "accessory" ? size !== "ONE SIZE" : size === "ONE SIZE")) return "This piece or size is unavailable.";
   start();
   const increment = Math.min(10, Math.max(1, Math.trunc(quantity)));
   const existing = lines.find((line) => line.slug === slug && line.size === size);
+  if (cartCount(lines) + increment > 20) return "A maximum of 20 pieces can be ordered at once. Please review your cart.";
+  if (existing && existing.quantity + increment > 10) return "A maximum of 10 of the same piece and size can be ordered at once.";
+  if (!existing && lines.length >= 12) return "A maximum of 12 different piece and size combinations can be ordered at once.";
   if (existing) {
     update(lines.map((line) =>
       line === existing ? { ...line, quantity: Math.min(10, line.quantity + increment) } : line,
@@ -115,6 +122,7 @@ export function changeQuantity(slug: string, size: GarmentSize, quantity: number
     update(lines.filter((line) => line.slug !== slug || line.size !== size));
     return;
   }
+  if (quantity > 10 || cartCount(lines) - (lines.find(line => line.slug === slug && line.size === size)?.quantity ?? 0) + quantity > 20) return;
   update(lines.map((line) =>
     line.slug === slug && line.size === size
       ? { ...line, quantity: Math.min(10, quantity) }

@@ -21,7 +21,7 @@ export default function Home() {
       { "@type": "WebSite", "@id": "https://www.maisonamiral.co.za/#website", name: "Maison Amiral", url: "https://www.maisonamiral.co.za/", publisher: { "@id": "https://www.maisonamiral.co.za/#organization" }, inLanguage: "en-ZA" }
     ]
   };
-  return <main id="top" className={styles.page}>
+  return <main className={styles.page}>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }} />
     <section className={styles.hero} aria-labelledby="hero-heading">
       <div className={styles.heroVisual} aria-hidden="true"><video autoPlay muted loop playsInline preload="metadata" poster="/products/emblem/front-edit.jpeg"><source src="/video/flag.mp4" type="video/mp4" /></video></div>

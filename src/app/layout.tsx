@@ -57,7 +57,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en-ZA"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full"><StoreHeader />{children}</body>
+      <body id="top" className="min-h-full"><StoreHeader />{children}</body>
     </html>
   );
 }

@@ -45,7 +45,7 @@ export function CartView() {
                       onClick={() => changeQuantity(item.slug, item.size, item.quantity - 1)}>−</button>
                     <output aria-label="Quantity">{item.quantity}</output>
                     <button type="button" aria-label={"Add one " + product.name}
-                      disabled={item.quantity >= 10}
+                      disabled={item.quantity >= 10 || cartCount(items) >= 20}
                       onClick={() => changeQuantity(item.slug, item.size, item.quantity + 1)}>+</button>
                   </div>
                   <button className={styles.remove} type="button"

@@ -37,3 +37,18 @@ test('test invoice clearly forbids payment and contains no banking instructions'
   assert.match(html, /Do not make payment/);
   assert.doesNotMatch(html, /EFT banking details|Please use the payment reference/);
 });
+
+test('rate limit retries keep the original recipient and idempotency key', async () => {
+  const original = globalThis.fetch;
+  const requests = [];
+  globalThis.fetch = async (_url, init) => {
+    requests.push(init);
+    return requests.length === 1 ? Response.json({message:'rate limit'},{status:429,headers:{'retry-after':'0.001'}}) : Response.json({id:'accepted-after-retry'});
+  };
+  try {
+    assert.equal(await sendOrderEmail('test@example.invalid', invoice, 'fake', 'support@maisonamiral.co.za', false), 'accepted-after-retry');
+    assert.equal(requests.length,2);
+    assert.equal(requests[0].body,requests[1].body);
+    assert.equal(requests[0].headers['Idempotency-Key'],requests[1].headers['Idempotency-Key']);
+  } finally { globalThis.fetch=original; }
+});

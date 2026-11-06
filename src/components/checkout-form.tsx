@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowIcon } from "@/components/ui-icons";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { cartSubtotal, clearCart, useCart } from "@/lib/cart";
@@ -19,6 +19,7 @@ type CheckoutConfig = { enabled: boolean; deliveryCents: number | null; currency
 const money = (cents: number) => "R" + (cents / 100).toFixed(2);
 
 export function CheckoutForm() {
+  const attempt = useRef<string | null>(null);
   const items = useCart();
   const subtotal = cartSubtotal(items);
   const deliveryCents = getDeliveryFee(items);
@@ -40,6 +41,23 @@ export function CheckoutForm() {
     return () => { active = false; };
   }, []);
 
+  useEffect(() => {
+    let active = true;
+    if (!items.length) Promise.resolve().then(() => {
+      try {
+        const saved = JSON.parse(window.sessionStorage.getItem("maison-last-receipt") ?? "null");
+        if (active && saved && /^MA-[A-F0-9]{12}$/.test(saved.reference) &&
+            ["sent", "needs_attention", "pending"].includes(saved.notificationStatus) &&
+            Date.now() - saved.savedAt < 86400_000) {
+          setConfirmed({reference:saved.reference,notificationStatus:saved.notificationStatus,
+            message:"Your order has been recorded. Check your email for the EFT invoice."});
+        }
+      } catch { /* Receipts remain in email when storage is unavailable. */ }
+    });
+    return () => { active = false; };
+  }, [items.length]);
+  const showReceipt = confirmed && !items.length;
+
   function setField(key: keyof Buyer, value: string) {
     setBuyer((current) => ({ ...current, [key]: value }));
     if (error) setError("");
@@ -47,15 +65,17 @@ export function CheckoutForm() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!items.length || !config?.enabled) return;
+    if (submitting || !items.length || !config?.enabled) return;
     setSubmitting(true);
     setError("");
     try {
-      let checkoutId = window.sessionStorage.getItem("maison-eft-checkout-id");
+      let checkoutId = attempt.current;
+      try { checkoutId ??= window.sessionStorage.getItem("maison-eft-checkout-id"); } catch { /* In-memory retry ID remains available. */ }
       if (!checkoutId || !/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(checkoutId)) {
         checkoutId = window.crypto.randomUUID();
-        window.sessionStorage.setItem("maison-eft-checkout-id", checkoutId);
+        try { window.sessionStorage.setItem("maison-eft-checkout-id", checkoutId); } catch { /* Storage may be blocked. */ }
       }
+      attempt.current = checkoutId;
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -65,12 +85,19 @@ export function CheckoutForm() {
         orderId?: string; reference?: string; notificationStatus?: string;
         message?: string; error?: string;
       };
+      if (response.status === 409) {
+        attempt.current = null;
+        try { window.sessionStorage.removeItem("maison-eft-checkout-id"); } catch { /* Storage may be blocked. */ }
+      }
       if (!response.ok || !payload.orderId || !payload.reference)
         throw new Error(payload.error ?? "Unable to place your order.");
-      setConfirmed({ reference:payload.reference,
+      const receipt = { reference:payload.reference,
         notificationStatus:payload.notificationStatus ?? "needs_attention",
-        message:payload.message ?? "Your order has been recorded." });
-      window.sessionStorage.removeItem("maison-eft-checkout-id");
+        message:payload.message ?? "Your order has been recorded." };
+      setConfirmed(receipt);
+      try { window.sessionStorage.setItem("maison-last-receipt", JSON.stringify({...receipt, savedAt:Date.now()})); } catch { /* The emailed invoice remains available. */ }
+      attempt.current = null;
+      try { window.sessionStorage.removeItem("maison-eft-checkout-id"); } catch { /* Storage may be blocked. */ }
       clearCart();
       setSubmitting(false);
     } catch (reason) {
@@ -81,7 +108,7 @@ export function CheckoutForm() {
 
   return (
     <div className={styles.layout}>
-      {confirmed && <section role="status" style={{gridColumn:"1 / -1",padding:"28px",border:"1px solid #202420",background:"#f7f7f7"}}>
+      {showReceipt && <section role="status" style={{gridColumn:"1 / -1",padding:"28px",border:"1px solid #202420",background:"#f7f7f7"}}>
         <p style={{fontSize:11,letterSpacing:".12em"}}>MAISON AMIRAL / ORDER RECORDED</p>
         <h2 style={{fontFamily:"Georgia,serif",fontSize:"clamp(32px,5vw,58px)",fontWeight:400,margin:"18px 0"}}>Awaiting EFT payment.</h2>
         <p>Your reference: <strong>{confirmed.reference}</strong></p>
@@ -90,7 +117,7 @@ export function CheckoutForm() {
         <p>Use the invoice reference for your transfer. Your order is only marked paid once the funds are verified.</p>
         <Link href="/shop" style={{display:"inline-block",borderBottom:"1px solid",marginTop:16}}>Return to shop <ArrowIcon direction="up-right" /></Link>
       </section>}
-      {!confirmed && <form id="ma-checkout-form" className={styles.form} onSubmit={submit}>
+      {!showReceipt && <form id="ma-checkout-form" className={styles.form} onSubmit={submit}>
         <h2>Your details.</h2>
         <p className={styles.formIntro}>We&apos;ll use these details to prepare and deliver your order.</p>
         <div className={styles.fields}>
@@ -120,7 +147,7 @@ export function CheckoutForm() {
         <Link className={styles.returnLink} href="/cart"><ArrowIcon direction="left" /> Return to cart</Link>
       </form>}
 
-      {!confirmed && <aside className={styles.summary}>
+      {!showReceipt && <aside className={styles.summary}>
         <div className={styles.summaryTop}><span>ORDER SUMMARY</span><span>EDITION 001</span></div>
         {items.length ? items.map((item) => {
           const product = getProductBySlug(item.slug);
