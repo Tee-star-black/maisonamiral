@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import { getDeliveryFee, getEftSettings, validateBuyer, validateItems } from "@/lib/commerce";
 import { referenceFor, sendOrderEmail } from "@/lib/eft-invoice";
 import { storeDb } from "@/lib/maison-store-db";
@@ -23,8 +22,7 @@ export async function POST(request: Request) {
   const buyer = validateBuyer(body.customer);
   const items = validateItems(body.items);
   if (!buyer || !items) return json({ error:"Please check your details, items, sizes and quantities." },400);
-  const fee = getDeliveryFee();
-  if (fee === null) return json({ error:"Delivery pricing is unavailable." },503);
+  const fee = getDeliveryFee(items);
   const subtotal = items.reduce((sum,item)=>sum+item.unit_price_cents*item.quantity,0);
   const total = subtotal + fee;
   if (!Number.isSafeInteger(total) || total <= 0 || total > 5000000)

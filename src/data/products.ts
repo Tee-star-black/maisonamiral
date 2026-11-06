@@ -1,4 +1,10 @@
-export const DELIVERY_FEE_CENTS = 4000;
+export const BOAT_DELIVERY_FEE_CENTS = 4000;
+
+/** Charge once per order only when the boat floating wheel is present. */
+export function getDeliveryFee(items: readonly { slug: string; quantity: number }[] = []) {
+  return items.some((item) => item.slug === "boat-floating-wheel" && item.quantity > 0)
+    ? BOAT_DELIVERY_FEE_CENTS : 0;
+}
 
 export type GarmentPrint = {
   src: string;

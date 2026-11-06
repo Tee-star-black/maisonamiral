@@ -4,13 +4,13 @@ import { ArrowIcon } from "@/components/ui-icons";
 import Image from "next/image";
 import Link from "next/link";
 import { cartCount, cartSubtotal, changeQuantity, removeFromCart, useCart } from "@/lib/cart";
-import { DELIVERY_FEE_CENTS, formatPrice, getProductBySlug } from "@/data/products";
+import { getDeliveryFee, formatPrice, getProductBySlug } from "@/data/products";
 import styles from "./cart-view.module.css";
 
 export function CartView() {
   const items = useCart();
   const subtotal = cartSubtotal(items);
-  const delivery = DELIVERY_FEE_CENTS / 100;
+  const delivery = getDeliveryFee(items) / 100;
 
   if (!items.length) {
     return (
@@ -62,9 +62,9 @@ export function CartView() {
       <aside className={styles.summary} aria-label="Order summary">
         <h2>Order summary.</h2>
         <div className={styles.summaryLine}><span>Subtotal</span><strong>{formatPrice(subtotal)}</strong></div>
-        <div className={styles.summaryLine}><span>Delivery</span><strong>{formatPrice(delivery)}</strong></div>
+        <div className={styles.summaryLine}><span>Delivery</span><strong>{delivery ? formatPrice(delivery) : "Free"}</strong></div>
         <div className={styles.grandTotal}><span>Total</span><strong>{formatPrice(subtotal + delivery)}</strong></div>
-        <p>Flat delivery fee of R40 per order, including mixed carts.</p>
+        <p>Free delivery on clothing. Orders containing the Boat Floating Wheel have a single R40 delivery fee.</p>
         <Link href="/checkout" className={styles.checkout}>PROCEED TO CHECKOUT <span><ArrowIcon direction="up-right" /></span></Link>
       </aside>
     </div>

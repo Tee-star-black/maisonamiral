@@ -1,4 +1,4 @@
-import { DELIVERY_FEE_CENTS, getProductBySlug } from "@/data/products";
+import { getProductBySlug } from "@/data/products";
 
 export const provinces = [
   "Eastern Cape", "Free State", "Gauteng", "KwaZulu-Natal", "Limpopo",
@@ -56,9 +56,7 @@ export function validateItems(raw: unknown): OrderItem[] | null {
   if (items.reduce((sum, row) => sum + row.quantity, 0) > 20) return null;
   return items;
 }
-export function getDeliveryFee() {
-  return DELIVERY_FEE_CENTS;
-}
+export { getDeliveryFee } from "@/data/products";
 export function getEftSettings() {
   const env = process.env;
   const bank = {
@@ -75,6 +73,5 @@ export function getEftSettings() {
   const bankReady = !!(bank.bankName && bank.accountHolder && bank.accountNumber && bank.branchCode);
   const mailReady = key.startsWith("re_") && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sender) &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(admin);
-  return { bank, sender, admin, key, enabled: hasDb && bankReady && mailReady &&
-    getDeliveryFee() !== null };
+  return { bank, sender, admin, key, enabled: hasDb && bankReady && mailReady };
 }

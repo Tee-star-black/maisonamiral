@@ -23,6 +23,12 @@
 Generate secrets locally with Node:
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
+## Independent subscriber database setup
+
+Apply `supabase/migrations/20261106_newsletter_standalone.sql` in the dedicated Maison Amiral Supabase project. It can run without the order tables, preserves existing subscribers, enables RLS, revokes public access and grants only the server service role access. Add `MAISON_SUPABASE_URL` and `MAISON_SUPABASE_SERVICE_ROLE_KEY` to the Vercel production environment, then redeploy. Never use credentials belonging to another application.
+
+The signup success panel is shown only after the confirmation-email API succeeds. It says to check the inbox; the address joins the database only after confirmation. Motion is disabled for reduced-motion preferences.
+
 ## Supabase table requirement
 
 Existing maison_subscribers table must have at least:

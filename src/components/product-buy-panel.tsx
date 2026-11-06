@@ -54,7 +54,7 @@ export function ProductBuyPanel({ slug }: { slug: string }) {
           Added to your cart. <Link href="/cart">View cart <ArrowIcon /></Link>
         </p>
       )}
-      <p className={styles.note}>A flat R40 delivery fee is added once per order. EFT details are provided with your invoice.</p>
+      <p className={styles.note}>{slug === "boat-floating-wheel" ? "R40 delivery per order containing this piece." : "Free delivery on this piece. Orders containing the Boat Floating Wheel have a single R40 delivery fee."} EFT details are provided with your invoice.</p>
     </div>
   );
 }

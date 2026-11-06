@@ -5,7 +5,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { cartSubtotal, clearCart, useCart } from "@/lib/cart";
-import { formatPrice, getProductBySlug } from "@/data/products";
+import { formatPrice, getDeliveryFee, getProductBySlug } from "@/data/products";
 import { provinces, type Buyer } from "@/lib/commerce";
 import styles from "./checkout-form.module.css";
 import { WheelLoader } from "./wheel-loader";
@@ -21,6 +21,7 @@ const money = (cents: number) => "R" + (cents / 100).toFixed(2);
 export function CheckoutForm() {
   const items = useCart();
   const subtotal = cartSubtotal(items);
+  const deliveryCents = getDeliveryFee(items);
   const [buyer, setBuyer] = useState<Buyer>(emptyBuyer);
   const [config, setConfig] = useState<CheckoutConfig | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -136,16 +137,14 @@ export function CheckoutForm() {
         }) : <p className={styles.empty}>Your cart is empty. <Link href="/shop">Shop collection</Link></p>}
         <div className={styles.subtotal}><span>Subtotal</span><strong>{formatPrice(subtotal)}</strong></div>
         <div className={styles.subtotal}><span>Delivery</span><span>
-          {config?.deliveryCents !== null && config?.deliveryCents !== undefined
-            ? money(config.deliveryCents) : "Not configured"}
+          {deliveryCents ? money(deliveryCents) : "Free"}
         </span></div>
         <div className={styles.total}><span>TOTAL</span><strong>
-          {config?.deliveryCents !== null && config?.deliveryCents !== undefined
-            ? money(subtotal * 100 + config.deliveryCents) : "Pending"}
+          {money(subtotal * 100 + deliveryCents)}
         </strong></div>
         {config && !config.enabled && (
           <p className={styles.notice} role="status">
-            EFT ordering is not available until our invoice email, banking and delivery settings are configured.
+            EFT ordering is not available until our invoice email, banking and database settings are configured.
           </p>
         )}
         {error && <p className={styles.error} role="alert">{error}</p>}

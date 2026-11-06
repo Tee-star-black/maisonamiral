@@ -55,7 +55,7 @@ export default function ShopPage() {
             </Link>
           ))}
         </div>
-        <p className={styles.delivery}>Delivery: R40 flat rate per order · Prices in ZAR</p>
+        <p className={styles.delivery}>Free delivery on clothing · R40 for orders containing the Boat Floating Wheel · Prices in ZAR</p>
       </section>
       <SiteFooter />
     </main>
