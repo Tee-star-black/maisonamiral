@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { sendOrderEmail, type Invoice } from "@/lib/eft-invoice";
 import { STORE_ORDER_RECIPIENTS } from "@/lib/order-recipients";
+import { storeDb } from "@/lib/maison-store-db";
 
 export const runtime = "nodejs";
 export const maxDuration = 45;
@@ -46,6 +47,17 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
   if (!authorized(request)) return json({ error: "Not found" }, 404);
+  if (new URL(request.url).searchParams.get("check") === "database") {
+    try {
+      await Promise.all([
+        storeDb("maison_orders", "GET", { query: { select: "id,notification_status,status", limit: "0" } }),
+        storeDb("maison_subscribers", "GET", { query: { select: "email,consent_at", limit: "0" } }),
+      ]);
+      return json({ databaseConnected: true, ordersReady: true, subscribersReady: true });
+    } catch (error) {
+      return json({ databaseConnected: false, error: error instanceof Error ? error.message : "Database check failed" }, 503);
+    }
+  }
   const ids = new URL(request.url).searchParams.getAll("id");
   if (!ids.length || ids.length > 2 || ids.some((id) => !/^[0-9a-f-]{36}$/i.test(id))) return json({ error: "Invalid email IDs" }, 400);
   const results = [];
