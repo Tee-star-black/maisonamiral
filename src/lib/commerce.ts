@@ -1,3 +1,4 @@
+import { storeOrderRecipients } from "./order-recipients";
 import { getProductBySlug } from "@/data/products";
 
 export const provinces = [
@@ -67,11 +68,11 @@ export function getEftSettings() {
     accountType: env.MAISON_BANK_ACCOUNT_TYPE?.trim() ?? "",
   };
   const sender = env.MAISON_RESEND_FROM?.trim() ?? "";
-  const admin = env.MAISON_ORDER_EMAIL?.trim() ?? "";
+  const adminRecipients = storeOrderRecipients();
   const key = env.RESEND_API_KEY?.trim() ?? "";
   const hasDb = !!(env.MAISON_SUPABASE_URL && env.MAISON_SUPABASE_SERVICE_ROLE_KEY);
   const bankReady = !!(bank.bankName && bank.accountHolder && bank.accountNumber && bank.branchCode);
   const mailReady = key.startsWith("re_") && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sender) &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(admin);
-  return { bank, sender, admin, key, enabled: hasDb && bankReady && mailReady };
+    adminRecipients.length >= 2 && adminRecipients.every((email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+  return { bank, sender, adminRecipients, key, enabled: hasDb && bankReady && mailReady };
 }

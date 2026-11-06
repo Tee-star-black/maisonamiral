@@ -67,10 +67,10 @@ export async function POST(request: Request) {
   const invoice = { id,buyer,items,subtotalCents:subtotal,deliveryCents:fee,totalCents:total,bank:settings.bank };
   const sent = await Promise.allSettled([
     sendOrderEmail(buyer.email,invoice,settings.key,settings.sender,false),
-    sendOrderEmail(settings.admin,invoice,settings.key,settings.sender,true),
+    ...settings.adminRecipients.map((email) => sendOrderEmail(email,invoice,settings.key,settings.sender,true)),
   ]);
   const customerSent = sent[0].status==="fulfilled";
-  const ownerSent = sent[1].status==="fulfilled";
+  const ownerSent = sent.slice(1).every((result) => result.status === "fulfilled");
   const notificationStatus = customerSent && ownerSent ? "sent" : "needs_attention";
   try {
     await storeDb("maison_orders","PATCH",{
