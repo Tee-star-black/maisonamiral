@@ -71,7 +71,7 @@ export function getEftSettings() {
   const adminRecipients = storeOrderRecipients();
   const key = env.RESEND_API_KEY?.trim() ?? "";
   const hasDb = !!(env.MAISON_SUPABASE_URL && env.MAISON_SUPABASE_SERVICE_ROLE_KEY);
-  const bankReady = !!(bank.bankName && bank.accountHolder && bank.accountNumber && bank.branchCode);
+  const bankReady = !!(bank.bankName && bank.accountHolder && bank.accountNumber);
   const mailReady = key.startsWith("re_") && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sender) &&
     adminRecipients.length >= 2 && adminRecipients.every((email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
   return { bank, sender, adminRecipients, key, enabled: hasDb && bankReady && mailReady };

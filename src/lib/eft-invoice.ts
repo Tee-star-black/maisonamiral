@@ -31,7 +31,8 @@ export function renderInvoice(invoice: Invoice, ownerCopy = false, testMode = fa
       ${invoiceTable(invoice)}
       ${testMode ? "" : `<h2 style="font-size:17px">EFT banking details</h2>
       <p>Bank: <strong>${escape(b.bankName)}</strong><br/>Account holder: <strong>${escape(b.accountHolder)}</strong><br/>
-      Account number: <strong>${escape(b.accountNumber)}</strong><br/>Branch code: <strong>${escape(b.branchCode)}</strong>
+      Account number: <strong>${escape(b.accountNumber)}</strong>
+      ${b.branchCode ? `<br/>Branch code: <strong>${escape(b.branchCode)}</strong>` : ""}
       ${b.accountType ? `<br/>Account type: <strong>${escape(b.accountType)}</strong>` : ""}<br/>
       Payment reference: <strong>${ref}</strong></p>
       <p style="font-size:13px;line-height:1.6">Please use the payment reference exactly as shown.
