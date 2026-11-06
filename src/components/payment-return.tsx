@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowIcon } from "@/components/ui-icons";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { clearCart } from "@/lib/cart";
@@ -73,10 +74,10 @@ export function PaymentReturn({
       {orderId && <p style={{ fontSize: 11, color: "#666", marginTop: 30 }}>REFERENCE / {orderId}</p>}
       <div style={{ display: "flex", gap: 25, flexWrap: "wrap", marginTop: 42, fontSize: 12 }}>
         <Link href={paid ? "/shop" : "/cart"} style={{ borderBottom: "1px solid currentColor", paddingBottom: 10 }}>
-          {paid ? "Continue shopping →" : "Return to cart →"}
+          {paid ? "Continue shopping" : "Return to cart"} <ArrowIcon />
         </Link>
         <Link href="/" style={{ borderBottom: "1px solid currentColor", paddingBottom: 10 }}>
-          Home →
+          Home <ArrowIcon />
         </Link>
       </div>
     </section>

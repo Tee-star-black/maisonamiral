@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowIcon } from "@/components/ui-icons";
 import { useEffect, useState, type FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -86,7 +87,7 @@ export function CheckoutForm() {
         <p>{confirmed.message}</p>
         {confirmed.notificationStatus !== "sent" && <p role="alert">Email delivery needs attention. Keep your order reference and contact Maison Amiral before making payment.</p>}
         <p>Use the invoice reference for your transfer. Your order is only marked paid once the funds are verified.</p>
-        <Link href="/shop" style={{display:"inline-block",borderBottom:"1px solid",marginTop:16}}>Return to shop ↗</Link>
+        <Link href="/shop" style={{display:"inline-block",borderBottom:"1px solid",marginTop:16}}>Return to shop <ArrowIcon direction="up-right" /></Link>
       </section>}
       {!confirmed && <form id="ma-checkout-form" className={styles.form} onSubmit={submit}>
         <h2>Your details.</h2>
@@ -115,7 +116,7 @@ export function CheckoutForm() {
             autoComplete="postal-code" maxLength={4}
             value={buyer.postalCode} onChange={(e) => setField("postalCode", e.target.value)} /></label>
         </div>
-        <Link className={styles.returnLink} href="/cart">← Return to cart</Link>
+        <Link className={styles.returnLink} href="/cart"><ArrowIcon direction="left" /> Return to cart</Link>
       </form>}
 
       {!confirmed && <aside className={styles.summary}>
@@ -151,7 +152,7 @@ export function CheckoutForm() {
         <button type="submit" form="ma-checkout-form" className={styles.pay}
           disabled={!items.length || !config?.enabled || submitting}>
           {submitting ? <><WheelLoader label="Placing order" compact /> PLACING ORDER...</> : "PLACE ORDER & RECEIVE EFT INVOICE"}
-          <span aria-hidden="true">↗</span>
+          <span aria-hidden="true"><ArrowIcon direction="up-right" /></span>
         </button>
         <p className={styles.security}>By placing an order you acknowledge our <Link href="/privacy" style={{textDecoration:"underline"}}>Privacy Policy</Link>, <Link href="/returns" style={{textDecoration:"underline"}}>Returns Policy</Link> and <Link href="/terms" style={{textDecoration:"underline"}}>Terms</Link>.</p>
         <p className={styles.security}>No card payment is taken. After placing your order, an invoice with EFT banking details is emailed to you. We dispatch only after verifying payment.</p>

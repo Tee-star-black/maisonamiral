@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowIcon } from "@/components/ui-icons";
 import { useState, type FormEvent } from "react";
 import { WheelLoader } from "./wheel-loader";
 import styles from "./more-to-come.module.css";
@@ -62,7 +63,7 @@ export function MoreToCome() {
                 autoComplete="email" maxLength={254}
                 placeholder="YOUR EMAIL ADDRESS"
                 value={email} onChange={(event) => setEmail(event.target.value)} />
-              <button type="submit" disabled={pending}>{pending ? <><WheelLoader label="Submitting" compact /> SENDING...</> : "NOTIFY ME"} <span aria-hidden="true">↗</span></button>
+              <button type="submit" disabled={pending}>{pending ? <><WheelLoader label="Submitting" compact /> SENDING...</> : "NOTIFY ME"} <span aria-hidden="true"><ArrowIcon direction="up-right" /></span></button>
             </div>
             <div className={styles.honeypot} aria-hidden="true">
               <label htmlFor="ma-release-website">Website</label>

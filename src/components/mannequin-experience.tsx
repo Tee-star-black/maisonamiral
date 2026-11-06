@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowIcon } from "@/components/ui-icons";
 import { useId, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -249,7 +250,7 @@ export function MannequinExperience() {
               </div>
             </dl>
             <Link href={`/shop/${product.slug}`} className={styles.enterButton}>
-              View piece <span aria-hidden="true">↗</span>
+              View piece <span aria-hidden="true"><ArrowIcon direction="up-right" /></span>
             </Link>
             <div className={styles.collection}>
               <p className={styles.eyebrow}>Explore the collection</p>

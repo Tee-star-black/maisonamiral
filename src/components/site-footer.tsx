@@ -1,3 +1,4 @@
+import { ArrowIcon } from "@/components/ui-icons";
 import Link from "next/link";
 import styles from "./site-footer.module.css";
 
@@ -31,7 +32,7 @@ export function SiteFooter() {
             <p className={styles.label}>A considered wardrobe / 001</p>
             <h2>Less noise.<br /><em>More presence.</em></h2>
             <Link href="/shop" className={styles.cta}>
-              Explore the collection <span aria-hidden="true">↗</span>
+              Explore the collection <span aria-hidden="true"><ArrowIcon direction="up-right" /></span>
             </Link>
           </div>
           <div className={styles.navigation}>
@@ -53,7 +54,7 @@ export function SiteFooter() {
         <div className={styles.baseline}>
           <span>© 2026 MAISON AMIRAL</span>
           <span>JOHANNESBURG / SOUTH AFRICA</span>
-          <a href="#top">BACK TO TOP ↑</a>
+          <a href="#top">BACK TO TOP <ArrowIcon direction="up" /></a>
         </div>
       </div>
     </footer>

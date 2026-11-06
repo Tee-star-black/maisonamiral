@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowIcon } from "@/components/ui-icons";
 import Image from "next/image";
 import Link from "next/link";
 import { cartCount, cartSubtotal, changeQuantity, removeFromCart, useCart } from "@/lib/cart";
@@ -15,7 +16,7 @@ export function CartView() {
     return (
       <section className={styles.empty}>
         <p>Your cart is empty.</p>
-        <Link href="/shop">Explore the collection <span aria-hidden="true">↗</span></Link>
+        <Link href="/shop">Explore the collection <span aria-hidden="true"><ArrowIcon direction="up-right" /></span></Link>
       </section>
     );
   }
@@ -55,7 +56,7 @@ export function CartView() {
             </article>
           );
         })}
-        <Link className={styles.back} href="/shop">← Continue shopping</Link>
+        <Link className={styles.back} href="/shop"><ArrowIcon direction="left" /> Continue shopping</Link>
       </section>
 
       <aside className={styles.summary} aria-label="Order summary">
@@ -64,7 +65,7 @@ export function CartView() {
         <div className={styles.summaryLine}><span>Delivery</span><strong>{formatPrice(delivery)}</strong></div>
         <div className={styles.grandTotal}><span>Total</span><strong>{formatPrice(subtotal + delivery)}</strong></div>
         <p>Flat delivery fee of R40 per order, including mixed carts.</p>
-        <Link href="/checkout" className={styles.checkout}>PROCEED TO CHECKOUT <span>↗</span></Link>
+        <Link href="/checkout" className={styles.checkout}>PROCEED TO CHECKOUT <span><ArrowIcon direction="up-right" /></span></Link>
       </aside>
     </div>
   );

@@ -1,3 +1,4 @@
+import { ArrowIcon } from "@/components/ui-icons";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -77,7 +78,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </div>
 
         <aside className={styles.productInfo}>
-          <Link href="/shop" className={styles.backLink}>← Back to shop</Link>
+          <Link href="/shop" className={styles.backLink}><ArrowIcon direction="left" /> Back to shop</Link>
           <div className={styles.productIndex}>
             OBJECT {String(products.findIndex((item) => item.slug === product.slug) + 1).padStart(2, "0")} / {String(products.length).padStart(2, "0")}
           </div>

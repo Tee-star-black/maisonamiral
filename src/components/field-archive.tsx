@@ -1,3 +1,4 @@
+import { ArrowIcon } from "@/components/ui-icons";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./field-archive.module.css";
@@ -161,7 +162,7 @@ export function FieldArchive() {
           <strong>From the archive to the garment.</strong>
           <p>Original graphic placement, documented in the Automobile Tee.</p>
         </div>
-        <span className={styles.detailArrow} aria-hidden="true">↗</span>
+        <span className={styles.detailArrow} aria-hidden="true"><ArrowIcon direction="up-right" /></span>
       </Link>
     </section>
   );

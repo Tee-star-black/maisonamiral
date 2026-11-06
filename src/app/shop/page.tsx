@@ -1,3 +1,4 @@
+import { ArrowIcon } from "@/components/ui-icons";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -42,7 +43,7 @@ export default function ShopPage() {
                   sizes="(max-width: 520px) 50vw, (max-width: 960px) 33vw, 25vw"
                   className={styles.image}
                 />
-                <span className={styles.quickView}>VIEW PRODUCT ↗</span>
+                <span className={styles.quickView}>VIEW PRODUCT <ArrowIcon direction="up-right" /></span>
               </div>
               <div className={styles.meta}>
                 <div className={styles.info}>

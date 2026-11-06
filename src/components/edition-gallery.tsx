@@ -1,3 +1,4 @@
+import { ArrowIcon } from "@/components/ui-icons";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./edition-gallery.module.css";
@@ -44,7 +45,7 @@ export function EditionGallery() {
 
       <div className={styles.footerRow}>
         <span>Johannesburg / South Africa</span>
-        <Link href="/shop/emblem-tee">Explore the Emblem Tee ↗</Link>
+        <Link href="/shop/emblem-tee">Explore the Emblem Tee <ArrowIcon direction="up-right" /></Link>
       </div>
     </section>
   );

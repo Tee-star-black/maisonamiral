@@ -1,3 +1,4 @@
+import { ArrowIcon } from "@/components/ui-icons";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./house-philosophy.module.css";
@@ -36,7 +37,7 @@ export function HousePhilosophy() {
             matter because the person wearing them matters more.
           </p>
           <Link href="/editorial" className={styles.link}>
-            Explore our philosophy <span aria-hidden="true">↗</span>
+            Explore our philosophy <span aria-hidden="true"><ArrowIcon direction="up-right" /></span>
           </Link>
         </div>
       </div>

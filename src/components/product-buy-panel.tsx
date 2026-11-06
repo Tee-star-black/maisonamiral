@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowIcon } from "@/components/ui-icons";
 import { useState } from "react";
 import Link from "next/link";
 import { getProductBySlug } from "@/data/products";
@@ -47,10 +48,10 @@ export function ProductBuyPanel({ slug }: { slug: string }) {
         </div>
       </div>
       {error && <p className={styles.error} role="alert">{error}</p>}
-      <button type="button" onClick={handleAdd} className={styles.add}>ADD TO CART <span>↗</span></button>
+      <button type="button" onClick={handleAdd} className={styles.add}>ADD TO CART <span><ArrowIcon direction="up-right" /></span></button>
       {added && (
         <p className={styles.success} role="status">
-          Added to your cart. <Link href="/cart">View cart →</Link>
+          Added to your cart. <Link href="/cart">View cart <ArrowIcon /></Link>
         </p>
       )}
       <p className={styles.note}>A flat R40 delivery fee is added once per order. EFT details are provided with your invoice.</p>

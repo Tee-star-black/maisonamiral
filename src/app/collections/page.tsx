@@ -1,3 +1,4 @@
+import { ArrowIcon } from "@/components/ui-icons";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -20,7 +21,7 @@ export default function CollectionsPage() {
     >
       <div className={styles.heading}>
         <span>FOUR PIECES / JOHANNESBURG</span>
-        <Link href="/shop">SHOP ALL <span aria-hidden="true">↗</span></Link>
+        <Link href="/shop">SHOP ALL <span aria-hidden="true"><ArrowIcon direction="up-right" /></span></Link>
       </div>
       <div className={styles.grid}>
         {products.map((product, i) => (

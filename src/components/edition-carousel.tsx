@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowIcon, PlaybackIcon } from "@/components/ui-icons";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -74,7 +75,7 @@ export function EditionCarousel() {
         </div>
         <div className={styles.intro}>
           <p>Four objects. One point of view.<br />Designed in Johannesburg.</p>
-          <Link href="/shop">View all pieces <span aria-hidden="true">↗</span></Link>
+          <Link href="/shop">View all pieces <span aria-hidden="true"><ArrowIcon direction="up-right" /></span></Link>
         </div>
       </div>
 
@@ -107,7 +108,7 @@ export function EditionCarousel() {
             <span className={styles.stageNumber} aria-hidden="true">
               MA / {pad(activeIndex)} — {String(products.length).padStart(2, "0")}
             </span>
-            <span className={styles.stageCorner} aria-hidden="true">VIEW PIECE ↗</span>
+            <span className={styles.stageCorner} aria-hidden="true">VIEW PIECE <ArrowIcon direction="up-right" /></span>
           </Link>
 
           <div className={styles.caption} aria-live={isPlaying ? "off" : "polite"} aria-atomic="true">
@@ -141,7 +142,7 @@ export function EditionCarousel() {
                     <strong>{product.name}</strong>
                     <small>{product.shortDescription}</small>
                   </span>
-                  <span className={styles.itemArrow} aria-hidden="true">{active ? "●" : "↗"}</span>
+                  <span className={styles.itemArrow} aria-hidden="true">{active ? "●" : <ArrowIcon direction="up-right" />}</span>
                 </button>
               );
             })}
@@ -150,10 +151,10 @@ export function EditionCarousel() {
           <div className={styles.controls}>
             <div className={styles.navigation} role="group" aria-label="Slideshow controls">
               <button type="button" onClick={() => choose(activeIndex - 1)} aria-label="Previous product">
-                <span aria-hidden="true">←</span>
+                <span aria-hidden="true"><ArrowIcon direction="left" /></span>
               </button>
               <button type="button" onClick={() => choose(activeIndex + 1)} aria-label="Next product">
-                <span aria-hidden="true">→</span>
+                <span aria-hidden="true"><ArrowIcon /></span>
               </button>
             </div>
             <button
@@ -163,7 +164,7 @@ export function EditionCarousel() {
               aria-pressed={!isPlaying}
               onClick={() => setPlayPreference(!isPlaying)}
             >
-              <span className={styles.playIcon} aria-hidden="true">{isPlaying ? "Ⅱ" : "▶"}</span>
+              <span className={styles.playIcon} aria-hidden="true"><PlaybackIcon paused={!isPlaying} /></span>
               {isPlaying ? "PAUSE" : "PLAY"}
             </button>
           </div>
