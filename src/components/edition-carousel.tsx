@@ -1,10 +1,11 @@
 "use client";
+import { useCatalogue } from "@/components/catalogue-provider";
 
 import { ArrowIcon, PlaybackIcon } from "@/components/ui-icons";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { formatPrice, products } from "@/data/products";
+import { formatPrice } from "@/data/products";
 import styles from "./edition-carousel.module.css";
 
 const SLIDE_INTERVAL = 6000;
@@ -25,6 +26,7 @@ function getServerReducedMotion() {
 }
 
 export function EditionCarousel() {
+  const products = useCatalogue();
   const sectionRef = useRef<HTMLElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [visible, setVisible] = useState(false);
@@ -35,7 +37,8 @@ export function EditionCarousel() {
     getServerReducedMotion,
   );
   const isPlaying = playPreference ?? !prefersReducedMotion;
-  const activeProduct = products[activeIndex];
+  const currentIndex = products.length ? activeIndex % products.length : 0;
+  const activeProduct = products[currentIndex];
 
   useEffect(() => {
     const element = sectionRef.current;
@@ -54,11 +57,19 @@ export function EditionCarousel() {
       setActiveIndex((previous) => (previous + 1) % products.length);
     }, SLIDE_INTERVAL);
     return () => window.clearTimeout(timer);
-  }, [activeIndex, isPlaying, visible]);
+  }, [activeIndex, isPlaying, visible, products.length]);
 
   function choose(index: number) {
     setActiveIndex((index + products.length) % products.length);
   }
+
+  if (!activeProduct)
+    return (
+      <section className={styles.section}>
+        <h2>The collection</h2>
+        <p>New pieces are on their way.</p>
+      </section>
+    );
 
   return (
     <section
@@ -74,8 +85,17 @@ export function EditionCarousel() {
           <h2 id="edition-heading">Edition 001.</h2>
         </div>
         <div className={styles.intro}>
-          <p>Four objects. One point of view.<br />Designed in Johannesburg.</p>
-          <Link href="/shop">View all pieces <span aria-hidden="true"><ArrowIcon direction="up-right" /></span></Link>
+          <p>
+            {products.length} objects. One point of view.
+            <br />
+            Designed in Johannesburg.
+          </p>
+          <Link href="/shop">
+            View all pieces{" "}
+            <span aria-hidden="true">
+              <ArrowIcon direction="up-right" />
+            </span>
+          </Link>
         </div>
       </div>
 
@@ -87,11 +107,13 @@ export function EditionCarousel() {
             aria-label={"View " + activeProduct.name}
           >
             {products.map((product, index) => {
-              const active = index === activeIndex;
+              const active = index === currentIndex;
               return (
                 <div
                   key={product.slug}
-                  className={styles.media + (active ? " " + styles.mediaActive : "")}
+                  className={
+                    styles.media + (active ? " " + styles.mediaActive : "")
+                  }
                   aria-hidden="true"
                 >
                   <Image
@@ -106,34 +128,52 @@ export function EditionCarousel() {
               );
             })}
             <span className={styles.stageNumber} aria-hidden="true">
-              MA / {pad(activeIndex)} — {String(products.length).padStart(2, "0")}
+              MA / {pad(activeIndex)} —{" "}
+              {String(products.length).padStart(2, "0")}
             </span>
-            <span className={styles.stageCorner} aria-hidden="true">VIEW PIECE <ArrowIcon direction="up-right" /></span>
+            <span className={styles.stageCorner} aria-hidden="true">
+              VIEW PIECE <ArrowIcon direction="up-right" />
+            </span>
           </Link>
 
-          <div className={styles.caption} aria-live={isPlaying ? "off" : "polite"} aria-atomic="true">
+          <div
+            className={styles.caption}
+            aria-live={isPlaying ? "off" : "polite"}
+            aria-atomic="true"
+          >
             <div className={styles.captionTitle} key={activeProduct.slug}>
               <small>EDITION 001 / {pad(activeIndex)}</small>
               <strong>{activeProduct.name}</strong>
             </div>
-            <span className={styles.captionPrice}>{formatPrice(activeProduct.price)}</span>
+            <span className={styles.captionPrice}>
+              {formatPrice(activeProduct.price)}
+            </span>
           </div>
         </div>
 
         <div className={styles.index}>
           <div className={styles.indexHeading}>
             <span>THE OBJECTS / INDEX</span>
-            <span>{pad(activeIndex)} / {String(products.length).padStart(2, "0")}</span>
+            <span>
+              {pad(activeIndex)} / {String(products.length).padStart(2, "0")}
+            </span>
           </div>
 
-          <div className={styles.indexItems} role="group" aria-label="Choose a product to preview">
+          <div
+            className={styles.indexItems}
+            role="group"
+            aria-label="Choose a product to preview"
+          >
             {products.map((product, index) => {
-              const active = index === activeIndex;
+              const active = index === currentIndex;
               return (
                 <button
                   key={product.slug}
                   type="button"
-                  className={styles.indexItem + (active ? " " + styles.indexItemActive : "")}
+                  className={
+                    styles.indexItem +
+                    (active ? " " + styles.indexItemActive : "")
+                  }
                   aria-pressed={active}
                   onClick={() => choose(index)}
                 >
@@ -142,29 +182,53 @@ export function EditionCarousel() {
                     <strong>{product.name}</strong>
                     <small>{product.shortDescription}</small>
                   </span>
-                  <span className={styles.itemArrow} aria-hidden="true">{active ? "●" : <ArrowIcon direction="up-right" />}</span>
+                  <span className={styles.itemArrow} aria-hidden="true">
+                    {active ? "●" : <ArrowIcon direction="up-right" />}
+                  </span>
                 </button>
               );
             })}
           </div>
 
           <div className={styles.controls}>
-            <div className={styles.navigation} role="group" aria-label="Slideshow controls">
-              <button type="button" onClick={() => choose(activeIndex - 1)} aria-label="Previous product">
-                <span aria-hidden="true"><ArrowIcon direction="left" /></span>
+            <div
+              className={styles.navigation}
+              role="group"
+              aria-label="Slideshow controls"
+            >
+              <button
+                type="button"
+                onClick={() => choose(activeIndex - 1)}
+                aria-label="Previous product"
+              >
+                <span aria-hidden="true">
+                  <ArrowIcon direction="left" />
+                </span>
               </button>
-              <button type="button" onClick={() => choose(activeIndex + 1)} aria-label="Next product">
-                <span aria-hidden="true"><ArrowIcon /></span>
+              <button
+                type="button"
+                onClick={() => choose(activeIndex + 1)}
+                aria-label="Next product"
+              >
+                <span aria-hidden="true">
+                  <ArrowIcon />
+                </span>
               </button>
             </div>
             <button
               type="button"
               className={styles.playButton}
-              aria-label={isPlaying ? "Pause automatic slideshow" : "Play automatic slideshow"}
+              aria-label={
+                isPlaying
+                  ? "Pause automatic slideshow"
+                  : "Play automatic slideshow"
+              }
               aria-pressed={!isPlaying}
               onClick={() => setPlayPreference(!isPlaying)}
             >
-              <span className={styles.playIcon} aria-hidden="true"><PlaybackIcon paused={!isPlaying} /></span>
+              <span className={styles.playIcon} aria-hidden="true">
+                <PlaybackIcon paused={!isPlaying} />
+              </span>
               {isPlaying ? "PAUSE" : "PLAY"}
             </button>
           </div>

@@ -1,14 +1,18 @@
 "use client";
+import { getProductBySlug } from "@/lib/client-catalogue";
+import { useCatalogue } from "@/components/catalogue-provider";
 
 import { ArrowIcon } from "@/components/ui-icons";
 import { useState } from "react";
 import Link from "next/link";
-import { getProductBySlug } from "@/data/products";
+
 import { addToCart, SIZES, type GarmentSize } from "@/lib/cart";
 import styles from "./product-buy-panel.module.css";
 
 export function ProductBuyPanel({ slug }: { slug: string }) {
-  const accessory = getProductBySlug(slug)?.category === "accessory";
+  useCatalogue();
+  const product = getProductBySlug(slug);
+  const accessory = product?.category === "accessory";
   const [size, setSize] = useState<GarmentSize | null>(accessory ? "ONE SIZE" : null);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
@@ -19,6 +23,7 @@ export function ProductBuyPanel({ slug }: { slug: string }) {
       setError("Choose a size before adding this piece to your cart.");
       return;
     }
+    if(product?.stock && (product.stock[accessory ? "ONE SIZE" : size!] ?? 0) < quantity) {setError("The selected quantity is unavailable in this size.");return;}
     const problem = addToCart(slug, accessory ? "ONE SIZE" : size!, quantity);
     if (problem) { setAdded(false); setError(problem); return; }
     setAdded(true);

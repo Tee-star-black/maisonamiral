@@ -3,7 +3,7 @@
  * in NEXT_PUBLIC variables or imported from client components.
  */
 export async function storeDb<T = unknown>(
-  table: "maison_orders" | "maison_subscribers",
+  table: "maison_orders" | "maison_subscribers" | "maison_products" | "maison_email_events",
   method: "GET" | "POST" | "PATCH" | "DELETE",
   options: { query?: Record<string, string>; body?: unknown; prefer?: string } = {},
 ): Promise<T> {

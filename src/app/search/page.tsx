@@ -1,10 +1,12 @@
+import { getCatalogue } from "@/lib/catalogue";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { products, formatPrice } from "@/data/products";
+import { formatPrice } from "@/data/products";
 import { EditorialPage } from "@/components/editorial-page";
 
 export const metadata: Metadata = { title: "Search", robots: { index: false, follow: true } };
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{q?:string}> }) {
+  const products = await getCatalogue();
   const {q = ""} = await searchParams;
   const query = typeof q === "string" ? q.trim().slice(0,100) : "";
   const found = products.filter(product => `${product.name} ${product.description}`.toLowerCase().includes(query.toLowerCase()));

@@ -31,6 +31,8 @@ jobs:
         run: npm audit --omit=dev --audit-level=high
       - name: Lint
         run: npm run lint
+      - name: Security and commerce regression tests
+        run: npm test
       - name: Production build
         run: npm run build
       - name: Smoke-test store routes and product assets

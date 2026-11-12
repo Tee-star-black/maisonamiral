@@ -1,9 +1,10 @@
+import { getCatalogue } from "@/lib/catalogue";
 import { ArrowIcon } from "@/components/ui-icons";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { formatPrice, getProductBySlug, products } from "@/data/products";
+import { formatPrice } from "@/data/products";
 import { ProductBuyPanel } from "@/components/product-buy-panel";
 import { SiteFooter } from "@/components/site-footer";
 import styles from "./page.module.css";
@@ -12,13 +13,12 @@ type ProductPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
-  return products.map((product) => ({ slug: product.slug }));
-}
+
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const products = await getCatalogue();
+  const product = products.find(p=>p.slug===slug);
   if (!product) return { title: "Product not found" };
   return {
     title: product.name + " | Shop South Africa",
@@ -30,12 +30,13 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const products = await getCatalogue();
+  const product = products.find(p=>p.slug===slug);
   if (!product) notFound();
 
   const structuredProduct = {
     "@context": "https://schema.org", "@type": "Product",
-    name: product.name, description: product.description, image: product.images.map((image) => "https://www.maisonamiral.co.za" + image),
+    name: product.name, description: product.description, image: product.images.map((image) => new URL(image,"https://www.maisonamiral.co.za").href),
     brand: { "@type": "Brand", name: "Maison Amiral" },
     offers: { "@type": "Offer", url: "https://www.maisonamiral.co.za/shop/" + product.slug, priceCurrency: "ZAR", price: product.price.toFixed(2), seller: { "@type": "Organization", name: "Maison Amiral" } }
   };

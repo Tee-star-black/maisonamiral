@@ -16,8 +16,8 @@ function setup(existing, failRecipient) {
   const emails=[];
   const exports={};
   vm.runInNewContext(compile('../src/app/api/checkout/route.ts'), {
-    exports,Response,Date,Promise,Number,JSON,console:{error:()=>{}},setTimeout:fn=>fn(),
-    require:name => name.includes('commerce') ? {...commerce,getEftSettings:()=>({enabled:true,bank:{},key:'fake',sender:'sender@example.invalid',adminRecipients:['support@maisonamiral.co.za','maisonamiral@gmail.com']})} : name.includes('eft-invoice') ? {referenceFor:()=> 'MA-TEST', sendOrderEmail:async(to)=>{emails.push(to);if(to===failRecipient)throw Error('temporary failure');return 'email-id';}} : {storeDb:async(_table,method,options)=>{
+    exports,Response,Date,Promise,Number,JSON,process:{env:{}},console:{error:()=>{}},setTimeout:fn=>fn(),
+    require:name => name.includes('catalogue') ? {getCatalogue:async()=>products} : name.includes('commerce') ? {...commerce,getEftSettings:()=>({enabled:true,bank:{},key:'fake',sender:'sender@example.invalid',adminRecipients:['support@maisonamiral.co.za','maisonamiral@gmail.com']})} : name.includes('eft-invoice') ? {referenceFor:()=> 'MA-TEST', sendOrderEmail:async(to)=>{emails.push(to);if(to===failRecipient)throw Error('temporary failure');return 'email-id';}} : {storeDb:async(_table,method,options)=>{
       if(method==='GET')return row?[row]:[];
       if(method==='POST'){inserts++;row={...options.body,created_at:new Date().toISOString()};return [];}
       if(method==='PATCH'){Object.assign(row,options.body);return [];}

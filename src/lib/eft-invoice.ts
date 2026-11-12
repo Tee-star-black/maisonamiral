@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import type { Buyer, OrderItem } from "@/lib/commerce";
 
 export type Invoice = {
+  replyTo?: string;
   id: string; buyer: Buyer; items: OrderItem[];
   subtotalCents: number; deliveryCents: number; totalCents: number;
   bank: { bankName: string; accountHolder: string; accountNumber: string;
@@ -51,7 +52,7 @@ export async function sendOrderEmail(to: string, invoice: Invoice, apiKey: strin
     method: "POST",
     headers: { Authorization: "Bearer " + apiKey, "Content-Type": "application/json",
       "Idempotency-Key": invoice.id + (ownerCopy ? "-store-" : "-customer-") + createHash("sha256").update(to.toLowerCase()).digest("hex").slice(0, 16) },
-    body: JSON.stringify({ from, to: [to],
+    body: JSON.stringify({ from, to: [to], ...(invoice.replyTo ? {reply_to:invoice.replyTo} : {}),
       subject: `${testMode ? "TEST ONLY | " : ""}${ownerCopy ? "New order" : "Your EFT invoice"} | ${referenceFor(invoice.id)} | Maison Amiral`,
       html: renderInvoice(invoice, ownerCopy, testMode) }),
     signal: AbortSignal.timeout(12000), cache: "no-store",

@@ -1,3 +1,4 @@
+import { CatalogueProvider } from "@/components/catalogue-provider";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -51,13 +52,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: {children:React.ReactNode}) {
   return (
     <html
       lang="en-ZA"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body id="top" className="min-h-full"><StoreHeader />{children}</body>
+      <body id="top" className="min-h-full"><CatalogueProvider><StoreHeader />{children}</CatalogueProvider></body>
     </html>
   );
 }
