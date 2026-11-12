@@ -1,9 +1,11 @@
+import { getCatalogue } from "@/lib/catalogue";
 import type { MetadataRoute } from "next";
-import { products } from "@/data/products";
+
 
 const baseUrl = "https://www.maisonamiral.co.za";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const products = await getCatalogue();
   const routes = [
     "",
     "/shop",

@@ -1,5 +1,5 @@
 import { storeOrderRecipients } from "./order-recipients";
-import { getProductBySlug } from "@/data/products";
+import { getProductBySlug, type MaisonProduct } from "@/data/products";
 
 export const provinces = [
   "Eastern Cape", "Free State", "Gauteng", "KwaZulu-Natal", "Limpopo",
@@ -34,19 +34,20 @@ export function validateBuyer(value: unknown): Buyer | null {
       !/^\d{4}$/.test(buyer.postalCode)) return null;
   return buyer;
 }
-export function validateItems(raw: unknown): OrderItem[] | null {
+export function validateItems(raw: unknown, catalogue?: MaisonProduct[]): OrderItem[] | null {
   if (!Array.isArray(raw) || raw.length < 1 || raw.length > 12) return null;
   const seen = new Set<string>();
   const items: OrderItem[] = [];
   for (const value of raw) {
     if (!value || typeof value !== "object") return null;
     const row = value as Record<string, unknown>;
-    const product = typeof row.slug === "string" ? getProductBySlug(row.slug) : null;
+    const product = typeof row.slug === "string" ? (catalogue ? catalogue.find(p=>p.slug===row.slug) : getProductBySlug(row.slug)) : null;
     const size = row.size;
     const quantity = row.quantity;
     if (!product || !(product.category === "accessory" ? size === "ONE SIZE" : ["S","M","L","XL"].includes(String(size))) ||
         !Number.isInteger(quantity) || (quantity as number) < 1 ||
         (quantity as number) > 10) return null;
+    if(product.stock && (product.stock[String(size)] ?? 0) < (quantity as number)) return null;
     const key = product.slug + ":" + size;
     if (seen.has(key)) return null;
     seen.add(key);

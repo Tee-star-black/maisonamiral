@@ -1,9 +1,10 @@
+import { getCatalogue } from "@/lib/catalogue";
 import { ArrowIcon } from "@/components/ui-icons";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { EditorialPage } from "@/components/editorial-page";
-import { formatPrice, products } from "@/data/products";
+import { formatPrice } from "@/data/products";
 import styles from "./collections.module.css";
 
 export const metadata: Metadata = {
@@ -12,7 +13,8 @@ export const metadata: Metadata = {
   description: "Maison Amiral Edition 001. Original clothing and accessories from Johannesburg.",
 };
 
-export default function CollectionsPage() {
+export default async function CollectionsPage() {
+  const products = await getCatalogue();
   return (
     <EditorialPage
       eyebrow="Collections / 001"

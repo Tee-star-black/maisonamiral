@@ -1,3 +1,4 @@
+import { getCatalogue } from "@/lib/catalogue";
 import { getDeliveryFee, getEftSettings, validateBuyer, validateItems } from "@/lib/commerce";
 import { referenceFor, sendOrderEmail } from "@/lib/eft-invoice";
 import { storeDb } from "@/lib/maison-store-db";
@@ -23,7 +24,9 @@ export async function POST(request: Request) {
   if (!raw || typeof raw !== "object") return json({ error:"Invalid checkout details." },400);
   const body = raw as Record<string,unknown>;
   const buyer = validateBuyer(body.customer);
-  const items = validateItems(body.items);
+  let catalogue;
+  try { catalogue = await getCatalogue(); } catch { return json({error:"The catalogue is unavailable. Please try again."},503); }
+  const items = validateItems(body.items, catalogue);
   if (!buyer || !items) return json({ error:"Please check your details, items, sizes and quantities." },400);
   const fee = getDeliveryFee(items);
   const subtotal = items.reduce((sum,item)=>sum+item.unit_price_cents*item.quantity,0);
@@ -84,13 +87,20 @@ export async function POST(request: Request) {
   }
   if (!isNew) return json({error:"Unable to create order."},503);
 
-  const invoice = { id,buyer,items,subtotalCents:subtotal,deliveryCents:fee,totalCents:total,bank:settings.bank };
+  const invoice = { replyTo:process.env.MAISON_REPLY_TO, id,buyer,items,subtotalCents:subtotal,deliveryCents:fee,totalCents:total,bank:settings.bank };
   const sent: PromiseSettledResult<string>[] = [];
   const recipients = [buyer.email, ...settings.adminRecipients];
   for (let index = 0; index < recipients.length; index++) {
     if (index) await new Promise(resolve => setTimeout(resolve, 600));
     try { sent.push({status:"fulfilled",value:await sendOrderEmail(recipients[index],invoice,settings.key,settings.sender,index > 0)}); }
     catch (reason) { sent.push({status:"rejected",reason}); }
+  }
+  if(process.env.MAISON_CATALOGUE_ENABLED==='true') {
+    for(let index=0;index<sent.length;index++) {
+      const result=sent[index]; if(result.status==='fulfilled') {
+        await storeDb('maison_email_events','POST',{body:{id:'invoice-'+id+'-'+index,event_type:'email.sent',email_id:result.value,recipient:recipients[index],subject:'EFT invoice | '+referenceFor(id),order_id:id},prefer:'resolution=ignore-duplicates,return=minimal'}).catch(()=>console.error('Email history save failed',{orderId:id}));
+      }
+    }
   }
   const customerSent = sent[0].status==="fulfilled";
   const ownerSent = sent.slice(1).every((result) => result.status === "fulfilled");

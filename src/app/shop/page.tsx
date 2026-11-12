@@ -1,9 +1,10 @@
+import { getCatalogue } from "@/lib/catalogue";
 import { ArrowIcon } from "@/components/ui-icons";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
-import { formatPrice, products } from "@/data/products";
+import { formatPrice } from "@/data/products";
 import styles from "./shop.module.css";
 
 export const metadata: Metadata = {
@@ -13,7 +14,8 @@ export const metadata: Metadata = {
   description: "Shop Maison Amiral graphic T-shirts and original accessories designed in Johannesburg. Explore Edition 001 and the Boat Floating Wheel.",
 };
 
-export default function ShopPage() {
+export default async function ShopPage() {
+  const products = await getCatalogue();
   return (
     <main className={styles.page}>
       <header className={styles.catalogHeader}>

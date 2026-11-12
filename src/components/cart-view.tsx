@@ -1,13 +1,16 @@
 "use client";
+import { getProductBySlug } from "@/lib/client-catalogue";
+import { useCatalogue } from "@/components/catalogue-provider";
 
 import { ArrowIcon } from "@/components/ui-icons";
 import Image from "next/image";
 import Link from "next/link";
 import { cartCount, cartSubtotal, changeQuantity, removeFromCart, useCart } from "@/lib/cart";
-import { getDeliveryFee, formatPrice, getProductBySlug } from "@/data/products";
+import { getDeliveryFee, formatPrice } from "@/data/products";
 import styles from "./cart-view.module.css";
 
 export function CartView() {
+  useCatalogue();
   const items = useCart();
   const subtotal = cartSubtotal(items);
   const delivery = getDeliveryFee(items) / 100;

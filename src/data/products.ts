@@ -17,6 +17,7 @@ export type MaisonProduct = {
   slug: string;
   name: string;
   price: number;
+  stock?: Record<string,number>;
   category?: "apparel" | "accessory";
   edition: string;
   artMark: string;

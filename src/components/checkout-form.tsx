@@ -1,11 +1,13 @@
 "use client";
+import { getProductBySlug } from "@/lib/client-catalogue";
+import { useCatalogue } from "@/components/catalogue-provider";
 
 import { ArrowIcon } from "@/components/ui-icons";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { cartSubtotal, clearCart, useCart } from "@/lib/cart";
-import { formatPrice, getDeliveryFee, getProductBySlug } from "@/data/products";
+import { formatPrice, getDeliveryFee } from "@/data/products";
 import { provinces, type Buyer } from "@/lib/commerce";
 import styles from "./checkout-form.module.css";
 import { WheelLoader } from "./wheel-loader";
@@ -19,6 +21,7 @@ type CheckoutConfig = { enabled: boolean; deliveryCents: number | null; currency
 const money = (cents: number) => "R" + (cents / 100).toFixed(2);
 
 export function CheckoutForm() {
+  useCatalogue();
   const attempt = useRef<string | null>(null);
   const items = useCart();
   const subtotal = cartSubtotal(items);

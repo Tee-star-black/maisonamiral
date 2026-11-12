@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { getProductBySlug } from "@/data/products";
+import { getProductBySlug } from "@/lib/client-catalogue";
 
 export const SIZES = ["S", "M", "L", "XL", "ONE SIZE"] as const;
 export type GarmentSize = (typeof SIZES)[number];
@@ -28,9 +28,8 @@ function sanitise(value: unknown): CartLine[] {
   for (const entry of value.slice(0, 50)) {
     if (!entry || typeof entry !== "object") continue;
     const raw = entry as Partial<CartLine>;
-    if (typeof raw.slug !== "string" || !getProductBySlug(raw.slug)) continue;
-    const product = getProductBySlug(raw.slug);
-    if (!SIZES.includes(raw.size as GarmentSize) || (product?.category === "accessory" ? raw.size !== "ONE SIZE" : raw.size === "ONE SIZE")) continue;
+    if (typeof raw.slug !== "string" || !/^[a-z0-9-]{1,100}$/.test(raw.slug)) continue;
+    if (!SIZES.includes(raw.size as GarmentSize)) continue;
     const quantity = Number(raw.quantity);
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 10) continue;
     const key = raw.slug + ":" + raw.size;

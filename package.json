@@ -7,15 +7,22 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "setup": "npm install"
+    "setup": "npm install",
+    "test": "node --test tests/*.test.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "2.119.0",
     "next": "^16.4.3",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "three": "^0.181.0"
+    "server-only": "0.0.1",
+    "sharp": "0.35.5",
+    "svix": "2.10.0",
+    "three": "^0.181.0",
+    "zod": "4.6.7"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.16",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
