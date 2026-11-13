@@ -11,7 +11,7 @@ export function HousePhilosophy() {
   return (
     <section className={styles.section} id="philosophy" aria-labelledby="house-philosophy-title">
       <div className={styles.heading}>
-        <span>04 / HOUSE PHILOSOPHY</span>
+        <span>03 / HOUSE PHILOSOPHY</span>
         <span>JOHANNESBURG / SOUTH AFRICA</span>
       </div>
       <div className={styles.layout}>

@@ -398,3 +398,18 @@
   .navigation button { width: 48px; height: 48px; }
   .playButton { min-height: 48px; }
 }
+
+/* Yellow interrupts the collection index and makes the new drop part of the house. */
+.section { position:relative; }
+.section::before {
+  content:"";
+  position:absolute;
+  top:0;
+  left:clamp(20px,4.1vw,76px);
+  width:min(250px,35vw);
+  height:3px;
+  pointer-events:none;
+  background:repeating-linear-gradient(90deg,#ffd500 0 44px,transparent 44px 51px,#ffd500 51px 55px,transparent 55px 85px);
+}
+.indexItemActive::before { background:#e8bd00; }
+.indexItemActive .itemArrow { color:#8a7500; }

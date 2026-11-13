@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { EditionCarousel } from "@/components/edition-carousel";
-import { FieldArchive } from "@/components/field-archive";
 import { MoreToCome } from "@/components/more-to-come";
 import { HousePhilosophy } from "@/components/house-philosophy";
 import { HeroMedia } from "@/components/hero-media";
@@ -55,7 +54,6 @@ export default function Home() {
       <div className={styles.redlineBottomline}><span>THE COLOUR INTERRUPTS THE ORDINARY</span><span>MAISON AMIRAL / REDLINE 001</span></div>
     </section>
     <EditionCarousel />
-    <FieldArchive />
     <HousePhilosophy />
     <section className={styles.about} id="about" aria-labelledby="about-heading"><div className={styles.aboutMedia}><Image src="/Edit.jpg" alt="Maison Amiral Emblem Tee worn in an editorial portrait" fill sizes="(max-width: 900px) 100vw, 50vw" /></div><div className={styles.aboutText}><p className={styles.kicker}>04 / THE HOUSE</p><h2 id="about-heading">Clothing with<br /><em>a point of view.</em></h2><p>Maison Amiral is an independent label from Johannesburg. We work with simple forms, graphic details and the belief that the best pieces become part of daily life.</p><Link href="/editorial">Read the house story <span aria-hidden="true"><ArrowIcon direction="up-right" /></span></Link><span className={styles.aboutIndex}>JOHANNESBURG / SOUTH AFRICA</span></div></section>
     <MoreToCome />

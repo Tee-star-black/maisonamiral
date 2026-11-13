@@ -120,3 +120,25 @@
   .navigation a { display: inline-flex; align-items: center; min-height: 44px; }
   .wordmark { white-space: normal; overflow-wrap: anywhere; font-size: clamp(2.3rem, 10vw, 4rem); }
 }
+
+/* Yellow glitch rule returns at the closing signature on every page. */
+.footer { position:relative; }
+.footer::before {
+  content:"";
+  position:absolute;
+  left:clamp(20px,4.1vw,76px);
+  top:-1px;
+  width:min(370px,45vw);
+  height:3px;
+  pointer-events:none;
+  background:repeating-linear-gradient(90deg,#ffd500 0 43px,transparent 43px 52px,#ffd500 52px 57px,transparent 57px 89px);
+}
+.navigation a:hover,.cta:hover { color:#ffdb38; }
+.wordmark::before {
+  content:"";
+  display:block;
+  width:clamp(65px,12vw,155px);
+  height:3px;
+  margin-bottom:18px;
+  background:repeating-linear-gradient(90deg,#ffcd00 0 27px,transparent 27px 34px);
+}

@@ -24,3 +24,18 @@
 @media(max-width:900px){.layout{grid-template-columns:1fr}.visual{min-height:520px;border-right:0;border-bottom:1px solid #d9d9d4}.copy{max-width:none;padding:70px clamp(20px,6vw,76px)}}
 @media(max-width:520px){.heading,.bottom{font-size:8px}.heading span:last-child,.bottom span:last-child{display:none}.visual{min-height:365px}.visualCode{left:18px;top:18px}.visualNote{bottom:18px;right:18px;font-size:8px}.copy{padding:65px 22px}.copy h2{font-size:clamp(3.2rem,13vw,5.5rem)}.link{width:100%}}
 @media(prefers-reduced-motion:reduce){.ringOuter,.ringInner{animation:none}}
+
+/* The wheel study keeps its shape; only a restrained Redline signal is introduced. */
+.section { position:relative; }
+.section::before {
+  content:"";
+  position:absolute;
+  z-index:2;
+  top:0;
+  right:clamp(20px,4.1vw,76px);
+  width:min(180px,24vw);
+  height:3px;
+  pointer-events:none;
+  background:repeating-linear-gradient(90deg,#ffd500 0 28px,transparent 28px 35px,#ffd500 35px 41px,transparent 41px 62px);
+}
+.link:hover { color:#997600; opacity:1; }

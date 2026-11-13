@@ -379,3 +379,15 @@
   .detailBlock { grid-template-columns: 90px minmax(0,1fr); gap: 12px; }
   .productNote { margin-top: 28px; }
 }
+
+/* A fine Redline accent on each garment detail page. */
+.productInfo::before {
+  content:"";
+  display:block;
+  height:3px;
+  width:clamp(95px,42%,195px);
+  margin:0 0 25px;
+  background:repeating-linear-gradient(90deg,#ffd500 0 32px,transparent 32px 38px,#ffd500 38px 43px,transparent 43px 65px);
+}
+.backLink:hover { border-bottom-color:#e6bd00; }
+@media(max-width:900px) { .productInfo::before { margin-bottom:19px; } }

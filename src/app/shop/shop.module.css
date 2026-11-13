@@ -58,3 +58,26 @@
 /* First Redline drop: small glitch bars and a visible NEW badge. */
 .redlineCard .visual::before { content:"NEW / REDLINE"; position:absolute; z-index:2; top:10px; left:10px; background:#ffd600; color:#151515; font-size:9px; font-weight:700; letter-spacing:.09em; padding:8px 9px; }
 .redlineCard .visual::after { content:""; position:absolute; z-index:2; right:0; top:11%; width:43%; height:3px; background:repeating-linear-gradient(90deg,#ffdc00 0 22px,transparent 22px 27px); box-shadow:0 9px 0 -1px #f5d000; pointer-events:none; }
+
+/* The yellow signal carries into the main catalogue rather than living on one card. */
+.catalogHeader { position:relative; }
+.catalogHeader::before {
+  content:"";
+  position:absolute;
+  top:0;
+  left:clamp(18px,4vw,64px);
+  height:3px;
+  width:min(210px,32vw);
+  background:repeating-linear-gradient(90deg,#ffd600 0 32px,transparent 32px 40px,#ffd600 40px 45px,transparent 45px 69px);
+}
+.toolbar { position:relative; }
+.toolbar::after {
+  content:"";
+  position:absolute;
+  bottom:-2px;
+  right:0;
+  height:2px;
+  width:min(160px,22vw);
+  background:repeating-linear-gradient(90deg,#fbd200 0 22px,transparent 22px 29px);
+}
+.card:hover .visual,.card:focus-visible .visual { border-color:#e8c400; }

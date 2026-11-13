@@ -103,11 +103,13 @@
   .heroContent { padding-left: 14px; padding-right: 14px; }
 }
 
-/* A short hero clip plays once, then the static poster remains. No 1.4s loop flash. */
+/* Two players dissolve the short film into itself, without freezing the hero. */
 .heroPoster { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; }
-.heroVisual video.heroVideo { position:absolute; inset:0; z-index:1; opacity:0; transition:opacity .5s ease; object-fit:cover; object-position:center; }
-.heroVisual video.heroVideoPlaying { opacity:1; }
+.heroVisual video.heroVideo { position:absolute; inset:0; z-index:1; width:100%; height:100%; opacity:0; object-fit:cover; object-position:center; pointer-events:none; transition:opacity .5s ease; }
+.heroVisual video.heroVideoActive { opacity:1; }
 .heroVisual::after { z-index:2; pointer-events:none; }
+.heroPlayButton { position:absolute; z-index:5; right:clamp(18px,4.1vw,76px); bottom:24px; display:flex; align-items:center; gap:18px; padding:12px 15px; border:1px solid #f4efe6; background:#151515d9; color:#fff; cursor:pointer; font:600 10px/1.4 var(--font-geist-sans),Arial,sans-serif; letter-spacing:.08em; text-transform:uppercase; }
+.heroPlayButton:hover,.heroPlayButton:focus-visible { border-color:#ffda00; color:#ffda00; }
 /* New-drop graphics are restrained horizontal pixel interruptions, not text effects. */
 .redlineDrop { position:relative; isolation:isolate; background:#fff; color:#171717; padding:clamp(38px,5vw,76px) clamp(18px,4.1vw,76px) clamp(56px,7vw,104px); overflow:hidden; }
 .redlineDrop::before,.redlineDrop::after { content:""; pointer-events:none; position:absolute; background:repeating-linear-gradient(90deg,#ffcf00 0 46px,transparent 46px 55px,#f0c500 55px 65px,transparent 65px 92px); height:3px; transform:skewX(-15deg); opacity:.93; }
@@ -143,3 +145,29 @@
  .redlineDrop::before { width:50%; top:115px; }
 }
 @media(prefers-reduced-motion:reduce) { .redlineVisual img,.heroVisual video.heroVideo { transition:none; } }
+
+/* Editorial glitch accents extend the Redline drop without overwhelming imagery. */
+.heroTitle::before {
+  content:"";
+  display:block;
+  width:clamp(110px,16vw,240px);
+  height:3px;
+  margin-bottom:23px;
+  background:repeating-linear-gradient(90deg,#ffdd00 0 31px,transparent 31px 39px,#ffdd00 39px 44px,transparent 44px 65px);
+}
+.aboutText::before {
+  content:"";
+  display:block;
+  width:clamp(100px,24%,200px);
+  height:3px;
+  margin-bottom:37px;
+  background:repeating-linear-gradient(90deg,#fbd000 0 34px,transparent 34px 41px,#fbd000 41px 46px,transparent 46px 63px);
+}
+.aboutText>a:hover { border-bottom-color:#d4ab00; }
+@media(max-width:760px) {
+  .heroTitle::before { margin-bottom:16px; }
+  .aboutText::before { margin-bottom:24px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .heroVisual video.heroVideo { transition:none; }
+}
