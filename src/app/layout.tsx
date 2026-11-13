@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { StoreHeader } from "@/components/store-header";
+import { ClickFeedback } from "@/components/click-feedback";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -58,7 +59,7 @@ export default function RootLayout({ children }: {children:React.ReactNode}) {
       lang="en-ZA"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body id="top" className="min-h-full"><CatalogueProvider><StoreHeader />{children}</CatalogueProvider></body>
+      <body id="top" className="min-h-full"><CatalogueProvider><StoreHeader /><ClickFeedback />{children}</CatalogueProvider></body>
     </html>
   );
 }

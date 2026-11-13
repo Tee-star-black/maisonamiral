@@ -18,3 +18,15 @@
 .note{font-size:11px;color:#717171;line-height:1.6;margin:17px 0 0}
 .panel button:focus-visible,.panel a:focus-visible{outline:2px solid #54745a;outline-offset:3px}
 @media(prefers-reduced-motion:reduce){.sizes button{transition:none}}
+
+/* Tactile size and add-to-bag feedback, with no change to checkout rules. */
+.sizes button:active { transform:translateY(1px) scale(.96); border-color:#e7c300; }
+.sizes button[aria-pressed="true"] { box-shadow:inset 0 -3px 0 #ffd600; }
+.add { transition:background .2s ease,color .2s ease,transform .14s ease; }
+.add:active { transform:translateY(2px) scale(.99); background:#ffd600; color:#151515; }
+.add span { display:inline-flex; transition:transform .22s ease; }
+.add:hover span { transform:translate(3px,-2px); }
+@media(prefers-reduced-motion:reduce) {
+  .add,.add span { transition:none; }
+  .add:active,.sizes button:active { transform:none; }
+}

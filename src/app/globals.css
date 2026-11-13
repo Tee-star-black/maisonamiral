@@ -38,7 +38,9 @@ a {
 
 main {
   min-height: 100vh;
-  overflow: hidden;
+  max-width: 100%;
+  overflow-x: clip;
+  overflow-y: visible;
 }
 
 .hero {
@@ -814,4 +816,45 @@ img, video, svg { max-width: 100%; }
 button, input, textarea, select { font: inherit; }
 @media (max-width: 600px) {
   .section-pad { padding: 64px 18px; }
+}
+
+/* Light-touch, site-wide pointer response. The burst is an inert overlay
+   created only for real clicks on interactive elements. */
+.ma-click-burst {
+  position:fixed;
+  z-index:9999;
+  left:0;
+  top:0;
+  width:30px;
+  height:30px;
+  border:2px solid #ffd600;
+  background:transparent;
+  pointer-events:none;
+  transform:translate(-50%,-50%) scale(.28);
+  animation:ma-click-glitch 480ms cubic-bezier(.2,.65,.3,1) forwards;
+  will-change:transform,opacity;
+}
+.ma-click-burst::before,.ma-click-burst::after {
+  content:"";
+  position:absolute;
+  top:6px;
+  left:-16px;
+  width:14px;
+  height:3px;
+  background:#ffd600;
+  box-shadow:20px 10px 0 #ffd600;
+}
+.ma-click-burst::after {
+  top:14px;
+  left:25px;
+  width:17px;
+  box-shadow:none;
+}
+@keyframes ma-click-glitch {
+  0% { opacity:1; transform:translate(-50%,-50%) scale(.25) rotate(-8deg); }
+  40% { opacity:1; transform:translate(-50%,-50%) scale(1.05) rotate(0deg); }
+  100% { opacity:0; transform:translate(-50%,-50%) scale(1.55) rotate(0deg); }
+}
+@media(prefers-reduced-motion:reduce) {
+  .ma-click-burst { display:none; animation:none; }
 }

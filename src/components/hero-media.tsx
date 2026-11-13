@@ -22,7 +22,6 @@ export function HeroMedia() {
   const mounted = useRef(false);
   const [active, setActive] = useState<0 | 1>(0);
   const [visible, setVisible] = useState(false);
-  const [autoplayBlocked, setAutoplayBlocked] = useState(false);
 
   useEffect(() => {
     mounted.current = true;
@@ -43,8 +42,8 @@ export function HeroMedia() {
       const video = players.current[currentPlayer.current];
       if (!video) return;
       void video.play()
-        .then(() => { if (mounted.current) { setVisible(true); setAutoplayBlocked(false); } })
-        .catch(() => { if (mounted.current) setAutoplayBlocked(true); });
+        .then(() => { if (mounted.current) setVisible(true); })
+        .catch(() => { if (mounted.current) setVisible(false); });
     };
 
     const onMotionChange = () => {
@@ -55,11 +54,17 @@ export function HeroMedia() {
     if (!motion.matches) resume();
     motion.addEventListener("change", onMotionChange);
     document.addEventListener("visibilitychange", resume);
+    // If the browser initially blocks autoplay, retry unobtrusively after a
+    // normal first interaction. Never show a manual film-play control.
+    document.addEventListener("pointerdown", resume, { once: true });
+    document.addEventListener("keydown", resume, { once: true });
 
     return () => {
       mounted.current = false;
       motion.removeEventListener("change", onMotionChange);
       document.removeEventListener("visibilitychange", resume);
+      document.removeEventListener("pointerdown", resume);
+      document.removeEventListener("keydown", resume);
       if (cleanupTimer.current !== null) clearTimeout(cleanupTimer.current);
       pauseAll();
     };
@@ -94,7 +99,7 @@ export function HeroMedia() {
       if (previous.ended) {
         previous.currentTime = 0;
         void previous.play().catch(() => {
-          if (mounted.current) setAutoplayBlocked(true);
+          if (mounted.current) setVisible(false);
         });
       }
     });
@@ -117,22 +122,12 @@ export function HeroMedia() {
     if (!video) return;
     video.currentTime = 0;
     void video.play().catch(() => {
-      if (mounted.current) setAutoplayBlocked(true);
+      if (mounted.current) setVisible(false);
     });
   }
 
-  function playOnRequest() {
-    const video = players.current[currentPlayer.current];
-    if (!video) return;
-    void video.play().then(() => {
-      setAutoplayBlocked(false);
-      setVisible(true);
-    }).catch(() => setAutoplayBlocked(true));
-  }
-
   return (
-    <>
-      <div className={styles.heroVisual} aria-hidden="true">
+    <div className={styles.heroVisual} aria-hidden="true">
         <Image src={POSTER} alt="" fill priority sizes="100vw" className={styles.heroPoster} />
         {([0, 1] as const).map((index) => (
           <video
@@ -156,12 +151,6 @@ export function HeroMedia() {
             <source src={HERO_FILM} type="video/mp4" />
           </video>
         ))}
-      </div>
-      {autoplayBlocked && (
-        <button type="button" className={styles.heroPlayButton} onClick={playOnRequest}>
-          Play the film <span aria-hidden="true">▶</span>
-        </button>
-      )}
-    </>
+    </div>
   );
 }
