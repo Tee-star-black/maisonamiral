@@ -102,3 +102,44 @@
   .heroTitle h1 { font-size: 13vw; }
   .heroContent { padding-left: 14px; padding-right: 14px; }
 }
+
+/* A short hero clip plays once, then the static poster remains. No 1.4s loop flash. */
+.heroPoster { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; }
+.heroVisual video.heroVideo { position:absolute; inset:0; z-index:1; opacity:0; transition:opacity .5s ease; object-fit:cover; object-position:center; }
+.heroVisual video.heroVideoPlaying { opacity:1; }
+.heroVisual::after { z-index:2; pointer-events:none; }
+/* New-drop graphics are restrained horizontal pixel interruptions, not text effects. */
+.redlineDrop { position:relative; isolation:isolate; background:#fff; color:#171717; padding:clamp(38px,5vw,76px) clamp(18px,4.1vw,76px) clamp(56px,7vw,104px); overflow:hidden; }
+.redlineDrop::before,.redlineDrop::after { content:""; pointer-events:none; position:absolute; background:repeating-linear-gradient(90deg,#ffcf00 0 46px,transparent 46px 55px,#f0c500 55px 65px,transparent 65px 92px); height:3px; transform:skewX(-15deg); opacity:.93; }
+.redlineDrop::before { top:90px; right:-5%; width:42%; box-shadow:0 8px 0 -1px #ffcf00,0 17px 0 -1px #ffdb25; }
+.redlineDrop::after { bottom:82px; left:-6%; width:38%; box-shadow:0 12px 0 -1px #ffdb25; }
+.redlineTopline,.redlineBottomline { display:flex; justify-content:space-between; gap:18px; font-size:10px; line-height:1.4; letter-spacing:.11em; font-weight:600; }
+.redlineTopline { padding-bottom:18px; border-bottom:1px solid #dcdcdc; }
+.redlineEyebrow { background:#ffd600; color:#151515; padding:6px 9px; }
+.redlineBottomline { padding-top:24px; border-top:1px solid #dcdcdc; color:#737373; }
+.redlineGrid { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:clamp(28px,5vw,90px); align-items:center; padding:32px 0 56px; }
+.redlineVisual { display:block; position:relative; background:#f7f7f7; aspect-ratio:4/5; min-height:320px; overflow:hidden; }
+.redlineVisual img { object-fit:contain; padding:clamp(10px,2vw,28px); transition:transform .5s ease; }
+.redlineVisual:hover img { transform:scale(1.025); }
+.redlineCorner { position:absolute; left:18px; bottom:18px; padding:9px 11px; background:#ffd600; font-size:9px; font-weight:700; letter-spacing:.11em; }
+.redlineCopy { position:relative; padding:40px 0; }
+.redlineCopy::before { content:""; display:block; width:min(260px,52%); height:5px; margin-bottom:45px; background:repeating-linear-gradient(90deg,#ffdc00 0 44px,transparent 44px 49px); }
+.redlineLabel { font-size:10px; font-weight:700; letter-spacing:.12em; }
+.redlineCopy h2 { margin:24px 0; font:400 clamp(3.2rem,5.5vw,7.2rem)/.96 Georgia,"Times New Roman",serif; letter-spacing:-.065em; overflow-wrap:anywhere; }
+.redlineCopy h2 em { font-weight:400; }
+.redlinePrice { font-size:clamp(24px,2.7vw,36px); font-weight:650; letter-spacing:-.025em; margin:18px 0 27px; }
+.redlineDescription { font:400 clamp(17px,1.6vw,22px)/1.45 Georgia,"Times New Roman",serif; max-width:470px; margin:0 0 26px; }
+.redlineSignature { display:flex; align-items:center; gap:14px; padding:14px 0; border-top:1px solid #ddd; font-size:9px; letter-spacing:.1em; color:#555; }
+.redlineSignature img { width:30px; height:40px; object-fit:contain; }
+.redlineCTA { margin-top:24px; padding:18px 22px; background:#141414; color:#fff; display:flex; justify-content:space-between; align-items:center; gap:25px; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+.redlineCTA:hover { background:#333; }
+@media(max-width:760px) {
+ .redlineGrid { grid-template-columns:1fr; gap:8px; }
+ .redlineVisual { min-height:0; aspect-ratio:4/4; }
+ .redlineCopy { padding:28px 0 8px; }
+ .redlineCopy::before { margin-bottom:25px; }
+ .redlineCopy h2 { font-size:clamp(2.9rem,11vw,5.2rem); }
+ .redlineTopline span:last-child,.redlineBottomline span:last-child { display:none; }
+ .redlineDrop::before { width:50%; top:115px; }
+}
+@media(prefers-reduced-motion:reduce) { .redlineVisual img,.heroVisual video.heroVideo { transition:none; } }

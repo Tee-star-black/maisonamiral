@@ -36,7 +36,7 @@ export default async function ShopPage() {
         </div>
         <div className={styles.grid}>
           {products.map((product) => (
-            <Link href={`/shop/${product.slug}`} key={product.slug} className={styles.card}>
+            <Link href={`/shop/${product.slug}`} key={product.slug} className={`${styles.card} ${product.slug === "redline-bumblebeee-blaze" ? styles.redlineCard : ""}`}>
               <div className={styles.visual}>
                 <Image
                   src={product.images[0]}

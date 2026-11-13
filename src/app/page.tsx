@@ -7,6 +7,7 @@ import { EditionCarousel } from "@/components/edition-carousel";
 import { FieldArchive } from "@/components/field-archive";
 import { MoreToCome } from "@/components/more-to-come";
 import { HousePhilosophy } from "@/components/house-philosophy";
+import { HeroMedia } from "@/components/hero-media";
 import styles from "./home.module.css";
 
 export const metadata: Metadata = {
@@ -24,13 +25,34 @@ export default function Home() {
   return <main className={styles.page}>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }} />
     <section className={styles.hero} aria-labelledby="hero-heading">
-      <div className={styles.heroVisual} aria-hidden="true"><video autoPlay muted loop playsInline preload="metadata" poster="/products/emblem/front-edit.jpeg"><source src="/video/flag.mp4" type="video/mp4" /></video></div>
+      <HeroMedia />
       <div className={styles.heroContent}>
         <div className={styles.heroMeta}><span>INDEPENDENT CLOTHING / JOHANNESBURG</span><span>EDITION 001 — 2026</span></div>
         <div className={styles.heroTitle}><p>RESTRAINT IN EVERY DETAIL</p><h1 id="hero-heading">Made to<br /><span>be worn.</span></h1></div>
         <div className={styles.heroBottom}><p>Contemporary clothing shaped by movement, memory and everyday life.</p><Link href="/shop" className={styles.heroButton}>Explore the collection <span aria-hidden="true"><ArrowIcon direction="up-right" /></span></Link></div>
       </div>
       <a className={styles.scroll} href="#collection">SCROLL TO EXPLORE <span aria-hidden="true"><ArrowIcon direction="down" /></span></a>
+    </section>
+    <section className={styles.redlineDrop} aria-labelledby="redline-drop-heading">
+      <div className={styles.redlineTopline}>
+        <span className={styles.redlineEyebrow}>NEW ITEM ADDED / REDLINE SERIES 001</span>
+        <span>SUMMER COLOUR STUDY / JOHANNESBURG</span>
+      </div>
+      <div className={styles.redlineGrid}>
+        <Link href="/shop/redline-bumblebeee-blaze" className={styles.redlineVisual} aria-label="Discover Redline-Bumblebeee Blaze">
+          <Image src="/products/redline-bumblebeee-blaze/front.webp" alt="Bright yellow Redline-Bumblebeee Blaze racing graphic T-shirt, front view" fill sizes="(max-width: 760px) 100vw, 55vw" />
+          <span className={styles.redlineCorner}>01 / FIRST OF THE REDLINE SERIES</span>
+        </Link>
+        <div className={styles.redlineCopy}>
+          <span className={styles.redlineLabel}>NEW DROP / RACING GRAPHICS</span>
+          <h2 id="redline-drop-heading">Redline-<br /><em>Bumblebeee Blaze.</em></h2>
+          <p className={styles.redlinePrice}>R450</p>
+          <p className={styles.redlineDescription}>First of the Redline Series. Portrait racing graphics, a red border and a yellow colourway designed with summer in mind.</p>
+          <div className={styles.redlineSignature}><Image src="/Ship.jpg" width={42} height={58} alt="" /><span>THE HOUSE INSIGNIA / MARITIME REFERENCE</span></div>
+          <Link href="/shop/redline-bumblebeee-blaze" className={styles.redlineCTA}>Explore the new drop <span aria-hidden="true"><ArrowIcon direction="up-right" /></span></Link>
+        </div>
+      </div>
+      <div className={styles.redlineBottomline}><span>THE COLOUR INTERRUPTS THE ORDINARY</span><span>MAISON AMIRAL / REDLINE 001</span></div>
     </section>
     <EditionCarousel />
     <FieldArchive />

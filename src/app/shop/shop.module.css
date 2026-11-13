@@ -54,3 +54,7 @@
   .grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
   .visual { width: 100%; aspect-ratio: 4/5; }
 }
+
+/* First Redline drop: small glitch bars and a visible NEW badge. */
+.redlineCard .visual::before { content:"NEW / REDLINE"; position:absolute; z-index:2; top:10px; left:10px; background:#ffd600; color:#151515; font-size:9px; font-weight:700; letter-spacing:.09em; padding:8px 9px; }
+.redlineCard .visual::after { content:""; position:absolute; z-index:2; right:0; top:11%; width:43%; height:3px; background:repeating-linear-gradient(90deg,#ffdc00 0 22px,transparent 22px 27px); box-shadow:0 9px 0 -1px #f5d000; pointer-events:none; }

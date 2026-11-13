@@ -120,7 +120,7 @@ export function FieldArchive() {
       <div className={styles.header}>
         <div className={styles.heading}>
           <span className={styles.eyebrow}>03 / THE IMAGE ARCHIVE</span>
-          <h2 id="ma-field-heading">Beyond the <em>uniform.</em></h2>
+          <h2 id="ma-field-heading">The visual <em>archive.</em></h2>
         </div>
         <p className={styles.intro}>Frames from the Maison Amiral archive. Four perspectives, one language. The original subjects and illustrations, stripped of their surroundings.</p>
       </div>

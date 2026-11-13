@@ -37,6 +37,26 @@ const asset = (product: string, file: string) =>
 
 export const products: MaisonProduct[] = [
   {
+    slug: "redline-bumblebeee-blaze",
+    name: "Redline-Bumblebeee Blaze",
+    price: 450,
+    category: "apparel",
+    edition: "Redline Series / 001",
+    artMark: "REDLINE",
+    shortDescription: "First in the Redline Series: yellow racing graphics framed in red, made for summertime.",
+    description:
+      "REDLINE-BUMBLEBEEE BLAZE opens the Redline Series. Portrait-style racing graphics sit within a protruding red border. Every graphic is deliberately selected to work with the colours and boat-inspired signage. Not restricted to a season, but right at home in summer. Future Redline releases will explore more colourways suited to warmer days.",
+    tone: "#fbd400",
+    ink: "#a61f1a",
+    images: [
+      "/products/redline-bumblebeee-blaze/front.webp",
+      "/products/redline-bumblebeee-blaze/detail.webp",
+      "/products/redline-bumblebeee-blaze/editorial.webp",
+    ],
+    imageLabels: ["Front", "Graphic detail", "Sleeve and garment detail"],
+  },
+
+  {
     slug: "automobile-tee",
     name: "Automobile Tee",
     price: 450,
