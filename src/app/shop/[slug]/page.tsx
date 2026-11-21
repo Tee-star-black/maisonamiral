@@ -85,6 +85,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </div>
           <p className={styles.eyebrow}>{product.edition} / Johannesburg</p>
           <h1>{product.name}</h1>
+          {product.slug === "flagship-beanie-safety-headwear" && <p className={styles.eyebrow}>{product.shortDescription}</p>}
           <p className={styles.price}>{formatPrice(product.price)}</p>
           <p className={styles.description}>{product.description}</p>
 

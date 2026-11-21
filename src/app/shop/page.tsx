@@ -51,13 +51,14 @@ export default async function ShopPage() {
                 <div className={styles.info}>
                   <span className={styles.category}>{product.category === "accessory" ? "ACCESSORIES" : "CLOTHING"} / {product.edition}</span>
                   <h2>{product.name}</h2>
+                  {product.slug === "flagship-beanie-safety-headwear" && <span className={styles.flagshipCaption}>{product.shortDescription}</span>}
                 </div>
                 <span className={styles.price}>{formatPrice(product.price)}</span>
               </div>
             </Link>
           ))}
         </div>
-        <p className={styles.delivery}>Free delivery on clothing · R40 for orders containing the Boat Floating Wheel · Prices in ZAR</p>
+        <p className={styles.delivery}>Free delivery on all pieces except the Boat Floating Wheel · R40 for orders containing the Boat Floating Wheel · Prices in ZAR</p>
       </section>
       <SiteFooter />
     </main>
