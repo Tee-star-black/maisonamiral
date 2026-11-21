@@ -818,7 +818,7 @@ button, input, textarea, select { font: inherit; }
   .section-pad { padding: 64px 18px; }
 }
 
-/* Light-touch, site-wide pointer response. The burst is an inert overlay
+/* Light-touch, red-on-white site-wide pointer response. The burst is an inert overlay
    created only for real clicks on interactive elements. */
 .ma-click-burst {
   position:fixed;
@@ -827,7 +827,7 @@ button, input, textarea, select { font: inherit; }
   top:0;
   width:30px;
   height:30px;
-  border:2px solid #ffd600;
+  border:2px solid #b50022;
   background:transparent;
   pointer-events:none;
   transform:translate(-50%,-50%) scale(.28);
@@ -841,8 +841,8 @@ button, input, textarea, select { font: inherit; }
   left:-16px;
   width:14px;
   height:3px;
-  background:#ffd600;
-  box-shadow:20px 10px 0 #ffd600;
+  background:#b50022;
+  box-shadow:20px 10px 0 #b50022;
 }
 .ma-click-burst::after {
   top:14px;

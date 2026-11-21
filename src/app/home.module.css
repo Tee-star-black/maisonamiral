@@ -110,20 +110,20 @@
 .heroVisual::after { z-index:2; pointer-events:none; }
 /* New-drop graphics are restrained horizontal pixel interruptions, not text effects. */
 .redlineDrop { position:relative; isolation:isolate; background:#fff; color:#171717; padding:clamp(38px,5vw,76px) clamp(18px,4.1vw,76px) clamp(56px,7vw,104px); overflow:hidden; }
-.redlineDrop::before,.redlineDrop::after { content:""; pointer-events:none; position:absolute; background:repeating-linear-gradient(90deg,#ffcf00 0 46px,transparent 46px 55px,#f0c500 55px 65px,transparent 65px 92px); height:3px; transform:skewX(-15deg); opacity:.93; }
-.redlineDrop::before { top:90px; right:-5%; width:42%; box-shadow:0 8px 0 -1px #ffcf00,0 17px 0 -1px #ffdb25; }
-.redlineDrop::after { bottom:82px; left:-6%; width:38%; box-shadow:0 12px 0 -1px #ffdb25; }
+.redlineDrop::before,.redlineDrop::after { content:""; pointer-events:none; position:absolute; background:repeating-linear-gradient(90deg,#b50022 0 46px,transparent 46px 55px,#d9153b 55px 65px,transparent 65px 92px); height:3px; transform:skewX(-15deg); opacity:.93; }
+.redlineDrop::before { top:90px; right:-5%; width:42%; box-shadow:0 8px 0 -1px #b50022,0 17px 0 -1px #d9153b; }
+.redlineDrop::after { bottom:82px; left:-6%; width:38%; box-shadow:0 12px 0 -1px #d9153b; }
 .redlineTopline,.redlineBottomline { display:flex; justify-content:space-between; gap:18px; font-size:10px; line-height:1.4; letter-spacing:.11em; font-weight:600; }
 .redlineTopline { padding-bottom:18px; border-bottom:1px solid #dcdcdc; }
-.redlineEyebrow { background:#ffd600; color:#151515; padding:6px 9px; }
+.redlineEyebrow { background:#b50022; color:#fff; padding:6px 9px; }
 .redlineBottomline { padding-top:24px; border-top:1px solid #dcdcdc; color:#737373; }
 .redlineGrid { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:clamp(28px,5vw,90px); align-items:center; padding:32px 0 56px; }
 .redlineVisual { display:block; position:relative; background:#f7f7f7; aspect-ratio:4/5; min-height:320px; overflow:hidden; }
 .redlineVisual img { object-fit:contain; padding:clamp(10px,2vw,28px); transition:transform .5s ease; }
 .redlineVisual:hover img { transform:scale(1.025); }
-.redlineCorner { position:absolute; left:18px; bottom:18px; padding:9px 11px; background:#ffd600; font-size:9px; font-weight:700; letter-spacing:.11em; }
+.redlineCorner { position:absolute; left:18px; bottom:18px; padding:9px 11px; background:#b50022; color:#fff; font-size:9px; font-weight:700; letter-spacing:.11em; }
 .redlineCopy { position:relative; padding:40px 0; }
-.redlineCopy::before { content:""; display:block; width:min(260px,52%); height:5px; margin-bottom:45px; background:repeating-linear-gradient(90deg,#ffdc00 0 44px,transparent 44px 49px); }
+.redlineCopy::before { content:""; display:block; width:min(260px,52%); height:5px; margin-bottom:45px; background:repeating-linear-gradient(90deg,#b50022 0 44px,transparent 44px 49px); }
 .redlineLabel { font-size:10px; font-weight:700; letter-spacing:.12em; }
 .redlineCopy h2 { margin:24px 0; font:400 clamp(3.2rem,5.5vw,7.2rem)/.96 Georgia,"Times New Roman",serif; letter-spacing:-.065em; overflow-wrap:anywhere; }
 .redlineCopy h2 em { font-weight:400; }
@@ -144,14 +144,14 @@
 }
 @media(prefers-reduced-motion:reduce) { .redlineVisual img,.heroVisual video.heroVideo { transition:none; } }
 
-/* Editorial glitch accents extend the Redline drop without overwhelming imagery. */
+/* Bloody Red and white editorial glitch accents, without overwhelming imagery. */
 .heroTitle::before {
   content:"";
   display:block;
   width:clamp(110px,16vw,240px);
   height:3px;
   margin-bottom:23px;
-  background:repeating-linear-gradient(90deg,#ffdd00 0 31px,transparent 31px 39px,#ffdd00 39px 44px,transparent 44px 65px);
+  background:repeating-linear-gradient(90deg,#b50022 0 31px,transparent 31px 39px,#b50022 39px 44px,transparent 44px 65px);
 }
 .aboutText::before {
   content:"";
@@ -159,9 +159,9 @@
   width:clamp(100px,24%,200px);
   height:3px;
   margin-bottom:37px;
-  background:repeating-linear-gradient(90deg,#fbd000 0 34px,transparent 34px 41px,#fbd000 41px 46px,transparent 46px 63px);
+  background:repeating-linear-gradient(90deg,#b50022 0 34px,transparent 34px 41px,#b50022 41px 46px,transparent 46px 63px);
 }
-.aboutText>a:hover { border-bottom-color:#d4ab00; }
+.aboutText>a:hover { border-bottom-color:#b50022; }
 @media(max-width:760px) {
   .heroTitle::before { margin-bottom:16px; }
   .aboutText::before { margin-bottom:24px; }
@@ -170,16 +170,19 @@
   .heroVisual video.heroVideo { transition:none; }
 }
 
-/* Flagship Beanie is the latest release. Keep the original yellow signal, not a new visual language. */
+/* Flagship Beanie is the latest release. Match its Bloody Red and white identity. */
 .flagshipDrop .redlineVisual img { object-fit:cover; object-position:center; padding:0; }
 .flagshipDrop .redlineVisual { background:#eae8e1; }
+.flagshipDrop .redlineCTA { background:#b50022; color:#fff; }
+.flagshipDrop .redlineCTA:hover { background:#8d001b; }
+.flagshipDrop .redlinePrice,.flagshipDrop .redlineLabel { color:#b50022; }
 .flagshipDrop .redlineCopy h2 { overflow-wrap:normal; }
 .flagshipDrop .redlineSignature img { width:42px; height:58px; object-fit:cover; background:#f4f4f4; }
 .previousDrop { border-top:1px solid #e7e7e7; }
 .previousDrop .redlineEyebrow { background:#efeee9; color:#545454; }
-.previousDrop .redlineCorner { background:#efeee9; }
+.previousDrop .redlineCorner { background:#efeee9; color:#151515; }
 .previousDrop .redlineCopy::before { opacity:.45; }
-.previousDrop .redlineDrop::before { opacity:.45; }
+.previousDrop::before,.previousDrop::after { opacity:.4; }
 @media(max-width:760px) {
   .flagshipDrop .redlineVisual { aspect-ratio:4/5; }
   .flagshipDrop .redlineCopy h2 { overflow-wrap:anywhere; }

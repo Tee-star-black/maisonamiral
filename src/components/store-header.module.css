@@ -62,7 +62,7 @@
 
 @media(max-width:900px){.mobileMenu nav{max-height:calc(100dvh - 100px);overflow-y:auto;overscroll-behavior:contain}}
 
-/* Site-wide Redline signature: narrow, segmented yellow signal line. */
+/* Site-wide signature: narrow, segmented Bloody Red and white line. */
 .header::after {
   content:"";
   position:absolute;
@@ -72,7 +72,7 @@
   width:min(300px,37vw);
   height:3px;
   pointer-events:none;
-  background:repeating-linear-gradient(90deg,#ffd500 0 31px,transparent 31px 40px,#ffdf2d 40px 46px,transparent 46px 75px);
+  background:repeating-linear-gradient(90deg,#b50022 0 31px,transparent 31px 40px,#d9153b 40px 46px,transparent 46px 75px);
 }
-.desktopNav a:hover,.cart:hover { border-bottom-color:#efc600; color:#151515; }
+.desktopNav a:hover,.cart:hover { border-bottom-color:#b50022; color:#151515; }
 @media(max-width:680px) { .header::after { left:16px; width:min(180px,42vw); height:2px; } }
