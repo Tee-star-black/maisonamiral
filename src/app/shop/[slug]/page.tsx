@@ -85,14 +85,21 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </div>
           <p className={styles.eyebrow}>{product.edition} / Johannesburg</p>
           <h1>{product.name}</h1>
+          {product.slug === "flagship-beanie-safety-headwear" && <p className={styles.eyebrow}>{product.shortDescription}</p>}
           <p className={styles.price}>{formatPrice(product.price)}</p>
           <p className={styles.description}>{product.description}</p>
 
-          {product.category === "accessory" ? (
+          {product.slug === "flagship-beanie-safety-headwear" ? (
+            <>
+              <div className={styles.detailBlock}><span>Type</span><strong>Ribbed knit beanie</strong></div>
+              <div className={styles.detailBlock}><span>Fit</span><strong>One size / Sideways styling</strong></div>
+            </>
+          ) : product.category === "accessory" ? (
             <><div className={styles.detailBlock}><span>Type</span><strong>Floating lapel accessory</strong></div><div className={styles.detailBlock}><span>Dimensions</span><strong>29 mm × 30 mm</strong></div></>
           ) : (
             <><div className={styles.detailBlock}><span>Cut</span><strong>Relaxed unisex tee</strong></div><div className={styles.detailBlock}><span>Sizes</span><strong>S / M / L / XL</strong></div></>
           )}
+          {product.colour && <div className={styles.detailBlock}><span>Colour</span><strong>{product.colour}</strong></div>}
           <div className={styles.detailBlock}><span>Origin</span><strong>Johannesburg, South Africa</strong></div>
 
           <ProductBuyPanel slug={product.slug} />

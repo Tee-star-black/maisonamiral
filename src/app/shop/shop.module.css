@@ -101,3 +101,6 @@
   .card .visual { transition:none; }
   .card:active .image { transform:none; }
 }
+
+/* Flagship headwear caption, without changing the existing catalogue card grid. */
+.flagshipCaption { display:block; margin-top:4px; font-size:10px; color:#666; line-height:1.4; }

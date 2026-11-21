@@ -23,6 +23,7 @@ export type MaisonProduct = {
   artMark: string;
   shortDescription: string;
   description: string;
+  colour?: string;
   tone: string;
   ink: string;
   /** Real garment photography, ordered front, back, then editorial/detail. */
@@ -56,6 +57,26 @@ export const products: MaisonProduct[] = [
     imageLabels: ["Front", "Graphic detail", "Sleeve and garment detail"],
   },
 
+  {
+    slug: "flagship-beanie-safety-headwear",
+    name: "Flagship Beanie",
+    price: 200,
+    category: "accessory",
+    edition: "Safety HR / Flagship",
+    artMark: "SAFETY HR",
+    shortDescription: "Flagship beanie- safety hr",
+    description:
+      "Flagship beanie safety headwear designed to blend the lines between headwear and skull cap, making it suitable for all seasons. Ribbed knit beanie crafted to be worn sideways.",
+    colour: "Bloody Red",
+    tone: "#b50022",
+    ink: "#f9f5f0",
+    images: [
+      "/products/flagship-beanie-safety-headwear/on-model.webp",
+      "/products/flagship-beanie-safety-headwear/detail.webp",
+      "/products/flagship-beanie-safety-headwear/field.webp",
+    ],
+    imageLabels: ["On model", "Ribbed knit detail", "Flagship field editorial"],
+  },
   {
     slug: "automobile-tee",
     name: "Automobile Tee",
