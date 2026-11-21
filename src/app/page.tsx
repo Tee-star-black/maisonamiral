@@ -32,9 +32,30 @@ export default function Home() {
       </div>
       <a className={styles.scroll} href="#collection">SCROLL TO EXPLORE <span aria-hidden="true"><ArrowIcon direction="down" /></span></a>
     </section>
-    <section className={styles.redlineDrop} aria-labelledby="redline-drop-heading">
+    <section className={styles.redlineDrop + " " + styles.flagshipDrop} aria-labelledby="flagship-drop-heading">
       <div className={styles.redlineTopline}>
-        <span className={styles.redlineEyebrow}>NEW ITEM ADDED / REDLINE SERIES 001</span>
+        <span className={styles.redlineEyebrow}>NEW ITEM ADDED / FLAGSHIP BEANIE</span>
+        <span>SAFETY HR / BLOODY RED</span>
+      </div>
+      <div className={styles.redlineGrid}>
+        <Link href="/shop/flagship-beanie-safety-headwear" className={styles.redlineVisual} aria-label="Discover the Bloody Red Flagship Beanie">
+          <Image src="/products/flagship-beanie-safety-headwear/on-model.webp" alt="Flagship Beanie in Bloody Red, styled sideways" fill sizes="(max-width: 760px) 100vw, 55vw" />
+          <span className={styles.redlineCorner}>NEW / BLOODY RED</span>
+        </Link>
+        <div className={styles.redlineCopy}>
+          <span className={styles.redlineLabel}>NEW DROP / SAFETY HR HEADWEAR</span>
+          <h2 id="flagship-drop-heading">Flagship<br /><em>Beanie.</em></h2>
+          <p className={styles.redlinePrice}>R200</p>
+          <p className={styles.redlineDescription}>Ribbed knit headwear designed to blur the line between a beanie and a skull cap. Made for every season and crafted to be worn sideways.</p>
+          <div className={styles.redlineSignature}><Image src="/products/flagship-beanie-safety-headwear/detail.webp" width={42} height={58} alt="Flagship Beanie ribbed knit detail" /><span>BLOODY RED / ONE SIZE / ALL SEASONS</span></div>
+          <Link href="/shop/flagship-beanie-safety-headwear" className={styles.redlineCTA}>Explore the new drop <span aria-hidden="true"><ArrowIcon direction="up-right" /></span></Link>
+        </div>
+      </div>
+      <div className={styles.redlineBottomline}><span>THE COLOUR INTERRUPTS THE ORDINARY</span><span>MAISON AMIRAL / FLAGSHIP 001</span></div>
+    </section>
+    <section className={styles.redlineDrop + " " + styles.previousDrop} aria-labelledby="redline-drop-heading">
+      <div className={styles.redlineTopline}>
+        <span className={styles.redlineEyebrow}>PREVIOUS DROP / REDLINE SERIES 001</span>
         <span>SUMMER COLOUR STUDY / JOHANNESBURG</span>
       </div>
       <div className={styles.redlineGrid}>
@@ -43,12 +64,12 @@ export default function Home() {
           <span className={styles.redlineCorner}>01 / FIRST OF THE REDLINE SERIES</span>
         </Link>
         <div className={styles.redlineCopy}>
-          <span className={styles.redlineLabel}>NEW DROP / RACING GRAPHICS</span>
+          <span className={styles.redlineLabel}>REDLINE SERIES / RACING GRAPHICS</span>
           <h2 id="redline-drop-heading">Redline-<br /><em>Bumblebeee Blaze.</em></h2>
           <p className={styles.redlinePrice}>R450</p>
           <p className={styles.redlineDescription}>First of the Redline Series. Portrait racing graphics, a red border and a yellow colourway designed with summer in mind.</p>
           <div className={styles.redlineSignature}><Image src="/Ship.jpg" width={42} height={58} alt="" /><span>THE HOUSE INSIGNIA / MARITIME REFERENCE</span></div>
-          <Link href="/shop/redline-bumblebeee-blaze" className={styles.redlineCTA}>Explore the new drop <span aria-hidden="true"><ArrowIcon direction="up-right" /></span></Link>
+          <Link href="/shop/redline-bumblebeee-blaze" className={styles.redlineCTA}>Explore Redline <span aria-hidden="true"><ArrowIcon direction="up-right" /></span></Link>
         </div>
       </div>
       <div className={styles.redlineBottomline}><span>THE COLOUR INTERRUPTS THE ORDINARY</span><span>MAISON AMIRAL / REDLINE 001</span></div>

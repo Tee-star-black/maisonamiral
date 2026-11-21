@@ -104,3 +104,36 @@
 
 /* Flagship headwear caption, without changing the existing catalogue card grid. */
 .flagshipCaption { display:block; margin-top:4px; font-size:10px; color:#666; line-height:1.4; }
+
+/* Flagship Beanie is the current drop; Redline remains a previous collection piece. */
+.flagshipCard .visual { border-color:#edcf24; }
+.flagshipCard .visual::after {
+  content:"";
+  position:absolute;
+  z-index:2;
+  top:14%;
+  right:0;
+  width:43%;
+  height:3px;
+  background:repeating-linear-gradient(90deg,#ffdc00 0 22px,transparent 22px 27px);
+  box-shadow:0 9px 0 -1px #f5d000;
+  pointer-events:none;
+}
+.flagshipNewBadge {
+  position:absolute;
+  z-index:3;
+  top:10px;
+  left:10px;
+  padding:8px 9px;
+  background:#ffd600;
+  color:#151515;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.09em;
+  line-height:1.2;
+}
+.redlineCard .visual::before { content:"REDLINE / 001"; background:#efeee9; }
+.redlineCard .visual::after { opacity:.35; }
+@media(max-width:520px) {
+  .flagshipNewBadge { top:7px; left:7px; font-size:8px; padding:6px 7px; letter-spacing:.04em; }
+}
