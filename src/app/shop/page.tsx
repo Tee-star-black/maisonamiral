@@ -36,7 +36,7 @@ export default async function ShopPage() {
         </div>
         <div className={styles.grid}>
           {products.map((product) => (
-            <Link href={`/shop/${product.slug}`} key={product.slug} className={`${styles.card} ${product.slug === "redline-bumblebeee-blaze" ? styles.redlineCard : ""}`}>
+            <Link href={`/shop/${product.slug}`} key={product.slug} className={`${styles.card} ${product.slug === "flagship-beanie-safety-headwear" ? styles.flagshipCard : product.slug === "redline-bumblebeee-blaze" ? styles.redlineCard : ""}`}>
               <div className={styles.visual}>
                 <Image
                   src={product.images[0]}
@@ -45,6 +45,7 @@ export default async function ShopPage() {
                   sizes="(max-width: 520px) 50vw, (max-width: 960px) 33vw, 25vw"
                   className={styles.image}
                 />
+                {product.slug === "flagship-beanie-safety-headwear" && <span className={styles.flagshipNewBadge}>NEW ITEM ADDED</span>}
                 <span className={styles.quickView}>VIEW PRODUCT <ArrowIcon direction="up-right" /></span>
               </div>
               <div className={styles.meta}>
