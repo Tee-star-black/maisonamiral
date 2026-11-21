@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 
 /**
- * A single delegated handler creates a brief yellow editorial spark on clicks.
+ * A single delegated handler creates a brief Bloody Red editorial spark on clicks.
  * This does not delay navigation, block form controls, or change the scroll.
  */
 export function ClickFeedback() {
