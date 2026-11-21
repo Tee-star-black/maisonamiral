@@ -23,7 +23,7 @@ test("Flagship Beanie delivery is free unless an order also contains the Boat Fl
   assert.equal(getDeliveryFee([{ slug, quantity: 1 }, { slug: "boat-floating-wheel", quantity: 1 }]), 4000);
 });
 
-test("Flagship Beanie leads the catalogue and the yellow NEW ITEM ADDED campaign", () => {
+test("Flagship Beanie leads the catalogue and the Bloody Red and white NEW ITEM ADDED campaign", () => {
   assert.equal(products[0].slug, slug, "The newest item should appear first");
   const home = readFileSync(new URL("../src/app/page.tsx", import.meta.url), "utf8");
   const shop = readFileSync(new URL("../src/app/shop/page.tsx", import.meta.url), "utf8");
@@ -35,6 +35,29 @@ test("Flagship Beanie leads the catalogue and the yellow NEW ITEM ADDED campaign
   assert.ok(home.includes("PREVIOUS DROP / REDLINE SERIES 001"));
   assert.ok(shop.includes("NEW ITEM ADDED"));
   assert.ok(shopStyles.includes(".flagshipNewBadge"));
-  assert.ok(shopStyles.includes("#ffd600"));
+  assert.ok(shopStyles.includes("background:#b50022;"));
+  assert.match(shopStyles, /\.flagshipNewBadge\s*\{[^}]*background:#b50022;[^}]*color:#fff;/);
+  assert.ok(homeStyles.includes(".redlineEyebrow { background:#b50022; color:#fff;"));
+  assert.ok(homeStyles.includes(".flagshipDrop .redlineCTA { background:#b50022; color:#fff; }"));
   assert.ok(homeStyles.includes(".flagshipDrop"));
+});
+
+test("Campaign details use Bloody Red and white, with no legacy yellow accent tokens", () => {
+  const stylePaths = [
+    "src/app/globals.css",
+    "src/app/home.module.css",
+    "src/app/shop/shop.module.css",
+    "src/app/shop/[slug]/page.module.css",
+    "src/components/edition-carousel.module.css",
+    "src/components/house-philosophy.module.css",
+    "src/components/store-header.module.css",
+    "src/components/site-footer.module.css",
+    "src/components/product-buy-panel.module.css",
+  ];
+  const oldYellow = /#(?:ffd600|ffd500|ffdc00|ffcf00|f0c500|ffdb25|ffdd00|fbd000|fbd200|f5d000|ffdf2d|ffcd00|ffdb38|e8bd00|e8c400|e2c200|e7c300|efc600|997600|d4ab00|e6bd00|8a7500|edcf24)\b/i;
+  for (const path of stylePaths) {
+    const css = readFileSync(new URL("../" + path, import.meta.url), "utf8");
+    assert.ok(css.includes("#b50022"), "Missing Bloody Red accent in " + path);
+    assert.doesNotMatch(css, oldYellow, "Legacy yellow accent remains in " + path);
+  }
 });
