@@ -170,20 +170,19 @@
   .heroVisual video.heroVideo { transition:none; }
 }
 
-/* Flagship Beanie is the latest release. Match its Bloody Red and white identity. */
-.flagshipDrop .redlineVisual img { object-fit:cover; object-position:center; padding:0; }
-.flagshipDrop .redlineVisual { background:#eae8e1; }
-.flagshipDrop .redlineCTA { background:#b50022; color:#fff; }
-.flagshipDrop .redlineCTA:hover { background:#8d001b; }
-.flagshipDrop .redlinePrice,.flagshipDrop .redlineLabel { color:#b50022; }
-.flagshipDrop .redlineCopy h2 { overflow-wrap:normal; }
-.flagshipDrop .redlineSignature img { width:42px; height:58px; object-fit:cover; background:#f4f4f4; }
+/* Keep the full tee visible in the latest drop feature. */
+.latestDrop .redlineVisual { background:#fff; border:1px solid #efefef; }
+.latestDrop .redlineCTA { background:#b50022; color:#fff; }
+.latestDrop .redlineCTA:hover { background:#8d001b; }
+.latestDrop .redlinePrice { color:#b50022; }
+.latestDrop .redlineCopy h2 { overflow-wrap:normal; }
+.latestDrop .redlineSignature img { width:42px; height:58px; object-fit:cover; background:#f4f4f4; }
 .previousDrop { border-top:1px solid #e7e7e7; }
 .previousDrop .redlineEyebrow { background:#efeee9; color:#545454; }
 .previousDrop .redlineCorner { background:#efeee9; color:#151515; }
 .previousDrop .redlineCopy::before { opacity:.45; }
 .previousDrop::before,.previousDrop::after { opacity:.4; }
 @media(max-width:760px) {
-  .flagshipDrop .redlineVisual { aspect-ratio:4/5; }
-  .flagshipDrop .redlineCopy h2 { overflow-wrap:anywhere; }
+  .latestDrop .redlineVisual { aspect-ratio:4/5; }
+  .latestDrop .redlineCopy h2 { overflow-wrap:anywhere; }
 }

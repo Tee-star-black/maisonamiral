@@ -105,9 +105,9 @@
 /* Flagship headwear caption, without changing the existing catalogue card grid. */
 .flagshipCaption { display:block; margin-top:4px; font-size:10px; color:#666; line-height:1.4; }
 
-/* Flagship Beanie is the current Bloody Red drop; Redline remains in the collection. */
-.flagshipCard .visual { border-color:#b50022; }
-.flagshipCard .visual::after {
+/* Latest drop treatment. */
+.latestDropCard .visual { border-color:#b50022; }
+.latestDropCard .visual::after {
   content:"";
   position:absolute;
   z-index:2;
@@ -119,7 +119,7 @@
   box-shadow:0 9px 0 -1px #d9153b;
   pointer-events:none;
 }
-.flagshipNewBadge {
+.latestDropBadge {
   position:absolute;
   z-index:3;
   top:10px;
@@ -135,5 +135,5 @@
 .redlineCard .visual::before { content:"REDLINE / 001"; background:#efeee9; }
 .redlineCard .visual::after { opacity:.35; }
 @media(max-width:520px) {
-  .flagshipNewBadge { top:7px; left:7px; font-size:8px; padding:6px 7px; letter-spacing:.04em; }
+  .latestDropBadge { top:7px; left:7px; font-size:8px; padding:6px 7px; letter-spacing:.04em; }
 }
