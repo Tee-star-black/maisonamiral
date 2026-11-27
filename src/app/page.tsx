@@ -7,6 +7,7 @@ import { EditionCarousel } from "@/components/edition-carousel";
 import { MoreToCome } from "@/components/more-to-come";
 import { HousePhilosophy } from "@/components/house-philosophy";
 import { HeroMedia } from "@/components/hero-media";
+import { formatPrice, latestDrop } from "@/data/products";
 import styles from "./home.module.css";
 
 export const metadata: Metadata = {
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
+  const latestDropUrl = `/shop/${latestDrop.slug}`;
   const schema = {
     "@context": "https://schema.org", "@graph": [
       { "@type": "Organization", "@id": "https://www.maisonamiral.co.za/#organization", name: "Maison Amiral", url: "https://www.maisonamiral.co.za/", logo: "https://www.maisonamiral.co.za/icon.svg", email: "support@maisonamiral.co.za", address: { "@type": "PostalAddress", addressLocality: "Johannesburg", addressCountry: "ZA" } },
@@ -32,26 +34,23 @@ export default function Home() {
       </div>
       <a className={styles.scroll} href="#collection">SCROLL TO EXPLORE <span aria-hidden="true"><ArrowIcon direction="down" /></span></a>
     </section>
-    <section className={styles.redlineDrop + " " + styles.flagshipDrop} aria-labelledby="flagship-drop-heading">
+    <section className={styles.redlineDrop + " " + styles.latestDrop} aria-labelledby="latest-drop-heading">
       <div className={styles.redlineTopline}>
-        <span className={styles.redlineEyebrow}>NEW ITEM ADDED / FLAGSHIP BEANIE</span>
-        <span>SAFETY HR / BLOODY RED</span>
+        <span className={styles.redlineEyebrow}>NEW ITEM ADDED</span>
+        <span>{latestDrop.edition}</span>
       </div>
       <div className={styles.redlineGrid}>
-        <Link href="/shop/flagship-beanie-safety-headwear" className={styles.redlineVisual} aria-label="Discover the Bloody Red Flagship Beanie">
-          <Image src="/products/flagship-beanie-safety-headwear/on-model.webp" alt="Flagship Beanie in Bloody Red, styled sideways" fill sizes="(max-width: 760px) 100vw, 55vw" />
-          <span className={styles.redlineCorner}>NEW / BLOODY RED</span>
+        <Link href={latestDropUrl} className={styles.redlineVisual} aria-label={`Discover ${latestDrop.name}`}>
+          <Image src={latestDrop.images[0]} alt="White Rally In T-shirt, front view" fill sizes="(max-width: 760px) 100vw, 55vw" />
         </Link>
         <div className={styles.redlineCopy}>
-          <span className={styles.redlineLabel}>NEW DROP / SAFETY HR HEADWEAR</span>
-          <h2 id="flagship-drop-heading">Flagship<br /><em>Beanie.</em></h2>
-          <p className={styles.redlinePrice}>R200</p>
-          <p className={styles.redlineDescription}>Ribbed knit headwear designed to blur the line between a beanie and a skull cap. Made for every season and crafted to be worn sideways.</p>
-          <div className={styles.redlineSignature}><Image src="/products/flagship-beanie-safety-headwear/detail.webp" width={42} height={58} alt="Flagship Beanie ribbed knit detail" /><span>BLOODY RED / ONE SIZE / ALL SEASONS</span></div>
-          <Link href="/shop/flagship-beanie-safety-headwear" className={styles.redlineCTA}>Explore the new drop <span aria-hidden="true"><ArrowIcon direction="up-right" /></span></Link>
+          <h2 id="latest-drop-heading">Redline<br /><em>Rally In.</em></h2>
+          <p className={styles.redlinePrice}>{formatPrice(latestDrop.price)}</p>
+          <p className={styles.redlineDescription}>{latestDrop.shortDescription}</p>
+          <div className={styles.redlineSignature}><Image src={latestDrop.images[1]} width={42} height={56} alt="Rally In chest graphic close-up" /><span>THE RALLY IN GRAPHIC</span></div>
+          <Link href={latestDropUrl} className={styles.redlineCTA}>Shop Rally In <span aria-hidden="true"><ArrowIcon direction="up-right" /></span></Link>
         </div>
       </div>
-      <div className={styles.redlineBottomline}><span>THE COLOUR INTERRUPTS THE ORDINARY</span><span>MAISON AMIRAL / FLAGSHIP 001</span></div>
     </section>
     <section className={styles.redlineDrop + " " + styles.previousDrop} aria-labelledby="redline-drop-heading">
       <div className={styles.redlineTopline}>

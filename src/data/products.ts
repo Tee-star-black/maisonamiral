@@ -36,7 +36,28 @@ export type MaisonProduct = {
 const asset = (product: string, file: string) =>
   `/products/edition-001/${product}/${file}`;
 
+export const latestDrop: MaisonProduct = {
+  slug: "redline-rally-in",
+  name: "Redline – Rally In",
+  price: 450,
+  category: "apparel",
+  edition: "Redline Series / 002",
+  artMark: "REDLINE",
+  shortDescription: "An essential white tee with a minimal Toyota Celica T180 rally graphic and Maison Amiral’s boat motifs.",
+  description:
+    "Rally In pairs the Toyota Celica T180 with Maison Amiral’s signature boat motifs. A compact, red-framed chest graphic keeps this essential white tee understated.",
+  colour: "White",
+  tone: "#ffffff",
+  ink: "#b50022",
+  images: [
+    "/products/redline-rally-in/front.webp",
+    "/products/redline-rally-in/detail.webp",
+  ],
+  imageLabels: ["Front", "Graphic detail"],
+};
+
 export const products: MaisonProduct[] = [
+  latestDrop,
   {
     slug: "flagship-beanie-safety-headwear",
     name: "Flagship Beanie",
@@ -56,25 +77,6 @@ export const products: MaisonProduct[] = [
       "/products/flagship-beanie-safety-headwear/field.webp",
     ],
     imageLabels: ["On model", "Ribbed knit detail", "Flagship field editorial"],
-  },
-  {
-    slug: "redline-rally-in",
-    name: "Redline – Rally In",
-    price: 450,
-    category: "apparel",
-    edition: "Redline Series / 002",
-    artMark: "REDLINE",
-    shortDescription: "An essential white tee with a minimal Toyota Celica T180 rally graphic and Maison Amiral’s boat motifs.",
-    description:
-      "Rally In pairs the Toyota Celica T180 with Maison Amiral’s signature boat motifs. A compact, red-framed chest graphic keeps this essential white tee understated.",
-    colour: "White",
-    tone: "#ffffff",
-    ink: "#b50022",
-    images: [
-      "/products/redline-rally-in/front.webp",
-      "/products/redline-rally-in/detail.webp",
-    ],
-    imageLabels: ["Front", "Graphic detail"],
   },
   {
     slug: "redline-bumblebeee-blaze",
